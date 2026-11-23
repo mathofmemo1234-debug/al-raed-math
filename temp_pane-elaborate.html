@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>السبورة التفاعلية الشاملة: إثبات تطابق المثلثات (SSS, SAS)</title>
+    <!-- Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { cairo: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .board-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s ease;
+        }
+        .board-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08);
+        }
+        .tool-draggable {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+            z-index: 60;
+            touch-action: none;
+        }
+        .tool-draggable:active {
+            cursor: grabbing;
+        }
+        .nav-btn.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+        }
+        .grid-pattern {
+            background-image: linear-gradient(#f1f5f9 1.5px, transparent 1.5px), linear-gradient(90deg, #f1f5f9 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-600 selection:text-white min-h-screen flex flex-col">
+
+    <!-- Sticky Top Navigation & Smartboard Bar -->
+    <header class="bg-white/95 backdrop-blur border-b border-slate-200 sticky top-0 z-50 px-4 sm:px-6 py-3 shadow-xs">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Branding -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-700 flex items-center justify-center text-white shadow-md shadow-blue-500/25 text-2xl font-black">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-black">رياضيات 1-2 • مسارات</span>
+                        <span class="text-xs text-slate-500 font-bold">الدرس (3-4): ص 170 – 177</span>
+                    </div>
+                    <h1 class="text-base sm:text-xl font-black text-slate-900 leading-tight">السبورة التفاعلية الذكية: إثبات تطابق المثلثات (SSS, SAS)</h1>
+                </div>
+            </div>
+
+            <!-- Virtual Floating Tools Controls -->
+            <div class="flex items-center gap-2">
+                <!-- Protractor Button -->
+                <button onclick="toggleTool('v-protractor')" class="px-3 py-2 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 text-xs font-black text-amber-900 shadow-xs transition flex items-center gap-1.5" title="إظهار/إخفاء المنقلة">
+                    <i class="fa-solid fa-compass-drafting text-amber-600 text-sm"></i>
+                    <span class="hidden sm:inline">المنقلة 360°</span>
+                </button>
+
+                <!-- Ruler Button -->
+                <button onclick="toggleTool('v-ruler')" class="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-xs font-black text-blue-900 shadow-xs transition flex items-center gap-1.5" title="إظهار/إخفاء المسطرة">
+                    <i class="fa-solid fa-ruler-combined text-blue-600 text-sm"></i>
+                    <span class="hidden sm:inline">المسطرة الرقمية</span>
+                </button>
+
+                <!-- Timer -->
+                <div class="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                    <i class="fa-regular fa-clock text-blue-600"></i>
+                    <span id="board-timer" class="font-mono text-xs sm:text-sm font-black text-slate-800">00:00</span>
+                    <button onclick="toggleTimer()" id="timer-btn" class="text-xs bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button onclick="resetTimer()" class="text-xs bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded text-slate-700">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+                <!-- Fullscreen -->
+                <button onclick="toggleFullScreen()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl text-xs font-bold shadow-xs transition" title="ملء الشاشة">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 6Es Navigation Tab Ribbon -->
+        <div class="max-w-7xl mx-auto mt-3 overflow-x-auto pb-1">
+            <div class="flex items-center gap-2 min-w-max bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-xs sm:text-sm">
+                <button onclick="switchTab('pane-engage')" id="btn-pane-engage" class="nav-btn px-3.5 py-1.5 rounded-xl font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>⚡ 1. لغز المربع والمثلث والسبورة A (Engage)</span>
+                </button>
+                <button onclick="switchTab('pane-explore')" id="btn-pane-explore" class="nav-btn px-3.5 py-1.5 rounded-xl font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>🔬 2. مختبر SSS و SAS وفخ SSA (Explore)</span>
+                </button>
+                <button onclick="switchTab('pane-explain')" id="btn-pane-explain" class="nav-btn px-3.5 py-1.5 rounded-xl font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>📐 3. براهين الكتاب ورسوماتها (Explain)</span>
+                </button>
+                <button onclick="switchTab('pane-engineer')" id="btn-pane-engineer" class="nav-btn px-3.5 py-1.5 rounded-xl font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>🏗️ 4. السقالات وجسر الرياض (Engineer)</span>
+                </button>
+                <button onclick="switchTab('pane-elaborate')" id="btn-pane-elaborate" class="nav-btn active px-3.5 py-1.5 rounded-xl font-black transition flex items-center gap-1.5">
+                    <span>⚔️ 5. شبكة الإحداثيات ومناظرة أحمد وخالد (Elaborate)</span>
+                </button>
+                <button onclick="switchTab('pane-evaluate')" id="btn-pane-evaluate" class="nav-btn px-3.5 py-1.5 rounded-xl font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>🏆 6. تذكرة الخروج وشجرة القرار (Evaluate)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Draggable Virtual Tools -->
+
+    <!-- Virtual Protractor (منقلة رقمية نصف دائرية شفافة قابلة للسحب والتدوير التام) -->
+    <div id="v-protractor" class="tool-draggable hidden" style="top: 140px; left: 60px;">
+        <div class="relative bg-amber-50/95 backdrop-blur border-2 border-amber-500 rounded-b-full p-2 shadow-2xl">
+            <button onclick="toggleTool('v-protractor')" class="absolute -top-3 -right-3 w-6 h-6 bg-rose-600 text-white rounded-full flex items-center justify-center text-xs shadow-md z-50">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center justify-between text-[11px] font-black text-amber-900 px-3 pb-1 border-b border-amber-300">
+                <span>المنقلة الشفافة</span>
+                <button onclick="rotateProtractor()" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-0.5 rounded text-[10px]">
+                    تدوير: <span id="prot-deg">0°</span>
+                </button>
+            </div>
+            <svg id="prot-svg" class="w-72 h-36 transition-transform" viewBox="0 0 320 160" fill="none">
+                <path d="M 10 150 A 150 150 0 0 1 310 150 Z" fill="rgba(254, 243, 199, 0.7)" stroke="#d97706" stroke-width="2.5"/>
+                <circle cx="160" cy="150" r="5" fill="#b45309"/>
+                <line x1="160" y1="135" x2="160" y2="150" stroke="#b45309" stroke-width="2"/>
+                <line x1="10" y1="150" x2="310" y2="150" stroke="#b45309" stroke-width="2"/>
+                <text x="160" y="25" font-size="12" font-weight="900" fill="#92400e" text-anchor="middle">90°</text>
+                <text x="55" y="125" font-size="11" font-weight="bold" fill="#92400e">30°</text>
+                <text x="85" y="70" font-size="11" font-weight="bold" fill="#92400e">60°</text>
+                <text x="235" y="70" font-size="11" font-weight="bold" fill="#92400e">120°</text>
+                <text x="265" y="125" font-size="11" font-weight="bold" fill="#92400e">150°</text>
+                <text x="25" y="145" font-size="11" font-weight="bold" fill="#92400e">0°</text>
+                <text x="295" y="145" font-size="11" font-weight="bold" fill="#92400e">180°</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Virtual Ruler (مسطرة رقمية قابلة للسحب) -->
+    <div id="v-ruler" class="tool-draggable hidden" style="top: 250px; left: 100px;">
+        <div class="relative bg-blue-50/95 backdrop-blur border-2 border-blue-400 rounded-xl p-2 shadow-2xl w-80">
+            <button onclick="toggleTool('v-ruler')" class="absolute -top-3 -right-3 w-6 h-6 bg-rose-600 text-white rounded-full flex items-center justify-center text-xs shadow-md z-50">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex justify-between items-center text-[10px] font-mono text-blue-900 border-b border-blue-300 pb-1">
+                <span class="font-sans font-bold">مسطرة القياس السنتيمترية الرقمية</span>
+                <span class="text-blue-700 font-bold">10 cm</span>
+            </div>
+            <div class="flex justify-between items-start h-5 pt-1 font-mono text-[9px] text-blue-800">
+                <span class="border-r border-blue-700 h-4 pl-0.5">0</span>
+                <span class="border-r border-blue-400 h-2"></span>
+                <span class="border-r border-blue-700 h-4 pl-0.5">2</span>
+                <span class="border-r border-blue-400 h-2"></span>
+                <span class="border-r border-blue-700 h-4 pl-0.5">4</span>
+                <span class="border-r border-blue-400 h-2"></span>
+                <span class="border-r border-blue-700 h-4 pl-0.5">6</span>
+                <span class="border-r border-blue-400 h-2"></span>
+                <span class="border-r border-blue-700 h-4 pl-0.5">8</span>
+                <span class="border-r border-blue-400 h-2"></span>
+                <span class="border-r border-blue-700 h-4 pl-0.5">10 cm</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Active Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+        <!-- ============================================================== -->
+        <!-- المحطة 1: ENGAGE - محاكاة تشوه المربع مقابل صلابة المثلث والسبورة A -->
+        <!-- ============================================================== -->
+        <section id="pane-engage" class="stage-pane hidden space-y-6">
+            <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-3xl p-6 text-white shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 1: التحدي الاستهلالي الديناميكي</span>
+                        <h2 class="text-xl sm:text-3xl font-black">صلابة المثلث الفولاذية: تشوه المربع مقابل ثبات السبورة A</h2>
+                    </div>
+                    <span class="text-xs bg-black/20 backdrop-blur px-3 py-1.5 rounded-xl font-bold">كتاب الطالب ص 170</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- 1. Square Simulation -->
+                <div class="board-card p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-black">
+                                <i class="fa-solid fa-shapes ml-1"></i>المضلع الرباعي (4 أضلاع ثابتة)
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">طول كل ضلع = 120 px</span>
+                        </div>
+                        <h3 class="text-base font-black text-slate-800">المربع المرن: تتغير زواياه وتتشوه مساحته مع ثبات أضلاعه!</h3>
+                        <p class="text-xs text-slate-500 mt-1">حرك الشريط الأفقي لدفع قمة المربع جانبياً وشاهد التحول إلى معين وتغير الزوايا:</p>
+                    </div>
+
+                    <!-- SVG Canvas -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center justify-center my-3 grid-pattern">
+                        <svg class="w-full max-w-[280px] h-48" viewBox="0 0 300 200" fill="none">
+                            <line x1="20" y1="180" x2="280" y2="180" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 4"/>
+                            <polygon id="sq-poly" points="80,180 200,180 200,60 80,60" fill="rgba(244, 63, 94, 0.1)" stroke="#e11d48" stroke-width="4" stroke-linejoin="round"/>
+                            <circle id="sq-c1" cx="80" cy="180" r="5" fill="#e11d48"/>
+                            <circle id="sq-c2" cx="200" cy="180" r="5" fill="#e11d48"/>
+                            <circle id="sq-c3" cx="200" cy="60" r="6" fill="#e11d48"/>
+                            <circle id="sq-c4" cx="80" cy="60" r="6" fill="#e11d48"/>
+                            <text id="sq-ang-display" x="140" y="130" font-size="14" font-weight="900" fill="#be123c" text-anchor="middle">الزاوية: 90°</text>
+                        </svg>
+                    </div>
+
+                    <!-- Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-600">
+                            <span>ادفع رأس المربع:</span>
+                            <span id="sq-val-display" class="font-mono text-rose-600 font-black">إزاحة: 0 px</span>
+                        </div>
+                        <input type="range" min="-60" max="60" value="0" id="sq-slider" oninput="shearSquare(this.value)" class="w-full accent-rose-600 cursor-pointer">
+                        <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 font-bold">
+                            الاستنتاج: معرفة 4 أضلاع لا تكفي أبداً لتثبيت الشكل الرباعي!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Rigid Triangle & A-Frame Board (p. 170) -->
+                <div class="board-card p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">
+                                <i class="fa-solid fa-lock ml-1"></i>المثلث وهيكل السبورة A (SSS)
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">كتاب الطالب ص 170</span>
+                        </div>
+                        <h3 class="text-base font-black text-slate-800">صلابة هيكل السبورة المزدوجة شكل A: المثلث صلب لا يتشوه</h3>
+                        <p class="text-xs text-slate-500 mt-1">تأمل تثبيت الذراعين المتساويين عند النقطتين B و C؛ المثلثان الناتجتان $\triangle ABC \cong \triangle XYZ$ يمنعان أي حركة!</p>
+                    </div>
+
+                    <!-- SVG A-Frame Canvas -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center justify-center my-3 grid-pattern">
+                        <svg class="w-full max-w-[280px] h-48" viewBox="0 0 260 200" fill="none">
+                            <line x1="20" y1="185" x2="240" y2="185" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 4"/>
+                            <line x1="130" y1="25" x2="50" y2="185" stroke="#ea580c" stroke-width="5" stroke-linecap="round"/>
+                            <line x1="130" y1="25" x2="210" y2="185" stroke="#ea580c" stroke-width="5" stroke-linecap="round"/>
+                            <line x1="82" y1="120" x2="178" y2="120" stroke="#0284c7" stroke-width="4.5" stroke-linecap="round"/>
+                            <circle cx="130" cy="25" r="6" fill="#1e293b"/>
+                            <circle cx="82" cy="120" r="5" fill="#0284c7"/>
+                            <circle cx="178" cy="120" r="5" fill="#0284c7"/>
+                            <text x="130" y="16" font-size="12" font-weight="900" fill="#0f172a" text-anchor="middle">القمة A (Z)</text>
+                            <text x="68" y="125" font-size="12" font-weight="bold" fill="#0284c7">B (X)</text>
+                            <text x="190" y="125" font-size="12" font-weight="bold" fill="#0284c7">C (Y)</text>
+                            <line x1="102" y1="68" x2="110" y2="76" stroke="#ef4444" stroke-width="2.5"/>
+                            <line x1="150" y1="76" x2="158" y2="68" stroke="#ef4444" stroke-width="2.5"/>
+                            <line x1="126" y1="115" x2="126" y2="125" stroke="#ef4444" stroke-width="2.5"/>
+                            <line x1="132" y1="115" x2="132" y2="125" stroke="#ef4444" stroke-width="2.5"/>
+                            <text x="130" y="145" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">الذراع الجانبي الثابت</text>
+                            <text x="130" y="195" font-size="10" font-weight="bold" fill="#64748b" text-anchor="middle">شكل السبورة المزدوجة ص 170</text>
+                        </svg>
+                    </div>
+
+                    <!-- Push Triangle Action -->
+                    <div class="space-y-2">
+                        <button onclick="toggleAlert('tri-push-note')" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-lock"></i>
+                            <span>اختبار صلابة المثلث (لماذا يستحيل تحريك القمة؟)</span>
+                        </button>
+                        <div id="tri-push-note" class="hidden p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 font-bold">
+                            القاعدة الهندسية لمسلمة SSS: تثبيت أطوال الأضلاع الثلاثة في الفراغ يثبت الزوايا حتماً دون حركة!
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- المحطة 2: EXPLORE - مختبر SSS و SAS وخديعة الضلع المتأرجح SSA -->
+        <!-- ============================================================== -->
+        <section id="pane-explore" class="stage-pane hidden space-y-6">
+            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 2: المختبر الديناميكي المتوسع</span>
+                        <h2 class="text-xl sm:text-3xl font-black">لماذا تنتج SSS و SAS مثلثاً فريداً، وتنتج SSA مثلثين مختلفين؟</h2>
+                    </div>
+                    <span class="text-xs bg-black/20 backdrop-blur px-3 py-1.5 rounded-xl font-bold">محاكاة فخ الضلع المتأرجح (Swinging Arm)</span>
+                </div>
+            </div>
+
+            <div class="board-card p-6 space-y-6">
+                <!-- Mode Selector -->
+                <div class="flex flex-wrap items-center justify-center gap-3 border-b border-slate-200 pb-4">
+                    <button onclick="changeMode('sss')" id="btn-m-sss" class="px-5 py-2.5 rounded-2xl bg-blue-600 text-white font-black text-xs sm:text-sm shadow transition">
+                        حالة الأضلاع الثلاثة (SSS) — مثلث وحيد
+                    </button>
+                    <button onclick="changeMode('sas')" id="btn-m-sas" class="px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs sm:text-sm transition">
+                        ضلعان والزاوية المحصورة (SAS) — مثلث وحيد
+                    </button>
+                    <button onclick="changeMode('ssa')" id="btn-m-ssa" class="px-5 py-2.5 rounded-2xl bg-rose-100 hover:bg-rose-200 text-rose-800 font-black text-xs sm:text-sm transition border-2 border-rose-300">
+                        ⚠️ خديعة SSA (ضلعان وزاوية غير محصورة) — مثلثان مختلفان!
+                    </button>
+                </div>
+
+                <!-- Simulation Canvas & Live HUD -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-8 bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col items-center justify-center relative min-h-[340px] grid-pattern">
+                        <svg id="canvas-svg" class="w-full max-w-[520px] h-80" viewBox="0 0 520 300" fill="none">
+                            <line x1="40" y1="240" x2="480" y2="240" stroke="#64748b" stroke-width="2.5"/>
+                            <text x="485" y="245" font-size="12" fill="#64748b" font-weight="bold">خط القاعدة</text>
+
+                            <path id="dyn-arc" d="M 85 240 A 45 45 0 0 0 74 205" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                            <text id="dyn-arc-txt" x="95" y="225" font-size="13" font-weight="900" fill="#d97706">30°</text>
+
+                            <line id="dyn-side-b" x1="50" y1="240" x2="210" y2="85" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
+                            <text id="dyn-label-b" x="110" y="150" font-size="13" font-weight="900" fill="#1d4ed8">الضلع b = 8 cm</text>
+
+                            <line id="dyn-side-a" x1="210" y1="85" x2="380" y2="240" stroke="#e11d48" stroke-width="4.5" stroke-linecap="round"/>
+                            <text id="dyn-label-a" x="315" y="155" font-size="13" font-weight="900" fill="#be123c">الضلع a = 6 cm</text>
+
+                            <line id="dyn-side-a2" x1="210" y1="85" x2="140" y2="240" stroke="#e11d48" stroke-width="3" stroke-dasharray="4 4" stroke-linecap="round" class="hidden"/>
+                            <text id="dyn-label-a2" x="145" y="175" font-size="11" font-weight="bold" fill="#be123c" class="hidden">الوضع الثاني للضلع</text>
+
+                            <path id="dyn-circle" d="M 390 240 A 170 170 0 0 1 130 240" stroke="#fda4af" stroke-width="2.5" stroke-dasharray="4 4" fill="none" class="hidden"/>
+
+                            <circle cx="50" cy="240" r="6" fill="#0f172a"/>
+                            <text x="35" y="260" font-size="14" font-weight="900" fill="#0f172a">A</text>
+
+                            <circle cx="210" cy="85" r="7" fill="#2563eb"/>
+                            <text x="210" y="68" font-size="14" font-weight="900" fill="#2563eb" text-anchor="middle">C</text>
+
+                            <circle id="dyn-pt-b1" cx="380" cy="240" r="7" fill="#e11d48"/>
+                            <text id="dyn-lbl-b1" x="380" y="265" font-size="13" font-weight="900" fill="#e11d48">B₁ (المثلث الحاد)</text>
+
+                            <circle id="dyn-pt-b2" cx="140" cy="240" r="7" fill="#be123c" class="hidden"/>
+                            <text id="dyn-lbl-b2" x="140" y="265" font-size="13" font-weight="900" fill="#be123c" class="hidden">B₂ (المثلث المنفرج)</text>
+                        </svg>
+
+                        <!-- SSA Swinging Action Bar -->
+                        <div id="ssa-ctrl-bar" class="hidden w-full max-w-md mt-2 flex items-center justify-between gap-3 bg-white p-3 rounded-2xl border-2 border-rose-200">
+                            <span class="text-xs font-bold text-rose-800">تأرجح الضلع الحر a:</span>
+                            <button onclick="swingArmAction()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-arrows-left-right"></i>
+                                <span>أرجح الضلع واكشف المثلث الثاني فوراً!</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Live HUD Telemetry -->
+                    <div class="lg:col-span-4 bg-white p-5 rounded-2xl border-2 border-slate-200 space-y-4">
+                        <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                            <i class="fa-solid fa-gauge-high text-blue-600 text-lg"></i>
+                            <h4 class="text-sm font-black text-slate-800">معداد الزوايا والبيانات الحية (Angle HUD)</h4>
+                        </div>
+
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between p-2 rounded-xl bg-blue-50 border border-blue-100">
+                                <span class="font-bold text-blue-900">الضلع الأول ($b$):</span>
+                                <span class="font-mono font-black text-blue-700">8.0 cm (ثابت)</span>
+                            </div>
+                            <div class="flex justify-between p-2 rounded-xl bg-rose-50 border border-rose-100">
+                                <span class="font-bold text-rose-900">الضلع الثاني ($a$):</span>
+                                <span class="font-mono font-black text-rose-700">6.0 cm (ثابت)</span>
+                            </div>
+                            <div class="flex justify-between p-2 rounded-xl bg-amber-50 border border-amber-100">
+                                <span class="font-bold text-amber-900">الزاوية $\angle A$:</span>
+                                <span class="font-mono font-black text-amber-700">30° (غير محصورة)</span>
+                            </div>
+                        </div>
+
+                        <div id="hud-diagnosis" class="p-4 rounded-xl bg-slate-100 text-xs font-bold text-slate-800 leading-relaxed border-r-4 border-blue-600">
+                            <strong>التشخيص الرياضي:</strong> الأضلاع تحدد مثلثاً واحداً فقط عند ثبات الأضلاع الثلاثة (SSS) أو وجود الزاوية المحصورة بينهما (SAS).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- المحطة 3: EXPLAIN - براهين الكتاب ورسوماتها الهندسية المتقنة -->
+        <!-- ============================================================== -->
+        <section id="pane-explain" class="stage-pane hidden space-y-6">
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 3: شفرة البرهان الهندسي</span>
+                        <h2 class="text-xl sm:text-3xl font-black">رسومات وبراهين أمثلة كتاب الطالب وتحقق من فهمك</h2>
+                    </div>
+                    <span class="text-xs bg-black/20 backdrop-blur px-3 py-1.5 rounded-xl font-bold">ص 170 وص 174</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- 1. Example 1 from Book (Flow Proof SSS) -->
+                <div class="board-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs">مثال 1</span>
+                            <h3 class="text-base font-black text-slate-900">برهان تسلسلي بـ SSS (كتاب الطالب ص 170)</h3>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400 font-mono">Flow Proof</span>
+                    </div>
+
+                    <div class="text-xs text-slate-700 space-y-1">
+                        <p><strong>المعطيات:</strong> $\overline{GH} \cong \overline{KJ}$ ، $\overline{HL} \cong \overline{JL}$ ، والنقطة $L$ هي منتصف $\overline{GK}$.</p>
+                        <p><strong>المطلوب:</strong> إثبات أن $\triangle GHL \cong \triangle KJL$.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-center">
+                        <svg class="w-full max-w-[280px] h-40" viewBox="0 0 280 150" fill="none">
+                            <line x1="30" y1="120" x2="250" y2="120" stroke="#0f172a" stroke-width="2.5"/>
+                            <polygon points="30,120 140,120 70,30" fill="rgba(37, 99, 235, 0.08)" stroke="#2563eb" stroke-width="2.5"/>
+                            <polygon points="140,120 250,120 210,30" fill="rgba(16, 185, 129, 0.08)" stroke="#059669" stroke-width="2.5"/>
+                            <text x="20" y="135" font-size="12" font-weight="900" fill="#0f172a">G</text>
+                            <text x="140" y="140" font-size="12" font-weight="900" fill="#0f172a" text-anchor="middle">L (المنتصف)</text>
+                            <text x="255" y="135" font-size="12" font-weight="900" fill="#0f172a">K</text>
+                            <text x="65" y="22" font-size="12" font-weight="900" fill="#2563eb">H</text>
+                            <text x="215" y="22" font-size="12" font-weight="900" fill="#059669">J</text>
+                            <line x1="45" y1="72" x2="55" y2="78" stroke="#ef4444" stroke-width="2"/>
+                            <line x1="225" y1="72" x2="235" y2="78" stroke="#ef4444" stroke-width="2"/>
+                            <line x1="100" y1="70" x2="108" y2="78" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="104" y1="67" x2="112" y2="75" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="172" y1="70" x2="180" y2="78" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="176" y1="67" x2="184" y2="75" stroke="#f59e0b" stroke-width="2"/>
+                            <line x1="85" y1="115" x2="85" y2="125" stroke="#0284c7" stroke-width="2"/>
+                            <line x1="195" y1="115" x2="195" y2="125" stroke="#0284c7" stroke-width="2"/>
+                        </svg>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="p-2 bg-slate-100 rounded-xl border border-slate-200">
+                            <div class="font-bold font-mono text-blue-700">$\overline{GH} \cong \overline{KJ}$</div>
+                            <span class="text-[10px] text-slate-500">معطى</span>
+                        </div>
+                        <div class="p-2 bg-amber-50 rounded-xl border border-amber-200">
+                            <div class="font-bold font-mono text-amber-800">$\overline{GL} \cong \overline{KL}$</div>
+                            <span class="text-[10px] text-amber-700">تعريف نقطة المنتصف</span>
+                        </div>
+                        <div class="p-2 bg-slate-100 rounded-xl border border-slate-200">
+                            <div class="font-bold font-mono text-blue-700">$\overline{HL} \cong \overline{JL}$</div>
+                            <span class="text-[10px] text-slate-500">معطى</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-emerald-600 text-white font-black text-center text-xs">
+                        النتيجة: $\triangle GHL \cong \triangle KJL$ بموجب مسلمة SSS
+                    </div>
+                </div>
+
+                <!-- 2. Check 1 from Book (QRS Isosceles Triangle, p. 170) -->
+                <div class="board-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-xs">تحقق 1</span>
+                            <h3 class="text-base font-black text-slate-900">المثلث متطابق الضلعين QRS (ص 170)</h3>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400 font-mono">Flow Proof</span>
+                    </div>
+
+                    <div class="text-xs text-slate-700 space-y-1">
+                        <p><strong>المعطيات:</strong> $\triangle QRS$ متطابق الضلعين فيه $\overline{QR} \cong \overline{SR}$ ، و $\overline{RT}$ تنصف $\overline{QS}$ عند $T$.</p>
+                        <p><strong>المطلوب:</strong> إثبات أن $\triangle QRT \cong \triangle SRT$.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-center">
+                        <svg class="w-full max-w-[240px] h-40" viewBox="0 0 240 150" fill="none">
+                            <line x1="30" y1="130" x2="210" y2="130" stroke="#0f172a" stroke-width="2.5"/>
+                            <polygon points="30,130 120,130 120,25" fill="rgba(245, 158, 11, 0.08)" stroke="#d97706" stroke-width="2.5"/>
+                            <polygon points="120,130 210,130 120,25" fill="rgba(16, 185, 129, 0.08)" stroke="#059669" stroke-width="2.5"/>
+                            <line x1="120" y1="25" x2="120" y2="130" stroke="#2563eb" stroke-width="3"/>
+                            <text x="18" y="135" font-size="12" font-weight="900" fill="#0f172a">Q</text>
+                            <text x="120" y="145" font-size="12" font-weight="900" fill="#0f172a" text-anchor="middle">T</text>
+                            <text x="218" y="135" font-size="12" font-weight="900" fill="#0f172a">S</text>
+                            <text x="120" y="18" font-size="12" font-weight="900" fill="#2563eb" text-anchor="middle">R</text>
+                            <line x1="70" y1="72" x2="78" y2="80" stroke="#ef4444" stroke-width="2"/>
+                            <line x1="162" y1="72" x2="170" y2="80" stroke="#ef4444" stroke-width="2"/>
+                            <line x1="75" y1="125" x2="75" y2="135" stroke="#059669" stroke-width="2"/>
+                            <line x1="165" y1="125" x2="165" y2="135" stroke="#059669" stroke-width="2"/>
+                        </svg>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="p-2 bg-slate-100 rounded-xl border border-slate-200">
+                            <div class="font-bold font-mono text-amber-700">$\overline{QR} \cong \overline{SR}$</div>
+                            <span class="text-[10px] text-slate-500">معطى</span>
+                        </div>
+                        <div class="p-2 bg-emerald-50 rounded-xl border border-emerald-200">
+                            <div class="font-bold font-mono text-emerald-800">$\overline{QT} \cong \overline{ST}$</div>
+                            <span class="text-[10px] text-emerald-700">تعريف المنصف</span>
+                        </div>
+                        <div class="p-2 bg-blue-50 rounded-xl border border-blue-200">
+                            <div class="font-bold font-mono text-blue-700">$\overline{RT} \cong \overline{RT}$</div>
+                            <span class="text-[10px] text-blue-700">خاصية الانعكاس</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-emerald-600 text-white font-black text-center text-xs">
+                        النتيجة: $\triangle QRT \cong \triangle SRT$ بموجب مسلمة SSS
+                    </div>
+                </div>
+
+                <!-- 3. Example 4 from Book (Vertical Angles & SAS, p. 174) -->
+                <div class="board-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black text-xs">مثال 4</span>
+                            <h3 class="text-base font-black text-slate-900">الزوايا المتقابلة بالرأس ونقطة المنتصف (ص 174)</h3>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400 font-mono">SAS Proof</span>
+                    </div>
+
+                    <div class="text-xs text-slate-700 space-y-1">
+                        <p><strong>المعطيات:</strong> $X$ منتصف $\overline{DB}$ ، و $X$ منتصف $\overline{AC}$.</p>
+                        <p><strong>المطلوب:</strong> إثبات أن $\triangle DXC \cong \triangle BXA$.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-center">
+                        <svg class="w-full max-w-[260px] h-36" viewBox="0 0 260 140" fill="none">
+                            <line x1="30" y1="25" x2="230" y2="115" stroke="#0f172a" stroke-width="2.5"/>
+                            <line x1="30" y1="115" x2="230" y2="25" stroke="#0f172a" stroke-width="2.5"/>
+                            <line x1="30" y1="25" x2="30" y2="115" stroke="#9333ea" stroke-width="3"/>
+                            <line x1="230" y1="25" x2="230" y2="115" stroke="#9333ea" stroke-width="3"/>
+                            <circle cx="130" cy="70" r="5" fill="#e11d48"/>
+                            <text x="130" y="55" font-size="12" font-weight="900" fill="#e11d48" text-anchor="middle">X</text>
+                            <text x="18" y="25" font-size="12" font-weight="900" fill="#0f172a">D</text>
+                            <text x="18" y="125" font-size="12" font-weight="900" fill="#0f172a">C</text>
+                            <text x="240" y="25" font-size="12" font-weight="900" fill="#0f172a">A</text>
+                            <text x="240" y="125" font-size="12" font-weight="900" fill="#0f172a">B</text>
+                            <path d="M 115 63 A 15 15 0 0 1 115 77" stroke="#ea580c" stroke-width="2.5" fill="none"/>
+                            <path d="M 145 63 A 15 15 0 0 1 145 77" stroke="#ea580c" stroke-width="2.5" fill="none"/>
+                            <line x1="75" y1="43" x2="85" y2="47" stroke="#2563eb" stroke-width="2"/>
+                            <line x1="175" y1="88" x2="185" y2="92" stroke="#2563eb" stroke-width="2"/>
+                            <line x1="75" y1="92" x2="85" y2="88" stroke="#059669" stroke-width="2"/>
+                            <line x1="175" y1="47" x2="185" y2="43" stroke="#059669" stroke-width="2"/>
+                        </svg>
+                    </div>
+
+                    <div class="p-3 bg-purple-50 rounded-xl border border-purple-200 text-xs text-purple-950 font-bold">
+                        السر: الزاويتان $\angle DXC \cong \angle BXA$ متقابلتان بالرأس ومحصورتان تماماً بين الضلعين المتطابقين $\implies$ التطابق بمسلمة SAS.
+                    </div>
+                </div>
+
+                <!-- 4. Check 4 from Book (Wheel Frame, p. 174) -->
+                <div class="board-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-amber-600 text-white flex items-center justify-center font-black text-xs">تحقق 4</span>
+                            <h3 class="text-base font-black text-slate-900">قضبان إطار العجلة الثمانية (ص 174)</h3>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400 font-mono">SAS Proof</span>
+                    </div>
+
+                    <div class="text-xs text-slate-700 space-y-1">
+                        <p><strong>المعطيات:</strong> $\overline{TU} \cong \overline{TX}$ ، $\angle XTV \cong \angle UTV$.</p>
+                        <p><strong>المطلوب:</strong> إثبات أن $\triangle XTV \cong \triangle UTV$.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-center">
+                        <svg class="w-full max-w-[240px] h-36" viewBox="0 0 240 140" fill="none">
+                            <circle cx="120" cy="70" r="55" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="3 3"/>
+                            <circle cx="120" cy="70" r="4" fill="#0f172a"/>
+                            <text x="120" y="85" font-size="11" font-weight="900" fill="#0f172a" text-anchor="middle">T</text>
+                            <line x1="120" y1="70" x2="120" y2="15" stroke="#2563eb" stroke-width="3"/>
+                            <text x="120" y="10" font-size="11" font-weight="900" fill="#2563eb" text-anchor="middle">V</text>
+                            <line x1="120" y1="70" x2="70" y2="35" stroke="#e11d48" stroke-width="2.5"/>
+                            <text x="60" y="35" font-size="11" font-weight="900" fill="#e11d48">X</text>
+                            <line x1="120" y1="70" x2="170" y2="35" stroke="#e11d48" stroke-width="2.5"/>
+                            <text x="180" y="35" font-size="11" font-weight="900" fill="#e11d48">U</text>
+                            <line x1="70" y1="35" x2="120" y2="15" stroke="#059669" stroke-width="2"/>
+                            <line x1="170" y1="35" x2="120" y2="15" stroke="#059669" stroke-width="2"/>
+                            <path d="M 105 57 A 20 20 0 0 1 115 50" stroke="#f59e0b" stroke-width="2" fill="none"/>
+                            <path d="M 125 50 A 20 20 0 0 1 135 57" stroke="#f59e0b" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-950 font-bold">
+                        التبرير: الضلع المشترك $\overline{TV} \cong \overline{TV}$ محصور بين الضلعين والزاوية المعطاة $\implies$ التطابق بـ SAS.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- المحطة 4: ENGINEER - السقالات وجسر الرياض المعلق ورسوماتها -->
+        <!-- ============================================================== -->
+        <section id="pane-engineer" class="stage-pane hidden space-y-6">
+            <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 4: التحدي الإنشائي الواقعي</span>
+                        <h2 class="text-xl sm:text-3xl font-black">دعامات السقالات السينمائية، الطائرات الشراعية، وجسر الرياض</h2>
+                    </div>
+                    <span class="text-xs bg-black/20 backdrop-blur px-3 py-1.5 rounded-xl font-bold">ص 173 وص 175</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- 1. Lighting Truss Scaffold (Example 3, p. 173) -->
+                <div class="board-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <h3 class="text-base font-black text-slate-800">دعامات السقالة حاملة المصابيح (مثال 3 ص 173)</h3>
+                        <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold font-mono">Two-Column Proof</span>
+                    </div>
+
+                    <p class="text-xs text-slate-600">
+                        <strong>المعطيات:</strong> $\overline{WX} \cong \overline{ZY}$ ، $\overline{WX} \parallel \overline{ZY}$. <strong>المطلوب:</strong> إثبات أن $\triangle WXZ \cong \triangle YZX$.
+                    </p>
+
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center justify-center">
+                        <svg class="w-full max-w-[280px] h-36" viewBox="0 0 280 120" fill="none">
+                            <rect x="25" y="20" width="230" height="80" rx="4" fill="#ffffff" stroke="#334155" stroke-width="2.5"/>
+                            <line x1="25" y1="100" x2="255" y2="20" stroke="#2563eb" stroke-width="3"/>
+                            <text x="12" y="25" font-size="13" font-weight="900" fill="#0f172a">W</text>
+                            <text x="262" y="25" font-size="13" font-weight="900" fill="#0f172a">X</text>
+                            <text x="262" y="105" font-size="13" font-weight="900" fill="#0f172a">Y</text>
+                            <text x="12" y="105" font-size="13" font-weight="900" fill="#0f172a">Z</text>
+                            <path d="M 130 16 L 140 20 L 130 24" stroke="#059669" stroke-width="2.5" fill="none"/>
+                            <path d="M 130 96 L 140 100 L 130 104" stroke="#059669" stroke-width="2.5" fill="none"/>
+                            <path d="M 225 20 A 20 20 0 0 1 232 35" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+                            <path d="M 55 100 A 20 20 0 0 1 48 85" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+                            <text x="140" y="65" font-size="11" font-weight="900" fill="#2563eb" text-anchor="middle">ضلع مشترك (XZ)</text>
+                        </svg>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-right text-xs">
+                            <thead class="bg-slate-100 text-slate-700 font-bold">
+                                <tr>
+                                    <th class="p-2 w-8 text-center">#</th>
+                                    <th class="p-2">العبارات</th>
+                                    <th class="p-2">المبررات</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 font-mono">
+                                <tr><td class="p-2 text-center text-slate-400">1</td><td>$\overline{WX} \cong \overline{ZY}$</td><td class="font-sans text-slate-600">معطى</td></tr>
+                                <tr><td class="p-2 text-center text-slate-400">2</td><td>$\overline{WX} \parallel \overline{ZY}$</td><td class="font-sans text-slate-600">معطى</td></tr>
+                                <tr class="bg-amber-50"><td class="p-2 text-center text-amber-600 font-bold">3</td><td class="text-amber-800 font-bold">$\angle WXZ \cong \angle XZY$</td><td class="font-sans text-amber-800">نظرية الزوايا الداخلية المتبادلة</td></tr>
+                                <tr class="bg-blue-50"><td class="p-2 text-center text-blue-600 font-bold">4</td><td class="text-blue-800 font-bold">$\overline{XZ} \cong \overline{ZX}$</td><td class="font-sans text-blue-800">خاصية الانعكاس للتطابق</td></tr>
+                                <tr class="bg-emerald-100"><td class="p-2 text-center text-emerald-800 font-black">5</td><td class="text-emerald-900 font-black">$\triangle WXZ \cong \triangle YZX$</td><td class="font-sans text-emerald-900 font-black">مسلمة SAS</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. Hang Glider & Riyadh Bridge -->
+                <div class="space-y-6">
+                    <div class="board-card p-6 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h3 class="text-base font-black text-slate-800">جناحا الطائرة الشراعية (تحقق 3 ص 173)</h3>
+                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">طيران شراعي</span>
+                        </div>
+                        <p class="text-xs text-slate-600">
+                            <strong>المعطيات:</strong> $\overline{FG} \cong \overline{GH}$ ، و $\overline{JG}$ تنصف $\angle FGH$. <strong>المطلوب:</strong> إثبات أن $\triangle FGJ \cong \triangle HGJ$.
+                        </p>
+                        <div class="bg-slate-50 p-2 rounded-2xl border border-slate-200 flex items-center justify-center">
+                            <svg class="w-full max-w-[240px] h-32" viewBox="0 0 240 120" fill="none">
+                                <polygon points="120,15 20,105 120,80" fill="rgba(37, 99, 235, 0.08)" stroke="#2563eb" stroke-width="2.5"/>
+                                <polygon points="120,15 220,105 120,80" fill="rgba(16, 185, 129, 0.08)" stroke="#059669" stroke-width="2.5"/>
+                                <line x1="120" y1="15" x2="120" y2="80" stroke="#dc2626" stroke-width="3"/>
+                                <text x="120" y="12" font-size="12" font-weight="900" fill="#dc2626" text-anchor="middle">G</text>
+                                <text x="120" y="98" font-size="12" font-weight="900" fill="#dc2626" text-anchor="middle">J</text>
+                                <text x="10" y="112" font-size="12" font-weight="900" fill="#2563eb">F</text>
+                                <text x="225" y="112" font-size="12" font-weight="900" fill="#059669">H</text>
+                            </svg>
+                        </div>
+                        <div class="p-2 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-950 font-bold">
+                            البرهان: $\overline{FG} \cong \overline{GH}$ و $\angle FGJ \cong \angle HGJ$ (تنصيف) و $\overline{GJ} \cong \overline{GJ}$ (انعكاس) $\implies$ التطابق بـ SAS.
+                        </div>
+                    </div>
+
+                    <div class="board-card p-6 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h3 class="text-base font-black text-slate-800">جسر الرياض المعلق (طوله 763m - ص 175)</h3>
+                            <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">رؤية 2030</span>
+                        </div>
+                        <p class="text-xs text-slate-600">
+                            يلتقي الحبلان المعدنيان العلويان في النقطة $C$ منتصف المسافة بين الدعامتين. إذا كان $AB = ED$، فأثبت تطابق المثلثين المبيّنين.
+                        </p>
+                        <div class="bg-slate-50 p-2 rounded-2xl border border-slate-200 flex items-center justify-center">
+                            <svg class="w-full max-w-[280px] h-32" viewBox="0 0 280 120" fill="none">
+                                <line x1="20" y1="105" x2="260" y2="105" stroke="#334155" stroke-width="3"/>
+                                <line x1="40" y1="105" x2="40" y2="25" stroke="#0f172a" stroke-width="4.5"/>
+                                <line x1="240" y1="105" x2="240" y2="25" stroke="#0f172a" stroke-width="4.5"/>
+                                <line x1="40" y1="25" x2="140" y2="105" stroke="#0284c7" stroke-width="2.5"/>
+                                <line x1="240" y1="25" x2="140" y2="105" stroke="#0284c7" stroke-width="2.5"/>
+                                <text x="40" y="18" font-size="11" font-weight="900" fill="#0f172a" text-anchor="middle">A</text>
+                                <text x="240" y="18" font-size="11" font-weight="900" fill="#0f172a" text-anchor="middle">E</text>
+                                <text x="140" y="118" font-size="11" font-weight="900" fill="#0284c7" text-anchor="middle">C (المنتصف)</text>
+                                <text x="30" y="118" font-size="11" font-weight="bold" fill="#0f172a">B</text>
+                                <text x="250" y="118" font-size="11" font-weight="bold" fill="#0f172a">D</text>
+                            </svg>
+                        </div>
+                        <div class="p-2 bg-blue-50 rounded-xl border border-blue-200 text-xs text-blue-950 font-bold">
+                            توزيع القوى: $AB = ED$ و $BC = DC$ وزاويتا التعامد $\angle B \cong \angle D = 90°$ $\implies$ تطابق بـ SAS لضمان الثبات الإنشائي.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- المحطة 5: ELABORATE - المستوى الإحداثي ومناظرة أحمد وخالد والجبر -->
+        <!-- ============================================================== -->
+        <section id="pane-elaborate" class="stage-pane space-y-6">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 5: ميدان الفرسان والتفكير الناقد</span>
+                        <h2 class="text-xl sm:text-3xl font-black">شبكة المستوى الإحداثي، مناظرة اكتشف الخطأ، ومسائل الجبر</h2>
+                    </div>
+                    <span class="text-xs bg-black/20 backdrop-blur px-3 py-1.5 rounded-xl font-bold">ص 171 وص 176 وص 177</span>
+                </div>
+            </div>
+
+            <!-- Coordinate Geometry Grid -->
+            <div class="board-card p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <h3 class="text-base font-black text-slate-800">الهندسة الإحداثية بقانون المسافة: $d = \sqrt{<span class="ar-pow"><span class="ar-base">(x_2-x_1)</span><sup class="ar-exp">٢</sup></span>+<span class="ar-pow"><span class="ar-base">(y_2-y_1)</span><sup class="ar-exp">٢</sup></span>}$ (ص 171)</h3>
+                    <span class="px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-bold font-mono">Cartesian Grid</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-7 bg-white p-4 rounded-2xl border-2 border-slate-200 flex flex-col items-center justify-center">
+                        <svg class="w-full max-w-[380px] h-64" viewBox="0 0 360 260" fill="none">
+                            <defs>
+                                <pattern id="cartGrid2" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="360" height="260" fill="url(#cartGrid2)" rx="8"/>
+                            <line x1="180" y1="10" x2="180" y2="250" stroke="#475569" stroke-width="2"/>
+                            <line x1="10" y1="130" x2="350" y2="130" stroke="#475569" stroke-width="2"/>
+                            <text x="345" y="125" font-size="11" font-weight="900" fill="#475569">x</text>
+                            <text x="185" y="22" font-size="11" font-weight="900" fill="#475569">y</text>
+
+                            <!-- Triangle 1 (JKL): J(2,5), K(1,1), L(5,2) -->
+                            <polygon points="210,55 195,115 255,100" fill="rgba(37, 99, 235, 0.15)" stroke="#2563eb" stroke-width="2.5"/>
+                            <circle cx="210" cy="55" r="4" fill="#2563eb"/>
+                            <text x="215" y="50" font-size="10" font-weight="900" fill="#2563eb">J(2,5)</text>
+                            <circle cx="195" cy="115" r="4" fill="#2563eb"/>
+                            <text x="175" y="125" font-size="10" font-weight="900" fill="#2563eb">K(1,1)</text>
+                            <circle cx="255" cy="100" r="4" fill="#2563eb"/>
+                            <text x="260" y="105" font-size="10" font-weight="900" fill="#2563eb">L(5,2)</text>
+
+                            <!-- Triangle 2 (NPQ): N(-3,0), P(-7,1), Q(-4,4) -->
+                            <polygon points="135,130 75,115 120,70" fill="rgba(16, 185, 129, 0.15)" stroke="#059669" stroke-width="2.5"/>
+                            <circle cx="135" cy="130" r="4" fill="#059669"/>
+                            <text x="135" y="145" font-size="10" font-weight="900" fill="#059669">N(-3,0)</text>
+                            <circle cx="75" cy="115" r="4" fill="#059669"/>
+                            <text x="45" y="115" font-size="10" font-weight="900" fill="#059669">P(-7,1)</text>
+                            <circle cx="120" cy="70" r="4" fill="#059669"/>
+                            <text x="120" y="60" font-size="10" font-weight="900" fill="#059669">Q(-4,4)</text>
+                        </svg>
+                        <span class="text-xs text-slate-500 font-bold mt-1">التمثيل البياني لرؤوس $\triangle JKL$ و $\triangle NPQ$</span>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-2 text-xs font-mono">
+                        <div class="p-3 rounded-xl bg-blue-50 border border-blue-200">
+                            <strong class="text-blue-900 font-sans block mb-1">أطوال أضلاع $\triangle JKL$:</strong>
+                            $JK = \sqrt{<span class="ar-pow"><span class="ar-base">(1-2)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(1-5)</span><sup class="ar-exp">٢</sup></span>} = \mathbf{\sqrt{17}}$<br>
+                            $KL = \sqrt{<span class="ar-pow"><span class="ar-base">(5-1)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(2-1)</span><sup class="ar-exp">٢</sup></span>} = \mathbf{\sqrt{17}}$<br>
+                            $JL = \sqrt{<span class="ar-pow"><span class="ar-base">(5-2)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(2-5)</span><sup class="ar-exp">٢</sup></span>} = \mathbf{\sqrt{18}} = 3\sqrt{2}$
+                        </div>
+                        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                            <strong class="text-emerald-900 font-sans block mb-1">أطوال أضلاع $\triangle NPQ$:</strong>
+                            $NP = \sqrt{<span class="ar-pow"><span class="ar-base">(-7 - -3)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(1-0)</span><sup class="ar-exp">٢</sup></span>} = \mathbf{\sqrt{17}}$<br>
+                            $NQ = \sqrt{<span class="ar-pow"><span class="ar-base">(-4 - -3)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(4-0)</span><sup class="ar-exp">٢</sup></span>} = \mathbf{\sqrt{17}}$<br>
+                            $PQ = \sqrt{<span class="ar-pow"><span class="ar-base">(-4 - -7)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(4-1)</span><sup class="ar-exp">٢</sup></span>} = \mathbf{\sqrt{18}} = 3\sqrt{2}$
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-purple-600 text-white font-sans font-bold text-center">
+                            جميع الأضلاع المتناظرة متطابقة $\implies$ $\triangle JKL \cong \triangle NPQ$ بموجب SSS.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Detection & Algebra -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Debate -->
+                <div class="board-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <h3 class="text-base font-black text-slate-800">اكتشف الخطأ: مناظرة أحمد وخالد (ص 177)</h3>
+                        <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-bold">سؤال 24</span>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-center">
+                        <svg class="w-full max-w-[260px] h-36" viewBox="0 0 260 130" fill="none">
+                            <polygon points="20,110 80,110 45,30" fill="rgba(244, 63, 94, 0.08)" stroke="#f43f5e" stroke-width="2.5"/>
+                            <text x="15" y="125" font-size="11" font-weight="900" fill="#0f172a">P</text>
+                            <text x="85" y="125" font-size="11" font-weight="900" fill="#0f172a">R</text>
+                            <text x="45" y="20" font-size="11" font-weight="900" fill="#0f172a">Q</text>
+                            <line x1="30" y1="65" x2="38" y2="72" stroke="#e11d48" stroke-width="2"/>
+                            <line x1="58" y1="65" x2="66" y2="72" stroke="#e11d48" stroke-width="2"/>
+                            <path d="M 35 110 A 15 15 0 0 1 30 95" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+                            <text x="35" y="90" font-size="10" font-weight="bold" fill="#d97706">59°</text>
+
+                            <polygon points="150,110 210,110 175,30" fill="rgba(244, 63, 94, 0.08)" stroke="#f43f5e" stroke-width="2.5"/>
+                            <text x="145" y="125" font-size="11" font-weight="900" fill="#0f172a">X</text>
+                            <text x="215" y="125" font-size="11" font-weight="900" fill="#0f172a">Z</text>
+                            <text x="175" y="20" font-size="11" font-weight="900" fill="#0f172a">Y</text>
+                            <line x1="160" y1="65" x2="168" y2="72" stroke="#e11d48" stroke-width="2"/>
+                            <line x1="188" y1="65" x2="196" y2="72" stroke="#e11d48" stroke-width="2"/>
+                            <path d="M 165 110 A 15 15 0 0 1 160 95" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+                            <text x="165" y="90" font-size="10" font-weight="bold" fill="#d97706">59°</text>
+                        </svg>
+                    </div>
+
+                    <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-950 font-bold leading-relaxed">
+                        <strong>خالد هو المحق:</strong> الزاوية $59°$ مقابلة لأحد الأضلاع وليست محصورة بينهما (حالة SSA)؛ لذلك لا يمكن الجزم بتطابق المثلثين!
+                    </div>
+                </div>
+
+                <!-- Algebra -->
+                <div class="board-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <h3 class="text-base font-black text-slate-800">مسائل الجبر والهندسة المتداخلة (ص 176)</h3>
+                        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">سؤال 21 و 22</span>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                            <span class="font-bold text-slate-800 block">مسألة 21: أوجد قيمة $y$ التي تجعل $\triangle WXY \cong \triangle WXZ$:</span>
+                            <div class="font-mono text-slate-700">
+                                الأضلاع المتناظرة: $3y + 7 = 19 \implies 3y = 12 \implies \mathbf{y = 4}$.<br>
+                                الزاوية المحصورة: $20y + 10 = 20(4) + 10 = \mathbf{90°}$.
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                            <span class="font-bold text-slate-800 block">مسألة 22: أوجد قيمة $x$ التي تجعل $\triangle ABC \cong \triangle FGH$:</span>
+                            <div class="font-mono text-slate-700">
+                                بمساواة الأضلاع المتناظرة: $4x + 1 = 13 \implies 4x = 12 \implies \mathbf{x = 3}$.<br>
+                                التحقق من الضلع الثاني: $3x - 2 = 3(3) - 2 = \mathbf{7}$ (متطابق تماماً!).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- المحطة 6: EVALUATE - تذكرة الخروج وشجرة القرار الذكية -->
+        <!-- ============================================================== -->
+        <section id="pane-evaluate" class="stage-pane hidden space-y-6">
+            <div class="bg-gradient-to-r from-rose-600 via-pink-600 to-red-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 6: تذكرة النصر والتقويم المعياري</span>
+                        <h2 class="text-xl sm:text-3xl font-black">تذكرة الخروج: سؤال الاختبار المعياري وشجرة اتخاذ القرار</h2>
+                    </div>
+                    <span class="text-xs bg-black/20 backdrop-blur px-3 py-1.5 rounded-xl font-bold">ص 177 مسألة 26</span>
+                </div>
+            </div>
+
+            <div class="board-card p-6 sm:p-8 space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h3 class="text-base sm:text-lg font-black text-slate-900">سؤال تدريب على اختبار معياري (سؤال 26 ص 177)</h3>
+                    <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-black">اختبار تحصيلي ومسارات</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-8 space-y-4">
+                        <p class="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
+                            في الشكلين أدناه، إذا كان $\overline{AC} \cong \overline{XZ}$ و $\angle C \cong \angle Z$.<br>
+                            ما المعلومة الإضافية التي يمكن استعمالها لإثبات أن $\triangle ABC \cong \triangle XYZ$ بمسلمة $SAS$؟
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                                <input type="radio" name="exit_radio" value="A" class="w-5 h-5 text-rose-600 focus:ring-rose-500">
+                                <span class="text-sm font-black text-slate-800 font-mono">(A) $\overline{BC} \cong \overline{YZ}$</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                                <input type="radio" name="exit_radio" value="B" class="w-5 h-5 text-rose-600 focus:ring-rose-500">
+                                <span class="text-sm font-black text-slate-800 font-mono">(B) $\overline{AB} \cong \overline{XY}$</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                                <input type="radio" name="exit_radio" value="C" class="w-5 h-5 text-rose-600 focus:ring-rose-500">
+                                <span class="text-sm font-black text-slate-800 font-mono">(C) $\overline{BC} \cong \overline{XZ}$</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                                <input type="radio" name="exit_radio" value="D" class="w-5 h-5 text-rose-600 focus:ring-rose-500">
+                                <span class="text-sm font-black text-slate-800 font-mono">(D) $\overline{XZ} \cong \overline{XY}$</span>
+                            </label>
+                        </div>
+
+                        <button onclick="checkFinalExitTicket()" class="px-6 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-sm shadow-md transition flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>تسجيل الإجابة والتصحيح الفوري على السبورة</span>
+                        </button>
+
+                        <div id="final-ticket-fb" class="hidden p-4 rounded-2xl text-xs sm:text-sm leading-relaxed"></div>
+                    </div>
+
+                    <!-- Visual Question 26 SVG -->
+                    <div class="lg:col-span-4 bg-slate-50 p-4 rounded-3xl border border-slate-200 flex flex-col items-center justify-center">
+                        <svg class="w-full max-w-[240px] h-40" viewBox="0 0 240 140" fill="none">
+                            <polygon points="25,120 90,120 55,30" fill="rgba(37, 99, 235, 0.08)" stroke="#2563eb" stroke-width="2.5"/>
+                            <text x="15" y="125" font-size="12" font-weight="900" fill="#0f172a">B</text>
+                            <text x="96" y="125" font-size="12" font-weight="900" fill="#0f172a">C</text>
+                            <text x="55" y="20" font-size="12" font-weight="900" fill="#0f172a">A</text>
+                            <path d="M 78 120 A 14 14 0 0 1 83 107" stroke="#10b981" stroke-width="3" fill="none"/>
+                            <line x1="68" y1="70" x2="77" y2="77" stroke="#ef4444" stroke-width="2.5"/>
+
+                            <polygon points="145,120 210,120 175,30" fill="rgba(16, 185, 129, 0.08)" stroke="#059669" stroke-width="2.5"/>
+                            <text x="135" y="125" font-size="12" font-weight="900" fill="#0f172a">Y</text>
+                            <text x="216" y="125" font-size="12" font-weight="900" fill="#0f172a">Z</text>
+                            <text x="175" y="20" font-size="12" font-weight="900" fill="#0f172a">X</text>
+                            <path d="M 198 120 A 14 14 0 0 1 203 107" stroke="#10b981" stroke-width="3" fill="none"/>
+                            <line x1="188" y1="70" x2="197" y2="77" stroke="#ef4444" stroke-width="2.5"/>
+                        </svg>
+                        <span class="text-xs text-slate-500 font-bold mt-2">المعطيات: $\overline{AC} \cong \overline{XZ}$ و $\angle C \cong \angle Z$</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Decision Tree Flowchart -->
+            <div class="board-card p-6 space-y-4 text-center">
+                <h4 class="text-base font-black text-slate-800 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-route text-blue-600"></i>
+                    <span>شجرة القرار السريعة لإثبات التطابق (Decision Tree)</span>
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900">
+                        <strong class="block text-sm font-black mb-1">1. هل المعطى 3 أضلاع؟</strong>
+                        استعمل مباشرة مسلمة <span class="font-black text-base text-blue-700">SSS</span>.<br>
+                        (ابحث عن ضلع مشترك أو منتصف قطعة مستقيمة).
+                    </div>
+                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900">
+                        <strong class="block text-sm font-black mb-1">2. هل الزاوية محصورة بين ضلعين؟</strong>
+                        استعمل مباشرة مسلمة <span class="font-black text-base text-emerald-700">SAS</span>.<br>
+                        (تأكد أن رأس الزاوية هو الحرف المشترك بين الضلعين).
+                    </div>
+                    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900">
+                        <strong class="block text-sm font-black mb-1">3. هل الزاوية غير محصورة (SSA)؟</strong>
+                        <span class="font-black text-rose-700 text-sm">توقف فوراً!</span> المعطيات غير كافية.<br>
+                        (تأرجح الضلع يولد أكثر من مثلث ولا يضمن التطابق).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive JavaScript Engine -->
+    <script>
+        // 1. Navigation Pane Switcher
+        function switchTab(targetId) {
+            document.querySelectorAll('.stage-pane').forEach(p => p.classList.add('hidden'));
+            const target = document.getElementById(targetId);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById('btn-' + targetId);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // 2. Square Shearing Engine
+        function shearSquare(val) {
+            const shift = parseFloat(val);
+            const x1 = 80 + shift;
+            const x2 = 200 + shift;
+            const poly = document.getElementById('sq-poly');
+            const c3 = document.getElementById('sq-c3');
+            const c4 = document.getElementById('sq-c4');
+            const valDisp = document.getElementById('sq-val-display');
+            const angDisp = document.getElementById('sq-ang-display');
+
+            if (poly) poly.setAttribute('points', `80,180 200,180 ${x2},60 ${x1},60`);
+            if (c3) c3.setAttribute('cx', x2);
+            if (c4) c4.setAttribute('cx', x1);
+
+            if (valDisp) valDisp.innerText = `إزاحة: ${shift} px`;
+
+            const deg = Math.round(90 - Math.atan(shift / 120) * (180 / Math.PI));
+            if (angDisp) angDisp.innerText = `الزاوية: ${deg}°`;
+        }
+
+        // 3. Geometry Simulation Switcher (SSS vs SAS vs SSA)
+        let armSwung = false;
+        function changeMode(mode) {
+            const ctrl = document.getElementById('ssa-ctrl-bar');
+            const circ = document.getElementById('dyn-circle');
+            const a2 = document.getElementById('dyn-side-a2');
+            const la2 = document.getElementById('dyn-label-a2');
+            const b2 = document.getElementById('dyn-pt-b2');
+            const lb2 = document.getElementById('dyn-lbl-b2');
+            const hud = document.getElementById('hud-diagnosis');
+
+            ['sss', 'sas', 'ssa'].forEach(m => {
+                const b = document.getElementById('btn-m-' + m);
+                if (b) b.className = 'px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs sm:text-sm transition';
+            });
+
+            const current = document.getElementById('btn-m-' + mode);
+            if (mode === 'ssa') {
+                if (current) current.className = 'px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-black text-xs sm:text-sm shadow transition';
+                if (ctrl) ctrl.classList.remove('hidden');
+                if (circ) circ.classList.remove('hidden');
+                if (a2) a2.classList.remove('hidden');
+                if (la2) la2.classList.remove('hidden');
+                if (b2) b2.classList.remove('hidden');
+                if (lb2) lb2.classList.remove('hidden');
+                if (hud) {
+                    hud.className = 'p-4 rounded-xl bg-rose-50 text-xs font-bold text-rose-900 leading-relaxed border-r-4 border-rose-600';
+                    hud.innerHTML = '<strong>خديعة SSA:</strong> الدائرة تقطع خط القاعدة في نقطتين $B_1$ و $B_2$! ينتج مثلثان مختلفان تماماً يحملان نفس المعطيات ($\triangle AB_1C$ حاد، و $\triangle AB_2C$ منفرج). إذن حالة SSA فاشلة ولا تثبت التطابق!';
+                }
+            } else {
+                if (current) current.className = 'px-5 py-2.5 rounded-2xl bg-blue-600 text-white font-black text-xs sm:text-sm shadow transition';
+                if (ctrl) ctrl.classList.add('hidden');
+                if (circ) circ.classList.add('hidden');
+                if (a2) a2.classList.add('hidden');
+                if (la2) la2.classList.add('hidden');
+                if (b2) b2.classList.add('hidden');
+                if (lb2) lb2.classList.add('hidden');
+                if (hud) {
+                    hud.className = 'p-4 rounded-xl bg-slate-100 text-xs font-bold text-slate-800 leading-relaxed border-r-4 border-blue-600';
+                    if (mode === 'sss') {
+                        hud.innerHTML = '<strong>مسلمة SSS:</strong> الأضلاع الثلاثة تحدد مثلثاً وحيداً في الفراغ؛ المثلثان متطابقان دائماً بنسبة 100%.';
+                    } else {
+                        hud.innerHTML = '<strong>مسلمة SAS:</strong> الزاوية محصورة بين الضلعين؛ لذلك يتحدد الضلع الثالث بدقة متناهية وينتج مثلث وحيد ومطابق!';
+                    }
+                }
+            }
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([hud]);
+            }
+        }
+
+        function swingArmAction() {
+            armSwung = !armSwung;
+            const side = document.getElementById('dyn-side-a');
+            const pt = document.getElementById('dyn-pt-b1');
+            const lbl = document.getElementById('dyn-lbl-b1');
+
+            if (armSwung) {
+                if (side) { side.setAttribute('x2', '140'); side.setAttribute('stroke', '#be123c'); }
+                if (pt) { pt.setAttribute('cx', '140'); }
+                if (lbl) { lbl.setAttribute('x', '140'); lbl.textContent = 'المثلث المنفرج البديل!'; }
+            } else {
+                if (side) { side.setAttribute('x2', '380'); side.setAttribute('stroke', '#e11d48'); }
+                if (pt) { pt.setAttribute('cx', '380'); }
+                if (lbl) { lbl.setAttribute('x', '380'); lbl.textContent = 'B₁ (المثلث الحاد)'; }
+            }
+        }
+
+        // 4. Virtual Drag & Rotate Tools
+        function toggleTool(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        let protDeg = 0;
+        function rotateProtractor() {
+            protDeg = (protDeg + 15) % 360;
+            const svg = document.getElementById('prot-svg');
+            if (svg) svg.style.transform = `rotate(${protDeg}deg)`;
+            const disp = document.getElementById('prot-deg');
+            if (disp) disp.innerText = `${protDeg}°`;
+        }
+
+        function setupDrag(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            let p1 = 0, p2 = 0, p3 = 0, p4 = 0;
+
+            el.onmousedown = function(e) {
+                if (e.target.closest('button')) return;
+                e.preventDefault();
+                p3 = e.clientX;
+                p4 = e.clientY;
+                document.onmouseup = function() { document.onmouseup = null; document.onmousemove = null; };
+                document.onmousemove = function(e) {
+                    e.preventDefault();
+                    p1 = p3 - e.clientX;
+                    p2 = p4 - e.clientY;
+                    p3 = e.clientX;
+                    p4 = e.clientY;
+                    el.style.top = (el.offsetTop - p2) + "px";
+                    el.style.left = (el.offsetLeft - p1) + "px";
+                };
+            };
+
+            // Touch support for Smartboards
+            el.ontouchstart = function(e) {
+                if (e.target.closest('button')) return;
+                const touch = e.touches[0];
+                p3 = touch.clientX;
+                p4 = touch.clientY;
+                document.ontouchend = function() { document.ontouchend = null; document.ontouchmove = null; };
+                document.ontouchmove = function(e) {
+                    const touch = e.touches[0];
+                    p1 = p3 - touch.clientX;
+                    p2 = p4 - touch.clientY;
+                    p3 = touch.clientX;
+                    p4 = touch.clientY;
+                    el.style.top = (el.offsetTop - p2) + "px";
+                    el.style.left = (el.offsetLeft - p1) + "px";
+                };
+            };
+        }
+        setupDrag('v-protractor');
+        setupDrag('v-ruler');
+
+        function toggleAlert(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        // 5. Final Exit Ticket Evaluation
+        function checkFinalExitTicket() {
+            const sel = document.querySelector('input[name="exit_radio"]:checked');
+            const fb = document.getElementById('final-ticket-fb');
+            if (!fb) return;
+
+            if (!sel) {
+                fb.className = 'p-3 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 block font-bold text-center';
+                fb.innerHTML = 'يرجى اختيار أحد البدائل أولاً قبل التحقق!';
+                return;
+            }
+
+            fb.classList.remove('hidden');
+            if (sel.value === 'A') {
+                fb.className = 'p-4 rounded-2xl bg-emerald-100 border-2 border-emerald-400 text-emerald-950 block space-y-1';
+                fb.innerHTML = `
+                    <div class="font-black text-emerald-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+                        <span>إجابة صحيحة ومثالية! (A) $\\overline{BC} \\cong \\overline{YZ}$</span>
+                    </div>
+                    <p class="text-xs text-slate-700 pt-1 leading-relaxed">
+                        الزاوية $\\angle C$ تكون محصورة تماماً بين الضلعين $\\overline{AC}$ و $\\overline{BC}$. وتطابق $\\overline{BC} \\cong \\overline{YZ}$ يكمل شروط مسلمة $SAS$.
+                    </p>
+                `;
+            } else {
+                fb.className = 'p-4 rounded-2xl bg-rose-100 border-2 border-rose-400 text-rose-950 block space-y-1';
+                fb.innerHTML = `
+                    <div class="font-black text-rose-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-xmark text-rose-600 text-base"></i>
+                        <span>إجابة خاطئة! فكر في موقع الزاوية المحصورة</span>
+                    </div>
+                    <p class="text-xs text-slate-700 pt-1 leading-relaxed">
+                        اختيار أي ضلع آخر ينتج حالة $SSA$ الخاطئة لأن الزاوية ستكون غير محصورة. البديل الصحيح الذي يجعل $\\angle C$ محصورة هو <strong>(A)</strong>.
+                    </p>
+                `;
+            }
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([fb]);
+            }
+        }
+
+        // Fullscreen Toggle
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        // Board Timer
+        let tSec = 0;
+        let tInt = null;
+        let tRun = false;
+
+        function updateTimerDisp() {
+            const m = Math.floor(tSec / 60);
+            const s = tSec % 60;
+            const d = document.getElementById('board-timer');
+            if (d) d.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timer-btn');
+            if (!tRun) {
+                tRun = true;
+                tInt = setInterval(() => { tSec++; updateTimerDisp(); }, 1000);
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+            } else {
+                tRun = false;
+                clearInterval(tInt);
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            }
+        }
+
+        function resetTimer() {
+            tRun = false;
+            clearInterval(tInt);
+            tSec = 0;
+            updateTimerDisp();
+            const btn = document.getElementById('timer-btn');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+        }
+    </script>
+</body>
+</html>

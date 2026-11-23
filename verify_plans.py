@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+import sys
+import re
+
+sys.stdout.reconfigure(encoding='utf-8')
+
+with open('generator_plans.py', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+plans = re.findall(r'<article class="unit-card" id="(plan-[^"]*)">([\s\S]*?)</article>', text)
+print(f"Total plans in generator_plans.py: {len(plans)}")
+for pid, pcontent in plans:
+    print(f"\n{pid}: chars={len(pcontent)}, words={len(pcontent.split())}")
+    print(f"   الحقبنة: {'الحقبنة' in pcontent}")
+    print(f"   التمهيد: {'التمهيد' in pcontent}")
+    print(f"   جدول KWL: {'KWL' in pcontent}")
+    print(f"   بيئة التعلم: {'بيئة التعلم' in pcontent}")
+    print(f"   مربع فرير: {'فرير' in pcontent}")
+    print(f"   منهجية STEM: {'STEM' in pcontent}")
+    print(f"   التقويم البنائي: {'التقويم البنائي' in pcontent}")
+    print(f"   الواجب المنزلي: {'الواجب' in pcontent}")
+    print(f"   الغلق: {'الغلق' in pcontent}")

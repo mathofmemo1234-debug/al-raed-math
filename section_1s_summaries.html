@@ -1,0 +1,1206 @@
+
+    <!-- ========================================================================= -->
+    <!-- القسم الثاني: الملخصات الشاملة ومطويات المفاهيم للطلاب (8 ملخصات متتالية)  -->
+    <!-- ========================================================================= -->
+    <section id="summaries-section" class="master-section">
+        <div class="section-header-banner summaries">
+            <h2>📚 القسم الثاني: الملخصات الشاملة ومطويات المفاهيم للطلاب (8 ملخصات متتالية)</h2>
+            <span class="section-badge">مفاهيم وقوانين وبراهين هندسية محررة بدقة بالغة</span>
+        </div>
+
+        <!-- ملخص الدرس (3-1) -->
+        <article class="unit-card" id="summary-3-1">
+            <div class="unit-title-box">
+                <h3><span>1️⃣</span> ملخص الدرس (3-1): تصنيف المثلثات (Classifying Triangles)</h3>
+                <span class="page-range-pill">كتاب الطالب: ص 146 – 152</span>
+            </div>
+
+            <!-- بطاقة المفاهيم الأساسية -->
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>📐 أولاً: التصنيف وفقاً للزوايا</h4>
+                    <ul>
+                        <li><strong>مثلث حاد الزوايا (Acute):</strong> جميع زواياه حادة (قياس كل منها \(< 90°\)).</li>
+                        <li><strong>مثلث متطابق الزوايا (Equiangular):</strong> جميع زواياه متطابقة وقياس كل منها \(60°\).</li>
+                        <li><strong>مثلث منفرج الزاوية (Obtuse):</strong> يحوي زاوية واحدة منفرجة (\(> 90°\)).</li>
+                        <li><strong>مثلث قائم الزاوية (Right):</strong> يحوي زاوية واحدة قائمة (\(= 90°\)).</li>
+                    </ul>
+                </div>
+                <div class="concept-card">
+                    <h4>📏 ثانياً: التصنيف وفقاً للأضلاع</h4>
+                    <ul>
+                        <li><strong>مثلث متطابق الأضلاع (Equilateral):</strong> أضلاعه الثلاثة متطابقة تماماً.</li>
+                        <li><strong>مثلث متطابق الضلعين (Isosceles):</strong> يحوي ضلعين متطابقين على الأقل.</li>
+                        <li><strong>مثلث مختلف الأضلاع (Scalene):</strong> لا يوجد فيه أي ضلعين متطابقين.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- الأشكال الهندسية المحررة -->
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 تصنيف المثلثات وفقاً لقياسات زواياها</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 650 185" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <!-- 1. Acute -->
+    <g transform="translate(10, 15)">
+        <polygon points="70,15 15,120 135,120" class="s-tri" />
+        <text x="70" y="8" class="t-en">A</text>
+        <text x="8" y="125" class="t-en">B</text>
+        <text x="142" y="125" class="t-en">C</text>
+        <path d="M 30,113 A 18 18 0 0 0 38,120" class="s-arc" />
+        <path d="M 112,120 A 18 18 0 0 0 120,113" class="s-arc" />
+        <path d="M 64,28 A 18 18 0 0 0 76,28" class="s-arc" />
+        <text x="75" y="150" class="t-ar">حاد الزوايا (Acute)</text>
+        <text x="75" y="168" class="t-sub">جميع الزوايا &lt; 90°</text>
+    </g>
+    <!-- 2. Right -->
+    <g transform="translate(170, 15)">
+        <polygon points="25,20 25,120 135,120" class="s-tri" />
+        <rect x="25" y="102" width="18" height="18" class="s-sq" />
+        <text x="25" y="12" class="t-en">D</text>
+        <text x="12" y="125" class="t-en">E</text>
+        <text x="142" y="125" class="t-en">F</text>
+        <text x="80" y="150" class="t-ar">قائم الزاوية (Right)</text>
+        <text x="80" y="168" class="t-sub">زاوية واحدة = 90°</text>
+    </g>
+    <!-- 3. Obtuse -->
+    <g transform="translate(330, 15)">
+        <polygon points="105,25 20,120 145,120" class="s-tri" />
+        <path d="M 38,108 A 24 24 0 0 0 44,120" class="s-arc" style="stroke-width:2.5; stroke:#b91c1c;" />
+        <text x="110" y="18" class="t-en">G</text>
+        <text x="10" y="125" class="t-en">H</text>
+        <text x="152" y="125" class="t-en">K</text>
+        <text x="82" y="150" class="t-ar">منفرج الزاوية (Obtuse)</text>
+        <text x="82" y="168" class="t-sub">إحدى الزوايا &gt; 90°</text>
+    </g>
+    <!-- 4. Equiangular -->
+    <g transform="translate(490, 15)">
+        <polygon points="70,18 15,120 125,120" class="s-tri" style="fill:#f0fdf4;" />
+        <path d="M 30,113 A 18 18 0 0 0 38,120" class="s-arc2" />
+        <path d="M 102,120 A 18 18 0 0 0 110,113" class="s-arc2" />
+        <path d="M 64,28 A 18 18 0 0 0 76,28" class="s-arc2" />
+        <text x="70" y="10" class="t-en">P</text>
+        <text x="8" y="125" class="t-en">Q</text>
+        <text x="132" y="125" class="t-en">R</text>
+        <text x="70" y="150" class="t-ar">متطابق الزوايا (Equiangular)</text>
+        <text x="70" y="168" class="t-sub">3 زوايا متطابقة = 60°</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 تصنيف المثلثات وفقاً لأطوال أضلاعها</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 650 185" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <!-- 1. Equilateral -->
+    <g transform="translate(20, 15)">
+        <polygon points="75,18 20,120 130,120" class="s-tri" />
+        <!-- 3 single tick marks -->
+        <line x1="43" y1="67" x2="52" y2="71" class="s-mark" />
+        <line x1="98" y1="71" x2="107" y2="67" class="s-mark" />
+        <line x1="75" y1="116" x2="75" y2="124" class="s-mark" />
+        <text x="75" y="10" class="t-en">A</text>
+        <text x="10" y="125" class="t-en">B</text>
+        <text x="138" y="125" class="t-en">C</text>
+        <text x="75" y="150" class="t-ar">متطابق الأضلاع (Equilateral)</text>
+        <text x="75" y="168" class="t-sub">3 أضلاع متطابقة</text>
+    </g>
+    <!-- 2. Isosceles -->
+    <g transform="translate(240, 15)">
+        <polygon points="75,15 30,120 120,120" class="s-tri" />
+        <!-- 2 double tick marks -->
+        <line x1="48" y1="65" x2="56" y2="68" class="s-mark" />
+        <line x1="51" y1="69" x2="59" y2="72" class="s-mark" />
+        <line x1="94" y1="68" x2="102" y2="65" class="s-mark" />
+        <line x1="91" y1="72" x2="99" y2="69" class="s-mark" />
+        <text x="75" y="8" class="t-en">J</text>
+        <text x="20" y="125" class="t-en">K</text>
+        <text x="130" y="125" class="t-en">L</text>
+        <text x="75" y="150" class="t-ar">متطابق الضلعين (Isosceles)</text>
+        <text x="75" y="168" class="t-sub">ضلعان متطابقان على الأقل</text>
+    </g>
+    <!-- 3. Scalene -->
+    <g transform="translate(460, 15)">
+        <polygon points="105,25 20,120 140,120" class="s-tri" />
+        <!-- 1, 2, 3 different ticks -->
+        <line x1="58" y1="68" x2="66" y2="74" class="s-mark" />
+        <line x1="118" y1="68" x2="127" y2="72" class="s-mark" />
+        <line x1="121" y1="72" x2="130" y2="76" class="s-mark" />
+        <line x1="76" y1="116" x2="76" y2="124" class="s-mark" />
+        <line x1="80" y1="116" x2="80" y2="124" class="s-mark" />
+        <line x1="84" y1="116" x2="84" y2="124" class="s-mark" />
+        <text x="110" y="18" class="t-en">X</text>
+        <text x="10" y="125" class="t-en">Y</text>
+        <text x="148" y="125" class="t-en">Z</text>
+        <text x="80" y="150" class="t-ar">مختلف الأضلاع (Scalene)</text>
+        <text x="80" y="168" class="t-sub">لا توجد أضلاع متطابقة</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <!-- الربط الجبري وحساب الأطوال -->
+            <div class="plan-step-box">
+                <div class="plan-step-title">🧮 استراتيجية حل مسائل الجبر في المثلثات المتطابقة الضلعين والأضلاع</div>
+                <p>عندما يطلب إيجاد قيمة متغير أو أطوال أضلاع مثلث متطابق الضلعين أو متطابق الأضلاع، نتبع الخطوات الآتية:</p>
+                <ol style="margin-right: 20px; line-height: 2;">
+                    <li><strong>تحديد العلاقة الهندسية:</strong> نحدد الضلعين المتطابقين بناءً على المعطيات أو علامات التطابق (Tick marks)، مثلاً: \(AB = AC\).</li>
+                    <li><strong>بناء المعادلة الجبرية:</strong> نعوض بالقيم المعطاة: \(5x - 0.5 = 4x + 1\).</li>
+                    <li><strong>حل المعادلة:</strong> بطرح \(4x\) وإضافة \(0.5\) للطرفين: \(x = 1.5\).</li>
+                    <li><strong>حساب الأطوال الفعلية:</strong> نعوض بقيمة \(x\) في كل عبارة جبرية لحساب أطوال الأضلاع والتأكد من تطابقها: \(AB = 5(1.5) - 0.5 = 7\)، \(AC = 4(1.5) + 1 = 7\).</li>
+                </ol>
+            </div>
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 إيجاد أطوال الأضلاع وقيمة x في مثلث متطابق الضلعين</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 600 195" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <g transform="translate(180, 20)">
+        <polygon points="120,15 20,140 220,140" class="s-tri" />
+        <!-- Equal ticks on AB and AC -->
+        <line x1="64" y1="74" x2="74" y2="80" class="s-mark" />
+        <line x1="166" y1="80" x2="176" y2="74" class="s-mark" />
+        <text x="120" y="8" class="t-en">A</text>
+        <text x="10" y="145" class="t-en">B</text>
+        <text x="230" y="145" class="t-en">C</text>
+        <text x="45" y="70" class="t-en" style="fill:#2563eb; font-size:14px;">5x - 0.5</text>
+        <text x="195" y="70" class="t-en" style="fill:#2563eb; font-size:14px;">4x + 1</text>
+        <text x="120" y="160" class="t-en" style="fill:#0d9488; font-size:14px;">3x + 2.5</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <!-- تنبيه الأخطاء الشائعة -->
+            <div class="mistake-alert">
+                <strong>⚠️ انتبه للأخطاء الشائعة:</strong>
+                المثلث المتطابق الأضلاع هو أيضاً مثلث متطابق الضلعين (لأنه يحقق شرط وجود ضلعين متطابقين على الأقل)، ولكن العكس غير صحيح؛ فالمثلث المتطابق الضلعين ليس بالضرورة متطابق الأضلاع. كذلك لا يمكن لأي مثلث أن يحوي أكثر من زاوية قائمة واحدة أو أكثر من زاوية منفرجة واحدة.
+            </div>
+        </article>
+    
+        <!-- ملخص الدرس (3-2) -->
+        <article class="unit-card" id="summary-3-2">
+            <div class="unit-title-box">
+                <h3><span>2️⃣</span> ملخص الدرس (3-2): زوايا المثلثات (Angles of Triangles)</h3>
+                <span class="page-range-pill">كتاب الطالب: ص 153 – 161</span>
+            </div>
+
+            <!-- جدول النظريات والنتائج -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>النظرية / النتيجة</th>
+                        <th>التعبير اللفظي</th>
+                        <th>الصيغة والرموز الرياضية (LTR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>نظرية مجموع قياسات زوايا المثلث</strong><br>(Triangle Angle-Sum Theorem)</td>
+                        <td>مجموع قياسات الزوايا الداخلية لأي مثلث يساوي دائماً \(180°\).</td>
+                        <td>\[m\angle A + m\angle B + m\angle C = 180°\]</td>
+                    </tr>
+                    <tr>
+                        <td><strong>نظرية الزاوية الخارجية للمثلث</strong><br>(Exterior Angle Theorem)</td>
+                        <td>قياس الزاوية الخارجية لمثلث يساوي مجموع قياسي الزاويتين الداخليتين البعيدتين عنها.</td>
+                        <td>\[m\angle 4 = m\angle 1 + m\angle 2\]</td>
+                    </tr>
+                    <tr>
+                        <td><strong>النتيجة 3.1: الزاويتان الحادتان في مثلث قائم</strong></td>
+                        <td>الزاويتان الحادتان في أي مثلث قائم الزاوية تكونان متتامتين دائماً.</td>
+                        <td>\[m\angle A + m\angle B = 90°\]</td>
+                    </tr>
+                    <tr>
+                        <td><strong>النتيجة 3.2: استقامة الزوايا</strong></td>
+                        <td>لا يمكن لمثلث أن يحوي أكثر من زاوية قائمة واحدة، أو أكثر من زاوية منفرجة واحدة.</td>
+                        <td>\[m\angle \ge 90° \text{ لزاوية واحدة فقط على الأكثر}\]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- الأشكال الهندسية المحررة -->
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 برهان ونظرية مجموع قياسات زوايا المثلث (Angle-Sum Theorem)</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 620 220" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <g transform="translate(120, 25)">
+        <!-- Auxiliary parallel line above vertex A -->
+        <line x1="20" y1="30" x2="360" y2="30" stroke="#64748b" stroke-width="1.8" stroke-dasharray="5,4" />
+        <text x="375" y="34" class="t-en" style="fill:#64748b;">ℓ ∥ BC</text>
+        <polygon points="190,30 60,150 320,150" class="s-tri" />
+        <text x="190" y="18" class="t-en">A</text>
+        <text x="45" y="155" class="t-en">B</text>
+        <text x="330" y="155" class="t-en">C</text>
+        <!-- interior angles -->
+        <path d="M 80,144 A 22 22 0 0 0 92,150" class="s-arc" />
+        <text x="105" y="142" class="t-num">2</text>
+        <path d="M 288,150 A 22 22 0 0 0 300,144" class="s-arc" />
+        <text x="275" y="142" class="t-num">3</text>
+        <path d="M 178,44 A 20 20 0 0 0 202,44" class="s-arc" />
+        <text x="190" y="60" class="t-num">1</text>
+        <!-- alternate interior angles along line ell -->
+        <path d="M 160,30 A 25 25 0 0 0 178,42" class="s-arc2" />
+        <text x="150" y="24" class="t-num" style="fill:#16a34a;">4</text>
+        <path d="M 202,42 A 25 25 0 0 0 220,30" class="s-arc2" />
+        <text x="230" y="24" class="t-num" style="fill:#16a34a;">5</text>
+        <text x="190" y="185" class="t-ar" style="font-size:14px;">نظرية مجموع قياسات زوايا المثلث: m∠1 + m∠2 + m∠3 = 180°</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 نظرية الزاوية الخارجية للمثلث (Exterior Angle Theorem)</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 600 210" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <g transform="translate(70, 25)">
+        <!-- Base line extending to D -->
+        <line x1="40" y1="130" x2="440" y2="130" stroke="#334155" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow)" />
+        <polygon points="170,25 60,130 280,130" class="s-tri" />
+        <text x="170" y="15" class="t-en">A</text>
+        <text x="45" y="135" class="t-en">B</text>
+        <text x="275" y="150" class="t-en">C</text>
+        <text x="445" y="135" class="t-en">D</text>
+        <!-- Remote interior angles 1 and 2 -->
+        <path d="M 160,40 A 20 20 0 0 0 178,40" class="s-arc" />
+        <text x="170" y="55" class="t-num">1</text>
+        <path d="M 80,123 A 22 22 0 0 0 92,130" class="s-arc" />
+        <text x="105" y="122" class="t-num">2</text>
+        <!-- Interior angle 3 -->
+        <path d="M 255,130 A 20 20 0 0 0 265,123" class="s-arc2" />
+        <text x="250" y="122" class="t-num" style="fill:#16a34a;">3</text>
+        <!-- Exterior angle 4 -->
+        <path d="M 295,123 A 22 22 0 0 1 305,130" class="s-arc" style="stroke-width:2.5; stroke:#b91c1c;" />
+        <text x="315" y="120" class="t-num" style="font-size:14px;">4</text>
+        <text x="240" y="175" class="t-ar" style="font-size:14px;">نظرية الزاوية الخارجية: m∠4 = m∠1 + m∠2</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <!-- خطوات حل مسائل الزوايا المركبة -->
+            <div class="plan-step-box">
+                <div class="plan-step-title">💡 الدليل الإرشادي لحساب الزوايا في الأشكال المركبة (مثل ص 158 و 159)</div>
+                <ul style="margin-right: 20px; line-height: 2;">
+                    <li><strong>البحث عن مثلث يحوي معلومين:</strong> إذا كان المثلث يحوي زاويتين معلومتين، ابدأ به فوراً باستخدام: \(m\angle 3 = 180° - (m\angle 1 + m\angle 2)\).</li>
+                    <li><strong>استثمار التقابل بالرأس والتحالف والتناظر:</strong> الزوايا المتقابلة بالرأس متطابقة وتنقلك من مثلث إلى مثلث مجاور.</li>
+                    <li><strong>استخدام الزاوية المستقيمة:</strong> الزاويتان المتجاورتان على خط مستقيم مجموعهما \(180°\).</li>
+                    <li><strong>توظيف الزاوية الخارجية مباشرة:</strong> توفر عليك خطوتين لحساب الزاوية دون الحاجة لحساب الزاوية المجاورة لها أولاً.</li>
+                </ul>
+            </div>
+
+            <div class="mistake-alert">
+                <strong>⚠️ خطأ شائع يجب الحذر منه:</strong>
+                الزاوية الخارجية لا تساوي أي زاوية مجاورة لها، بل تساوي مجموع الزاويتين <em>البعيدتين عنها</em>. الزاوية المجاورة لها تشكل معها زوجاً خطياً متكاملاً مجموعه \(180°\).
+            </div>
+        </article>
+    
+        <!-- ملخص الدرس (3-3) -->
+        <article class="unit-card" id="summary-3-3">
+            <div class="unit-title-box">
+                <h3><span>3️⃣</span> ملخص الدرس (3-3): المثلثات المتطابقة (Congruent Triangles)</h3>
+                <span class="page-range-pill">كتاب الطالب: ص 162 – 169</span>
+            </div>
+
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>🔗 تعريف المضلعات المتطابقة (CPCTC)</h4>
+                    <p>يتطابق مضلعان إذا وفقط إذا كانت أجزاؤهما المتناظرة متطابقة. ويعبر عن ذلك اختصاراً بالإنجليزية بـ <strong>CPCTC</strong>:</p>
+                    <p style="direction:ltr; text-align:center; font-weight:bold; color:#1e3a8a;">Corresponding Parts of Congruent Triangles are Congruent</p>
+                    <p>يتضمن ذلك 6 عناصر: 3 أزواج من الأضلاع المتناظرة المتطابقة + 3 أزواج من الزوايا المتناظرة المتطابقة.</p>
+                </div>
+                <div class="concept-card">
+                    <h4>📐 نظرية الزاوية الثالثة (Third Angles Theorem)</h4>
+                    <p>إذا تطابقت زاويتان في مثلث مع زاويتين مناظرتين في مثلث آخر، فإن الزاوية الثالثة في المثلث الأول تطابق حتماً الزاوية الثالثة في المثلث الثاني:</p>
+                    <p style="direction:ltr; text-align:center; font-weight:bold;">If \(\angle A \cong \angle D\) and \(\angle B \cong \angle E\), then \(\angle C \cong \angle F\).</p>
+                </div>
+            </div>
+
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 تطابق المثلثات والعناصر المتناظرة (CPCTC: △ABC ≅ △DEF)</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 500 180" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <!-- Triangle 1: ABC -->
+    <g transform="translate(50, 20)">
+        <polygon points="70,20 15,125 130,125" class="s-tri" />
+        <!-- Ticks on sides -->
+        <line x1="39" y1="69" x2="47" y2="73" class="s-mark" />
+        <line x1="96" y1="74" x2="104" y2="70" class="s-mark" />
+        <line x1="93" y1="77" x2="101" y2="73" class="s-mark" />
+        <line x1="68" y1="121" x2="68" y2="129" class="s-mark" />
+        <line x1="72" y1="121" x2="72" y2="129" class="s-mark" />
+        <line x1="76" y1="121" x2="76" y2="129" class="s-mark" />
+        <!-- Angle arcs -->
+        <path d="M 64,32 A 18 18 0 0 0 76,32" class="s-arc" />
+        <path d="M 28,118 A 18 18 0 0 0 36,125" class="s-arc2" />
+        <path d="M 32,114 A 23 23 0 0 0 42,125" class="s-arc2" />
+        <path d="M 112,125 A 18 18 0 0 0 118,118" class="s-arc" style="stroke:#7c3aed;" />
+        <text x="70" y="10" class="t-en">A</text>
+        <text x="8" y="130" class="t-en">B</text>
+        <text x="138" y="130" class="t-en">C</text>
+        <text x="70" y="155" class="t-en" style="font-size:16px;">△ABC</text>
+    </g>
+    <!-- Congruence symbol -->
+    <text x="240" y="90" class="t-en" style="font-size:32px; fill:#2563eb;">≅</text>
+    <!-- Triangle 2: DEF -->
+    <g transform="translate(300, 20)">
+        <polygon points="70,20 15,125 130,125" class="s-tri2" />
+        <!-- Ticks on sides -->
+        <line x1="39" y1="69" x2="47" y2="73" class="s-mark" />
+        <line x1="96" y1="74" x2="104" y2="70" class="s-mark" />
+        <line x1="93" y1="77" x2="101" y2="73" class="s-mark" />
+        <line x1="68" y1="121" x2="68" y2="129" class="s-mark" />
+        <line x1="72" y1="121" x2="72" y2="129" class="s-mark" />
+        <line x1="76" y1="121" x2="76" y2="129" class="s-mark" />
+        <!-- Angle arcs -->
+        <path d="M 64,32 A 18 18 0 0 0 76,32" class="s-arc" />
+        <path d="M 28,118 A 18 18 0 0 0 36,125" class="s-arc2" />
+        <path d="M 32,114 A 23 23 0 0 0 42,125" class="s-arc2" />
+        <path d="M 112,125 A 18 18 0 0 0 118,118" class="s-arc" style="stroke:#7c3aed;" />
+        <text x="70" y="10" class="t-en">D</text>
+        <text x="8" y="130" class="t-en">E</text>
+        <text x="138" y="130" class="t-en">F</text>
+        <text x="70" y="155" class="t-en" style="font-size:16px;">△DEF</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <!-- جدول خصائص تطابق المثلثات -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>الخاصية</th>
+                        <th>الصيغة الرمزية (LTR)</th>
+                        <th>الشرح اللفظي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>الانعكاس (Reflexive)</strong></td>
+                        <td>\[\triangle ABC \cong \triangle ABC\]</td>
+                        <td>أي مثلث يطابق نفسه دائماً.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>التماثل (Symmetric)</strong></td>
+                        <td>\[\triangle ABC \cong \triangle DEF \implies \triangle DEF \cong \triangle ABC\]</td>
+                        <td>إذا طابق مثلث أول مثلثاً ثانياً، فإن الثاني يطابق الأول.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>التعدي (Transitive)</strong></td>
+                        <td>\[\triangle ABC \cong \triangle DEF \text{ and } \triangle DEF \cong \triangle JKL \implies \triangle ABC \cong \triangle JKL\]</td>
+                        <td>إذا طابق مثلث مثلثين آخرين، فإن المثلثين الآخرين متطابقان.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="mistake-alert">
+                <strong>⚠️ انتبه لترتيب الرؤوس في عبارة التطابق:</strong>
+                كتابة \(\triangle ABC \cong \triangle DEF\) تعني أن \(A \leftrightarrow D\)، \(B \leftrightarrow E\)، \(C \leftrightarrow F\). إذا غيّر الطالب ترتيب حرف واحد فقط مثل كتابة \(\triangle ABC \cong \triangle EDF\) فإن العبارة تصبح خاطئة رياضياً.
+            </div>
+        </article>
+    
+        <!-- ملخص الدرس (3-4) -->
+        <article class="unit-card" id="summary-3-4">
+            <div class="unit-title-box">
+                <h3><span>4️⃣</span> ملخص الدرس (3-4): إثبات تطابق المثلثات SSS, SAS</h3>
+                <span class="page-range-pill">كتاب الطالب: ص 170 – 177</span>
+            </div>
+
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>🔺 مسلمة التطابق بثلاثة أضلاع (SSS)</h4>
+                    <p><strong>Side-Side-Side:</strong> إذا تطابقت أضلاع مثلث مع الأضلاع المناظرة لها في مثلث آخر، فإن المثلثين متطابقان.</p>
+                    <p style="direction:ltr; text-align:center; font-weight:bold; color:#2563eb;">\(AB \cong DE, BC \cong EF, AC \cong DF \implies \triangle ABC \cong \triangle DEF\)</p>
+                </div>
+                <div class="concept-card">
+                    <h4>📐 مسلمة التطابق بضلعين والزاوية المحصورة (SAS)</h4>
+                    <p><strong>Side-Angle-Side:</strong> إذا تطابق ضلعان والزاوية المحصورة بينهما في مثلث مع نظائرها في مثلث آخر، فإن المثلثين متطابقان.</p>
+                    <p style="direction:ltr; text-align:center; font-weight:bold; color:#0d9488;">\(AB \cong DE, \angle B \cong \angle E, BC \cong EF \implies \triangle ABC \cong \triangle DEF\)</p>
+                </div>
+            </div>
+
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 مقارنة مسلمتي التطابق: SSS مقابل SAS</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 480 150" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <!-- SSS Section -->
+    <g transform="translate(10, 10)">
+        <polygon points="50,15 15,95 90,95" class="s-tri" />
+        <line x1="29" y1="52" x2="36" y2="56" class="s-mark" />
+        <line x1="67" y1="56" x2="73" y2="52" class="s-mark" />
+        <line x1="64" y1="59" x2="70" y2="55" class="s-mark" />
+        <line x1="49" y1="92" x2="49" y2="98" class="s-mark" />
+        <line x1="53" y1="92" x2="53" y2="98" class="s-mark" />
+        <line x1="57" y1="92" x2="57" y2="98" class="s-mark" />
+        <text x="50" y="8" class="t-en" style="font-size:12px;">A</text>
+        <text x="8" y="98" class="t-en" style="font-size:12px;">B</text>
+        <text x="96" y="98" class="t-en" style="font-size:12px;">C</text>
+
+        <polygon points="150,15 115,95 190,95" class="s-tri2" />
+        <line x1="129" y1="52" x2="136" y2="56" class="s-mark" />
+        <line x1="167" y1="56" x2="173" y2="52" class="s-mark" />
+        <line x1="164" y1="59" x2="170" y2="55" class="s-mark" />
+        <line x1="149" y1="92" x2="149" y2="98" class="s-mark" />
+        <line x1="153" y1="92" x2="153" y2="98" class="s-mark" />
+        <line x1="157" y1="92" x2="157" y2="98" class="s-mark" />
+        <text x="150" y="8" class="t-en" style="font-size:12px;">D</text>
+        <text x="108" y="98" class="t-en" style="font-size:12px;">E</text>
+        <text x="196" y="98" class="t-en" style="font-size:12px;">F</text>
+        <text x="105" y="125" class="t-ar">مسلمة SSS: تطابق ثلاثة أضلاع</text>
+    </g>
+    <!-- Divider -->
+    <line x1="230" y1="15" x2="230" y2="135" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4" />
+    <!-- SAS Section -->
+    <g transform="translate(250, 10)">
+        <polygon points="50,15 15,95 90,95" class="s-tri" />
+        <line x1="29" y1="52" x2="36" y2="56" class="s-mark" />
+        <line x1="49" y1="92" x2="49" y2="98" class="s-mark" />
+        <line x1="53" y1="92" x2="53" y2="98" class="s-mark" />
+        <!-- Included angle B -->
+        <path d="M 25,90 A 14 14 0 0 0 32,95" class="s-arc" style="stroke-width:2.2;" />
+        <text x="50" y="8" class="t-en" style="font-size:12px;">J</text>
+        <text x="8" y="98" class="t-en" style="font-size:12px;">K</text>
+        <text x="96" y="98" class="t-en" style="font-size:12px;">L</text>
+
+        <polygon points="150,15 115,95 190,95" class="s-tri2" />
+        <line x1="129" y1="52" x2="136" y2="56" class="s-mark" />
+        <line x1="149" y1="92" x2="149" y2="98" class="s-mark" />
+        <line x1="153" y1="92" x2="153" y2="98" class="s-mark" />
+        <path d="M 125,90 A 14 14 0 0 0 132,95" class="s-arc" style="stroke-width:2.2;" />
+        <text x="150" y="8" class="t-en" style="font-size:12px;">P</text>
+        <text x="108" y="98" class="t-en" style="font-size:12px;">Q</text>
+        <text x="196" y="98" class="t-en" style="font-size:12px;">R</text>
+        <text x="105" y="125" class="t-ar">مسلمة SAS: ضلعان وزاوية محصورة</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <!-- استراتيجية البرهان في المستوى الإحداثي -->
+            <div class="plan-step-box">
+                <div class="plan-step-title">📍 خطوات إثبات تطابق مثلثين في المستوى الإحداثي باستعمال مسلمة SSS</div>
+                <ol style="margin-right: 20px; line-height: 2;">
+                    <li><strong>حساب أطوال أضلاع المثلث الأول الثلاثة:</strong> باستعمال قانون المسافة بين نقطتين:
+                    \[d = \sqrt{<span class="ar-pow"><span class="ar-base">(x_2 - x_1)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(y_2 - y_1)</span><sup class="ar-exp">٢</sup></span>}\]
+                    </li>
+                    <li><strong>حساب أطوال أضلاع المثلث الثاني الثلاثة:</strong> بنفس القانون لكل ضلع مناظر.</li>
+                    <li><strong>المقارنة الدقيقة:</strong> إذا تساوت الأطوال الثلاثة المتناظرة، فإن الأضلاع متطابقة (\(\cong\)).</li>
+                    <li><strong>النتيجة النهائية:</strong> يتطابق المثلثان وفق مسلمة SSS.</li>
+                </ol>
+            </div>
+
+            <div class="mistake-alert">
+                <strong>⚠️ ما هي الزاوية المحصورة؟</strong>
+                الزاوية المحصورة بين الضلعين \(AB\) و \(BC\) هي الزاوية التي يشترك فيها الضلعان وهي \(\angle B\). إذا كانت الزاوية المعطاة غير محصورة (مثل \(\angle A\) أو \(\angle C\))، فإننا نكون أمام حالة SSA (ضلعان وزاوية غير محصورة) وهي <em>ليست حالة تطابق</em> ولا تثبت تطابق المثلثات أبداً!
+            </div>
+        </article>
+    
+        <!-- ملخص مراجعة منتصف الفصل الثالث -->
+        <article class="unit-card" id="summary-3-mid">
+            <div class="unit-title-box">
+                <h3><span>5️⃣</span> ملخص مراجعة منتصف الفصل الثالث (ص 178)</h3>
+                <span class="page-range-pill">كتاب الطالب: ص 178 (مراجعة الدروس 3-1 إلى 3-4)</span>
+            </div>
+
+            <!-- خريطة المفاهيم الموحدة -->
+            <div class="plan-step-box">
+                <div class="plan-step-title">🗺️ خريطة المفاهيم الشاملة للنصف الأول من الفصل الثالث</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>الدرس</th>
+                            <th>المفاهيم والنظريات الأساسية</th>
+                            <th>القوانين والصيغ المعتمدة (LTR)</th>
+                            <th>مفتاح الحل الذكي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>3-1: تصنيف المثلثات</strong></td>
+                            <td>تصنيف الزوايا (حاد، قائم، منفرج، متطابق الزوايا) وتصنيف الأضلاع (متطابق الأضلاع، متطابق الضلعين، مختلف الأضلاع).</td>
+                            <td>معادلات التساوي: \(d_1 = d_2\) لحساب المتغيرات.</td>
+                            <td>ابحث عن علامات التطابق، أو الزوايا القائمة والمنفرجة.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3-2: زوايا المثلثات</strong></td>
+                            <td>مجموع زوايا المثلث \(180°\)، نظرية الزاوية الخارجية، وتتام الزاويتين الحادتين في القائم.</td>
+                            <td>\[m\angle A + m\angle B + m\angle C = 180°\]
+                            \[m\angle ext = m\angle 1 + m\angle 2\]</td>
+                            <td>الزاوية الخارجية = مجموع البعيدتين فوراً دون حساب المجاورة.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3-3: المثلثات المتطابقة</strong></td>
+                            <td>تطابق المضلعات CPCTC، ترتيب الرؤوس، نظرية الزاوية الثالثة، وخصائص التطابق.</td>
+                            <td>\[\triangle ABC \cong \triangle DEF \implies 6 \text{ pairs congruent}\]</td>
+                            <td>الترتيب هو الأساس؛ الحرف الأول يقابل الأول دائماً.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3-4: إثبات التطابق SSS, SAS</strong></td>
+                            <td>تطابق ثلاثة أضلاع SSS، وتطابق ضلعين وزاوية محصورة SAS، والمسافة في المستوى الإحداثي.</td>
+                            <td>\[d = \sqrt{<span class="ar-pow"><span class="ar-base">(x_2-x_1)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(y_2-y_1)</span><sup class="ar-exp">٢</sup></span>}\]</td>
+                            <td>تأكد أن الزاوية محصورة بين الضلعين؛ الضلع المشترك يطابق نفسه بالانعكاس.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- جدول المصطلحات الإنجليزية الأساسية للمرحلة الثانوية -->
+            <div class="plan-step-box stem">
+                <div class="plan-step-title">🔤 مسرد المصطلحات الرياضية والرموز الإنجليزية المعتمدة (Glossary)</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>المصطلح بالعربية</th>
+                            <th>المصطلح بالإنجليزية</th>
+                            <th>الرمز المعتمد</th>
+                            <th>الاستعمال الرياضي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>مثلث متطابق الأضلاع</td><td>Equilateral Triangle</td><td>Equilateral</td><td>جميع الأضلاع الثلاثة متطابقة</td></tr>
+                        <tr><td>مثلث متطابق الضلعين</td><td>Isosceles Triangle</td><td>Isosceles</td><td>ضلعان متطابقان على الأقل</td></tr>
+                        <tr><td>مثلث مختلف الأضلاع</td><td>Scalene Triangle</td><td>Scalene</td><td>لا توجد أضلاع متطابقة</td></tr>
+                        <tr><td>رمز التطابق</td><td>Congruence Symbol</td><td>\(\cong\)</td><td>\(\triangle ABC \cong \triangle DEF\)</td></tr>
+                        <tr><td>الأجزاء المتناظرة متطابقة</td><td>Corresponding Parts</td><td>CPCTC</td><td>استنتاج تطابق باقي العناصر بعد البرهان</td></tr>
+                        <tr><td>ضلع - ضلع - ضلع</td><td>Side-Side-Side</td><td>SSS</td><td>مسلمة التطابق بثلاثة أضلاع</td></tr>
+                        <tr><td>ضلع - زاوية محصورة - ضلع</td><td>Side-Angle-Side</td><td>SAS</td><td>مسلمة التطابق بضلعين وزاوية محصورة</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    
+        <!-- ملخص الدرس (3-5) -->
+        <article class="unit-card" id="summary-3-5">
+            <div class="unit-title-box">
+                <h3><span>6️⃣</span> ملخص الدرس (3-5): إثبات تطابق المثلثات ASA, AAS ومعمل تطابق المثلثات القائمة</h3>
+                <span class="page-range-pill">كتاب الطالب: ص 179 – 187</span>
+            </div>
+
+            <!-- مقارنة ASA و AAS -->
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>📐 مسلمة التطابق بزاويتين وضلع محصور (ASA)</h4>
+                    <p><strong>Angle-Side-Angle:</strong> إذا تطابقت زاويتان والضلع المحصور بينهما في مثلث مع نظائرها في مثلث آخر، فإن المثلثين متطابقان.</p>
+                    <p style="direction:ltr; text-align:center; font-weight:bold; color:#2563eb;">\(\angle A \cong \angle D, AB \cong DE, \angle B \cong \angle E \implies \triangle ABC \cong \triangle DEF\)</p>
+                </div>
+                <div class="concept-card">
+                    <h4>📐 نظرية التطابق بزاويتين وضلع غير محصور (AAS)</h4>
+                    <p><strong>Angle-Angle-Side:</strong> إذا تطابقت زاويتان وضلع غير محصور في مثلث مع نظائرها في مثلث آخر، فإن المثلثين متطابقان.</p>
+                    <p style="direction:ltr; text-align:center; font-weight:bold; color:#0d9488;">\(\angle A \cong \angle D, \angle B \cong \angle E, BC \cong EF \implies \triangle ABC \cong \triangle DEF\)</p>
+                </div>
+            </div>
+
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 مقارنة حالتي التطابق: ASA مقابل AAS</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 480 150" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <!-- ASA Section -->
+    <g transform="translate(10, 10)">
+        <polygon points="50,15 15,95 90,95" class="s-tri" />
+        <path d="M 25,90 A 14 14 0 0 0 32,95" class="s-arc" />
+        <path d="M 78,95 A 14 14 0 0 0 83,90" class="s-arc2" />
+        <!-- Included side BC -->
+        <line x1="50" y1="92" x2="50" y2="98" class="s-mark" />
+        <text x="50" y="8" class="t-en" style="font-size:12px;">A</text>
+        <text x="8" y="98" class="t-en" style="font-size:12px;">B</text>
+        <text x="96" y="98" class="t-en" style="font-size:12px;">C</text>
+
+        <polygon points="150,15 115,95 190,95" class="s-tri2" />
+        <path d="M 125,90 A 14 14 0 0 0 132,95" class="s-arc" />
+        <path d="M 178,95 A 14 14 0 0 0 183,90" class="s-arc2" />
+        <line x1="150" y1="92" x2="150" y2="98" class="s-mark" />
+        <text x="150" y="8" class="t-en" style="font-size:12px;">D</text>
+        <text x="108" y="98" class="t-en" style="font-size:12px;">E</text>
+        <text x="196" y="98" class="t-en" style="font-size:12px;">F</text>
+        <text x="105" y="125" class="t-ar">مسلمة ASA: زاويتان وضلع محصور</text>
+    </g>
+    <!-- Divider -->
+    <line x1="230" y1="15" x2="230" y2="135" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4" />
+    <!-- AAS Section -->
+    <g transform="translate(250, 10)">
+        <polygon points="50,15 15,95 90,95" class="s-tri" />
+        <path d="M 45,26 A 14 14 0 0 0 55,26" class="s-arc" />
+        <path d="M 25,90 A 14 14 0 0 0 32,95" class="s-arc2" />
+        <!-- Non-included side AC -->
+        <line x1="68" y1="56" x2="74" y2="52" class="s-mark" />
+        <text x="50" y="8" class="t-en" style="font-size:12px;">X</text>
+        <text x="8" y="98" class="t-en" style="font-size:12px;">Y</text>
+        <text x="96" y="98" class="t-en" style="font-size:12px;">Z</text>
+
+        <polygon points="150,15 115,95 190,95" class="s-tri2" />
+        <path d="M 145,26 A 14 14 0 0 0 155,26" class="s-arc" />
+        <path d="M 125,90 A 14 14 0 0 0 132,95" class="s-arc2" />
+        <line x1="168" y1="56" x2="174" y2="52" class="s-mark" />
+        <text x="150" y="8" class="t-en" style="font-size:12px;">U</text>
+        <text x="108" y="98" class="t-en" style="font-size:12px;">V</text>
+        <text x="196" y="98" class="t-en" style="font-size:12px;">W</text>
+        <text x="105" y="125" class="t-ar">نظرية AAS: زاويتان وضلع غير محصور</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <!-- معمل الهندسة: تطابق المثلثات القائمة وحالات HL, LL, HA, LA -->
+            <div class="plan-step-box">
+                <div class="plan-step-title">⭐ حالات خاصة لتطابق المثلثات القائمة (ص 186 – 187)</div>
+                <p>في المثلث القائم الزاوية، الزاوية القائمة (\(90°\)) معلومة دائماً، لذا تكفي معلومتان إضافيتان فقط لإثبات التطابق:</p>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>الحالة والرمز</th>
+                            <th>الاسم الكامل</th>
+                            <th>الشروط المطلوبة</th>
+                            <th>الأصل من حالات المثلثات العامة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>HL</strong></td>
+                            <td>وتر وساق (Hypotenuse-Leg)</td>
+                            <td>تطابق الوتر وأحد الساقين في مثلثين قائمين.</td>
+                            <td>حالة خاصة بالمثلث القائم مشتقة من نظرية فيثاغورس.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LL</strong></td>
+                            <td>ساق وساق (Leg-Leg)</td>
+                            <td>تطابق ساقي القائمة في المثلثين.</td>
+                            <td>تكافئ مسلمة SAS (الزاوية القائمة محصورة بين الساقين).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>HA</strong></td>
+                            <td>وتر وزاوية حادة (Hypotenuse-Angle)</td>
+                            <td>تطابق الوتر وإحدى الزاويتين الحادتين.</td>
+                            <td>تكافئ نظرية AAS.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LA</strong></td>
+                            <td>ساق وزاوية حادة (Leg-Angle)</td>
+                            <td>تطابق أحد الساقين وإحدى الزاويتين الحادتين.</td>
+                            <td>تكافئ مسلمة ASA أو نظرية AAS (حسب موقع الساق).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 نظرية تطابق المثلثات القائمة: وتر وساق (HL)</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 460 185" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <!-- Triangle 1 -->
+    <g transform="translate(60, 20)">
+        <polygon points="25,20 25,120 120,120" class="s-tri" />
+        <rect x="25" y="104" width="16" height="16" class="s-sq" />
+        <!-- Hypotenuse tick -->
+        <line x1="68" y1="68" x2="76" y2="72" class="s-mark" style="stroke-width:2.5;" />
+        <!-- Leg tick -->
+        <line x1="22" y1="70" x2="28" y2="70" class="s-mark" />
+        <text x="25" y="12" class="t-en">A</text>
+        <text x="12" y="125" class="t-en">B</text>
+        <text x="128" y="125" class="t-en">C</text>
+        <text x="75" y="60" class="t-sub" style="font-weight:bold; fill:#dc2626;">الوتر (H)</text>
+        <text x="5" y="75" class="t-sub" style="font-weight:bold;">ساق (L)</text>
+    </g>
+    <!-- Congruence -->
+    <text x="220" y="85" class="t-en" style="font-size:28px; fill:#2563eb;">≅</text>
+    <!-- Triangle 2 -->
+    <g transform="translate(260, 20)">
+        <polygon points="25,20 25,120 120,120" class="s-tri2" />
+        <rect x="25" y="104" width="16" height="16" class="s-sq" />
+        <line x1="68" y1="68" x2="76" y2="72" class="s-mark" style="stroke-width:2.5;" />
+        <line x1="22" y1="70" x2="28" y2="70" class="s-mark" />
+        <text x="25" y="12" class="t-en">D</text>
+        <text x="12" y="125" class="t-en">E</text>
+        <text x="128" y="125" class="t-en">F</text>
+        <text x="75" y="60" class="t-sub" style="font-weight:bold; fill:#dc2626;">الوتر (H)</text>
+        <text x="5" y="75" class="t-sub" style="font-weight:bold;">ساق (L)</text>
+    </g>
+    <text x="230" y="165" class="t-ar" style="font-size:13.5px;">نظرية الوتر وساق (HL Theorem): يتطابق المثلثان القائمان إذا تطابق وتر وساق</text>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <!-- الجدول الماستر لحالات التطابق الخمس -->
+            <div class="plan-step-box">
+                <div class="plan-step-title">🏆 الدليل الشامل لمعايير تطابق المثلثات الخمسة المعتمدة</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>الحالة</th>
+                            <th>العناصر المتطابقة</th>
+                            <th>الموقع الهندسي</th>
+                            <th>هل تطبق على أي مثلث؟</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>SSS</strong></td><td>3 أضلاع</td><td>جميع الأضلاع المتناظرة</td><td>نعم، لجميع المثلثات</td></tr>
+                        <tr><td><strong>SAS</strong></td><td>ضلعان وزاوية</td><td>الزاوية محصورة بين الضلعين تماماً</td><td>نعم، لجميع المثلثات</td></tr>
+                        <tr><td><strong>ASA</strong></td><td>زاويتان وضلع</td><td>الضلع محصور بين الزاويتين تماماً</td><td>نعم، لجميع المثلثات</td></tr>
+                        <tr><td><strong>AAS</strong></td><td>زاويتان وضلع</td><td>الضلع غير محصور (يقابل إحدى الزاويتين)</td><td>نعم، لجميع المثلثات</td></tr>
+                        <tr><td><strong>HL</strong></td><td>وتر وساق</td><td>الوتر وساق في مثلث قائم الزاوية</td><td>خاصة بالمثلثات القائمة فقط</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mistake-alert">
+                <strong>⚠️ انتبه: حالتان لا تكفيان لإثبات التطابق أبداً!</strong><br>
+                1. <strong>AAA (ثلاث زوايا):</strong> تثبت التشابه فقط ولا تثبت التطابق أبداً (يمكن رسم مثلثين زواياهما متطابقة وأحدهما صغير والآخر عملاق).<br>
+                2. <strong>SSA (ضلعان وزاوية غير محصورة):</strong> لا تثبت التطابق في المثلثات العامة (حالة غموض Ambiguous Case قد تعطي مثلثين مختلفين)، ما لم تكن الزاوية قائمة وتكون الحالة HL.
+            </div>
+        </article>
+    
+        <!-- ملخص الدرس (3-6) -->
+        <article class="unit-card" id="summary-3-6">
+            <div class="unit-title-box">
+                <h3><span>7️⃣</span> ملخص الدرس (3-6): المثلثات المتطابقة الضلعين والمتطابقة الأضلاع</h3>
+                <span class="page-range-pill">كتاب الطالب: ص 188 – 195</span>
+            </div>
+
+            <!-- تشريح المثلث المتطابق الضلعين -->
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 تشريح ونظرية المثلث المتطابق الضلعين (Isosceles Triangle)</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 540 225" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <g transform="translate(140, 20)">
+        <polygon points="130,20 30,150 230,150" class="s-tri" />
+        <!-- congruent legs -->
+        <line x1="75" y1="82" x2="85" y2="88" class="s-mark" style="stroke-width:2.2;" />
+        <line x1="175" y1="88" x2="185" y2="82" class="s-mark" style="stroke-width:2.2;" />
+        <!-- base angles -->
+        <path d="M 45,142 A 20 20 0 0 0 54,150" class="s-arc" style="stroke-width:2.2;" />
+        <path d="M 206,150 A 20 20 0 0 0 215,142" class="s-arc" style="stroke-width:2.2;" />
+        <!-- vertex angle -->
+        <path d="M 122,35 A 18 18 0 0 0 138,35" class="s-arc2" />
+        <!-- Labels -->
+        <text x="130" y="10" class="t-en">A</text>
+        <text x="18" y="155" class="t-en">B</text>
+        <text x="242" y="155" class="t-en">C</text>
+        <text x="130" y="55" class="t-sub" style="font-weight:bold; fill:#16a34a;">زاوية الرأس (Vertex Angle)</text>
+        <text x="40" y="80" class="t-sub" style="font-weight:bold; fill:#dc2626;">الساق (Leg)</text>
+        <text x="220" y="80" class="t-sub" style="font-weight:bold; fill:#dc2626;">الساق (Leg)</text>
+        <text x="130" y="170" class="t-sub" style="font-weight:bold; fill:#1e3a8a;">القاعدة (Base)</text>
+        <text x="40" y="170" class="t-sub" style="font-weight:bold; fill:#ea580c;">زاوية القاعدة</text>
+        <text x="220" y="170" class="t-sub" style="font-weight:bold; fill:#ea580c;">زاوية القاعدة</text>
+        <text x="130" y="195" class="t-ar">نظرية المثلث المتطابق الضلعين: إذا كان AB ≅ AC فإن ∠B ≅ ∠C والعكس صحيح</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>النظرية / النتيجة</th>
+                        <th>النص والرموز (LTR)</th>
+                        <th>الأهمية التطبيقية في حل المسائل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>نظرية المثلث المتطابق الضلعين</strong><br>(Isosceles Triangle Theorem)</td>
+                        <td>إذا تطابق ضلعان في مثلث فإن الزاويتين المقابلتين لهما متطابقتان:
+                        \[AB \cong AC \implies \angle B \cong \angle C\]</td>
+                        <td>تسمح بمساواة زاويتي القاعدة وحساب قياسهما جبرياً.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>عكس نظرية المثلث المتطابق الضلعين</strong><br>(Converse of Isosceles Thm)</td>
+                        <td>إذا تطابقت زاويتان في مثلث فإن الضلعين المقابلين لهما متطابقان:
+                        \[\angle B \cong \angle C \implies AB \cong AC\]</td>
+                        <td>تسمح بإثبات تطابق الساقين بمعلومية تطابق زاويتي القاعدة.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>نتيجة المثلث المتطابق الأضلاع</strong><br>(Equilateral Corollary)</td>
+                        <td>يكون المثلث متطابق الأضلاع إذا وفقط إذا كان متطابق الزوايا:
+                        \[AB \cong BC \cong AC \iff \angle A \cong \angle B \cong \angle C\]</td>
+                        <td>التطابق في الأضلاع يستلزم التطابق في الزوايا والعكس صحيح.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>قياس زوايا المتطابق الأضلاع</strong></td>
+                        <td>قياس كل زاوية في أي مثلث متطابق الأضلاع يساوي دائماً:
+                        \[m\angle = \frac{180°}{3} = 60°\]</td>
+                        <td>ثابت هندسي حاسم: لا توجد زاوية في مثلث متطابق الأضلاع غير \(60°\).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- قواعد حل معادلات المثلثات المتطابقة الضلعين -->
+            <div class="plan-step-box">
+                <div class="plan-step-title">🧮 معادلات زوايا المثلث المتطابق الضلعين</div>
+                <p>إذا كانت زاوية الرأس هي \(\angle A\)، وزاويتا القاعدة هما \(\angle B, \angle C\):</p>
+                <ul>
+                    <li>حساب زاويتي القاعدة بمعلومية زاوية الرأس:
+                    \[m\angle B = m\angle C = \frac{180° - m\angle A}{2}\]
+                    </li>
+                    <li>حساب زاوية الرأس بمعلومية إحدى زاويتي القاعدة:
+                    \[m\angle A = 180° - 2(m\angle B)\]
+                    </li>
+                </ul>
+            </div>
+
+            <div class="mistake-alert">
+                <strong>⚠️ خطأ شائع:</strong>
+                الخلط بين زاوية الرأس وزاويتي القاعدة. زاوية الرأس تقع دائماً بين الساقين المتطابقين، بينما زاويتا القاعدة تقعان عند طرفي القاعدة ومقابلتين للساقين المتطابقين.
+            </div>
+        </article>
+    
+        <!-- ملخص الدرس (3-7) -->
+        <article class="unit-card" id="summary-3-7">
+            <div class="unit-title-box">
+                <h3><span>8️⃣</span> ملخص الدرس (3-7): المثلثات والبرهان الإحداثي (Coordinate Proof)</h3>
+                <span class="page-range-pill">كتاب الطالب: ص 196 – 200</span>
+            </div>
+
+            <!-- بطاقة مفهوم البرهان الإحداثي -->
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>📍 ما هو البرهان الإحداثي؟</h4>
+                    <p>هو برهان يوظف رسم الأشكال الهندسية في المستوى الإحداثي واستعمال الجبر وقوانينه لإثبات صحة المبرهنات والعلاقات الهندسية العامة دون التقيد بأرقام خاصة.</p>
+                </div>
+                <div class="concept-card">
+                    <h4>📐 القواعد الأربع للوضع الذكي للمثلث</h4>
+                    <ol style="margin-right: 15px; font-size: 13px;">
+                        <li>اجعل نقطة الأصل \(O(0, 0)\) رأساً للمثلث.</li>
+                        <li>اجعل ضلعاً منطبقاً على أحد المحورين (عادة محور \(x\)).</li>
+                        <li>اجعل الشكل في الربع الأول قدر الإمكان لتكون الإحداثيات موجبة.</li>
+                        <li>استعمل مضاعفات المتغيرات (\(2a, 2b\)) لتجنب الكسور عند حساب نقاط المنتصف.</li>
+                    </ol>
+                </div>
+            </div>
+
+            
+    <div class="geometry-figure-container">
+        <div class="figure-title">📐 استراتيجية وضع المثلث في المستوى الإحداثي (Coordinate Proof)</div>
+        <div class="svg-wrapper">
+            <svg viewBox="0 0 500 225" class="geom-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+                    </marker>
+                </defs>
+                <style>
+                    .t-ar { font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: bold; fill: #1e3a8a; text-anchor: middle; }
+                    .t-sub { font-family: 'Tajawal', sans-serif; font-size: 11px; fill: #64748b; text-anchor: middle; }
+                    .t-en { font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+                    .t-num { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; fill: #dc2626; text-anchor: middle; }
+                    .s-tri { stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #eff6ff; fill-opacity: 0.6; }
+                    .s-tri2 { stroke: #0d9488; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: #f0fdfa; fill-opacity: 0.6; }
+                    .s-mark { stroke: #dc2626; stroke-width: 2; stroke-linecap: round; }
+                    .s-arc { stroke: #ea580c; stroke-width: 2; fill: none; }
+                    .s-arc2 { stroke: #16a34a; stroke-width: 2; fill: none; }
+                    .s-sq { stroke: #dc2626; stroke-width: 1.8; fill: #fee2e2; }
+                    .s-axis { stroke: #334155; stroke-width: 1.8; }
+                    .s-grid { stroke: #e2e8f0; stroke-width: 1; }
+                    .s-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 1.5; }
+                </style>
+                
+    <g transform="translate(60, 25)">
+        <!-- Axes -->
+        <line x1="40" y1="140" x2="380" y2="140" class="s-axis" marker-end="url(#arrow)" />
+        <line x1="60" y1="160" x2="60" y2="20" class="s-axis" marker-end="url(#arrow)" />
+        <text x="390" y="145" class="t-en" style="font-size:14px;">x</text>
+        <text x="60" y="12" class="t-en" style="font-size:14px;">y</text>
+        <text x="48" y="155" class="t-en" style="font-size:12px;">O</text>
+        <!-- Triangle placed on axes: (0,0), (a,0), (b,c) -->
+        <polygon points="60,140 300,140 180,45" class="s-tri" />
+        <!-- Dots and coordinates -->
+        <circle cx="60" cy="140" r="4.5" class="s-dot" />
+        <text x="60" y="175" class="t-en">(0, 0)</text>
+        <text x="45" y="135" class="t-en">A</text>
+
+        <circle cx="300" cy="140" r="4.5" class="s-dot" />
+        <text x="300" y="160" class="t-en">(a, 0)</text>
+        <text x="312" y="135" class="t-en">B</text>
+
+        <circle cx="180" cy="45" r="4.5" class="s-dot" />
+        <text x="180" y="35" class="t-en">(b, c)</text>
+        <text x="180" y="20" class="t-en">C</text>
+        <text x="210" y="195" class="t-ar" style="font-size:13.5px;">أفضل وضع للبرهان الإحداثي: رأس عند نقطة الأصل، وضلع منطبق على محور x</text>
+    </g>
+    
+            </svg>
+        </div>
+    </div>
+    
+
+            <!-- القوانين الجبرية الثلاثة المعتمدة في البرهان الإحداثي -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>القانون الهندسي</th>
+                        <th>الصيغة الجبرية الرمزية (LTR)</th>
+                        <th>الغرض واستخدامه في البرهان</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>صيغة المسافة بين نقطتين</strong><br>(Distance Formula)</td>
+                        <td>\[d = \sqrt{<span class="ar-pow"><span class="ar-base">(x_2 - x_1)</span><sup class="ar-exp">٢</sup></span> + <span class="ar-pow"><span class="ar-base">(y_2 - y_1)</span><sup class="ar-exp">٢</sup></span>}\]</td>
+                        <td>لإثبات تطابق الأضلاع والقطع المستقيمة (\(\overline{AB} \cong \overline{CD}\)).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>صيغة نقطة المنتصف</strong><br>(Midpoint Formula)</td>
+                        <td>\[M = \left( \frac{x_1 + x_2}{2}, \frac{y_1 + y_2}{2} \right)\]</td>
+                        <td>لإيجاد إحداثيات نقاط المنتصف وإثبات تنصيف القطع المستقيمة.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>صيغة الميل</strong><br>(Slope Formula)</td>
+                        <td>\[m = \frac{y_2 - y_1}{x_2 - x_1}\]</td>
+                        <td>لإثبات التوازي (\(m_1 = m_2\)) أو التعامد (\(m_1 \cdot m_2 = -1\)).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- أمثلة التسمية الرمزية للرؤوس المجهولة -->
+            <div class="plan-step-box">
+                <div class="plan-step-title">🏷️ تسمية الرؤوس المجهولة في أشكال خاصة:</div>
+                <ul style="margin-right: 20px; line-height: 2;">
+                    <li><strong>مثلث قائم الزاوية متطابق الضلعين:</strong> الرؤوس هي \((0, 0)\)، \((a, 0)\)، \((0, a)\).</li>
+                    <li><strong>مثلث متطابق الضلعين قاعدته على محور \(x\) ونقطة منتصفها الأصل:</strong> الرؤوس هي \((-a, 0)\)، \((a, 0)\)، \((0, b)\).</li>
+                    <li><strong>مثلث متطابق الضلعين رأسه على محور \(y\):</strong> الرؤوس هي \((0, 0)\)، \((2a, 0)\)، \((a, b)\).</li>
+                </ul>
+            </div>
+
+            <div class="mistake-alert">
+                <strong>⚠️ تجنب الأخطاء القاتلة في البرهان الإحداثي:</strong>
+                لا تستخدم أرقاماً عددية محددة (مثل \(2, 5, 8\)) في البرهان الإحداثي، لأن البرهان العددي يثبت الحالة لمثلث واحد فقط ولا يعتبر برهاناً عاماً! البرهان الصحيح يجب أن يستخدم متغيرات جبرية عامة مثل \(a, b, c\).
+            </div>
+        </article>
+    
+    </section>

@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سجل المتابعة اليومية للطلاب - مادة الرياضيات - ثالث متوسط</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 5mm 6mm;
+  }
+  
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  body {
+    font-family: 'Tajawal', 'Segoe UI', Tahoma, Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    direction: rtl;
+  }
+  
+  .no-print-bar {
+    max-width: 1100px;
+    margin: 0 auto 15px auto;
+    background: #ffffff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  
+  .btn-print {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: #ffffff;
+    border: none;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-print:hover {
+    background: linear-gradient(135deg, #172554, #1d4ed8);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(37,99,235,0.3);
+  }
+  
+  .badge-info {
+    font-size: 13px;
+    color: #475569;
+    font-weight: 600;
+  }
+  
+  /* Sheet Container: Fits exactly on single A4 Landscape */
+  .sheet {
+    width: 285mm;
+    min-height: 198mm;
+    max-height: 200mm;
+    margin: 0 auto 20px auto;
+    background: #ffffff;
+    padding: 6mm 8mm;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  /* Header Section */
+  .header-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+  }
+  
+  .hdr-right {
+    text-align: right;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #334155;
+  }
+  
+  .hdr-right strong {
+    color: #1e3a8a;
+    font-size: 12px;
+  }
+  
+  .hdr-center {
+    text-align: center;
+  }
+  
+  .main-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: #1e3a8a;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+  
+  .sub-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #b45309;
+    margin-top: 2px;
+  }
+  
+  .hdr-left {
+    text-align: left;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #334155;
+  }
+  
+  .badge-class {
+    display: inline-block;
+    background: #ecfdf5;
+    color: #047857;
+    font-weight: 800;
+    padding: 1px 8px;
+    border-radius: 4px;
+    border: 1px solid #a7f3d0;
+  }
+  
+  /* Main Table */
+  .table-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  table.register-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 10px;
+    border: 1.5px solid #1e3a8a;
+  }
+  
+  table.register-table th, 
+  table.register-table td {
+    border: 1px solid #cbd5e1;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0;
+    height: 19.5px;
+  }
+  
+  /* Column Widths */
+  .col-num {
+    width: 24px;
+    background-color: #f8fafc;
+    font-weight: 800;
+    color: #1e3a8a;
+  }
+  
+  .col-name {
+    width: 190px;
+    text-align: right !important;
+    padding-right: 8px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
+    color: #0f172a;
+    border-left: 2px solid #1e3a8a !important;
+  }
+  
+  .col-day {
+    width: 28px;
+  }
+  
+  /* Week border separation */
+  .col-week-end {
+    border-left: 1.8px solid #475569 !important;
+  }
+  
+  /* Header Rows */
+  .row-weeks th {
+    background-color: #1e3a8a;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    height: 22px;
+    border-bottom: 1px solid #3b82f6;
+  }
+  
+  .row-days th {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    height: 18px;
+  }
+  
+  .row-date th {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-size: 9px;
+    font-weight: 700;
+    height: 17px;
+  }
+  
+  .date-placeholder {
+    font-size: 8px;
+    color: #94a3b8;
+    letter-spacing: -0.5px;
+  }
+  
+  /* Student Rows */
+  tr.student-row:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  
+  tr.student-row:hover {
+    background-color: #eff6ff;
+  }
+  
+  /* Footer Section */
+  .footer-container {
+    margin-top: 5px;
+  }
+  
+  .legend-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 4px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  
+  .legend-title {
+    color: #1e3a8a;
+    font-weight: 800;
+  }
+  
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  
+  .code {
+    display: inline-block;
+    padding: 0 4px;
+    border-radius: 3px;
+    font-weight: 800;
+    font-size: 10px;
+  }
+  
+  .code-t { background: #fef3c7; color: #b45309; }
+  .code-g { background: #fee2e2; color: #dc2626; }
+  .code-z { background: #d1fae5; color: #047857; }
+  .code-s { background: #ffedd5; color: #ea580c; }
+  .code-w { background: #dbeafe; color: #1d4ed8; }
+  .code-m { background: #ccfbf1; color: #0f766e; }
+  .code-b { background: #ede9fe; color: #6d28d9; }
+  
+  .signatures-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    text-align: center;
+    margin-top: 6px;
+    padding-top: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #334155;
+  }
+  
+  .sig-dots {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+  
+  @media print {
+    body {
+      background-color: #ffffff;
+      padding: 0;
+    }
+    .no-print-bar {
+      display: none !important;
+    }
+    .sheet {
+      width: 100% !important;
+      min-height: 198mm !important;
+      max-height: 200mm !important;
+      margin: 0 !important;
+      padding: 4mm 6mm !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      page-break-after: always !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print-bar">
+  <div>
+    <span style="font-size: 16px; font-weight: 800; color: #1e3a8a;">سجل المتابعة اليومية — مادة الرياضيات (ثالث متوسط)</span>
+    <div class="badge-info">معلم المادة: أ. محمد عبدالله جمعة | مجهز للطباعة المباشرة على مقاس A4 بالعرض (Landscape)</div>
+  </div>
+  <button class="btn-print" onclick="window.print()">
+    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+    </svg>
+    طباعة السجل (A4 بالعرض)
+  </button>
+</div>
+
+<div class="sheet">
+  <!-- Header -->
+  <div class="header-grid">
+    <div class="hdr-right">
+      <strong>المملكة العربية السعودية</strong><br>
+      وزارة التعليم — الإدارة العامة للتعليم<br>
+      المدارس المتقدمة للتعلم الذكي<br>
+      المرحلة المتوسطة (بنين)
+    </div>
+    <div class="hdr-center">
+      <h1 class="main-title">سجل المتابعة اليومية للطلاب</h1>
+      <div class="sub-title">مادة الرياضيات — الفصل الدراسي الأول — العام الدراسي 1448 هـ</div>
+    </div>
+    <div class="hdr-left">
+      الصف: <strong>الثالث المتوسط</strong><br>
+      الفصل: <span class="badge-class">فصل ( 3 / 1 )</span><br>
+      معلم المادة: <strong>أ. محمد عبدالله جمعة</strong><br>
+      عدد الطلاب: <strong>21 طالباً</strong>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="register-table">
+      <thead>
+        <!-- Row 0: Weeks -->
+        <tr class="row-weeks">
+          <th rowspan="3" class="col-num">م</th>
+          <th rowspan="2" class="col-name" style="text-align: center !important; color: #ffffff !important;">اسم الطالب</th>
+          <th colspan="5" class="col-week-end">الأسبوع الأول</th>
+          <th colspan="5" class="col-week-end">الأسبوع الثاني</th>
+          <th colspan="5" class="col-week-end">الأسبوع الثالث</th>
+          <th colspan="5" class="col-week-end">الأسبوع الرابع</th>
+          <th colspan="5" class="col-week-end">الأسبوع الخامس</th>
+        </tr>
+        <!-- Row 1: Days -->
+        <tr class="row-days">
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+        </tr>
+        <!-- Row 2: Dates -->
+        <tr class="row-date">
+          <th class="col-name" style="text-align: center !important; background: #e2e8f0; color: #1e293b;">التاريخ</th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="student-row">
+          <td class="col-num">1</td>
+          <td class="col-name" title="أصيل ممدوح صالح معتوق فراش">أصيل ممدوح صالح معتوق فراش</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">2</td>
+          <td class="col-name" title="الاسر ياسر بن سعيد بن الغامدي">الاسر ياسر بن سعيد بن الغامدي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">3</td>
+          <td class="col-name" title="جواد عبدالله علي حمد المومني">جواد عبدالله علي حمد المومني</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">4</td>
+          <td class="col-name" title="حسين محمد حسين علي العمودي">حسين محمد حسين علي العمودي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">5</td>
+          <td class="col-name" title="سليمان احمد عبدالعزيز السلامه">سليمان احمد عبدالعزيز السلامه</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">6</td>
+          <td class="col-name" title="صالح محمد صالح الصالحي">صالح محمد صالح الصالحي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">7</td>
+          <td class="col-name" title="طلال علي محمد مسفر القحطاني">طلال علي محمد مسفر القحطاني</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">8</td>
+          <td class="col-name" title="عبد الاله احمد محمود عجب نور">عبد الاله احمد محمود عجب نور</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">9</td>
+          <td class="col-name" title="عبدالرحمن حسين فؤاد الجراب">عبدالرحمن حسين فؤاد الجراب</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">10</td>
+          <td class="col-name" title="عبدالعزيز وليد عبدالمحسن الحقيلي">عبدالعزيز وليد عبدالمحسن الحقيلي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">11</td>
+          <td class="col-name" title="عبدالله ربيع فؤاد ديب نصري">عبدالله ربيع فؤاد ديب نصري</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">12</td>
+          <td class="col-name" title="عبدالله محمد عبدالرحيم الزهراني">عبدالله محمد عبدالرحيم الزهراني</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">13</td>
+          <td class="col-name" title="عبدالملك عادل محسن باسبعين">عبدالملك عادل محسن باسبعين</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">14</td>
+          <td class="col-name" title="عز انور احمد علي مرغلاني">عز انور احمد علي مرغلاني</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">15</td>
+          <td class="col-name" title="عمر محمد طاهر ريحان نبي بخش">عمر محمد طاهر ريحان نبي بخش</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">16</td>
+          <td class="col-name" title="مجد خالد دويل عوض بالعلا">مجد خالد دويل عوض بالعلا</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">17</td>
+          <td class="col-name" title="محمد اسامه محمد حميد اللبدي">محمد اسامه محمد حميد اللبدي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">18</td>
+          <td class="col-name" title="مؤيد ماجد علي الرديني">مؤيد ماجد علي الرديني</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">19</td>
+          <td class="col-name" title="همام علي محمد علي الفاهوم">همام علي محمد علي الفاهوم</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">20</td>
+          <td class="col-name" title="يزن جهاد محمدماهر الساعاتي">يزن جهاد محمدماهر الساعاتي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">21</td>
+          <td class="col-name" title="يوسف فارس داود سليمان صبحي">يوسف فارس داود سليمان صبحي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-container">
+    <div class="legend-box">
+      <span class="legend-title">📌 مفتاح رموز المتابعة اليومية:</span>
+      <span class="legend-item"><span class="code code-t">[ت]</span> تأخير</span>
+      <span class="legend-item"><span class="code code-g">[غ]</span> غياب</span>
+      <span class="legend-item"><span class="code code-z">[ز]</span> تميز وإبداع</span>
+      <span class="legend-item"><span class="code code-s">[س]</span> سلوك ومواظبة</span>
+      <span class="legend-item"><span class="code code-w">[و]</span> واجب منزلي</span>
+      <span class="legend-item"><span class="code code-m">[م]</span> مشاركة صفية</span>
+      <span class="legend-item"><span class="code code-b">[ب]</span> مهمة أدائية / بحث</span>
+    </div>
+
+    <div class="signatures-grid">
+      <div>معلم المادة: <span style="color:#1e3a8a;">أ. محمد عبدالله جمعة</span></div>
+      <div>المشرف التربوي: <span class="sig-dots">...................................................</span></div>
+      <div>مدير المدرسة: <span class="sig-dots">...................................................</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sheet">
+  <!-- Header -->
+  <div class="header-grid">
+    <div class="hdr-right">
+      <strong>المملكة العربية السعودية</strong><br>
+      وزارة التعليم — الإدارة العامة للتعليم<br>
+      المدارس المتقدمة للتعلم الذكي<br>
+      المرحلة المتوسطة (بنين)
+    </div>
+    <div class="hdr-center">
+      <h1 class="main-title">سجل المتابعة اليومية للطلاب</h1>
+      <div class="sub-title">مادة الرياضيات — الفصل الدراسي الأول — العام الدراسي 1448 هـ</div>
+    </div>
+    <div class="hdr-left">
+      الصف: <strong>الثالث المتوسط</strong><br>
+      الفصل: <span class="badge-class">فصل ( 3 / 2 )</span><br>
+      معلم المادة: <strong>أ. محمد عبدالله جمعة</strong><br>
+      عدد الطلاب: <strong>23 طالباً</strong>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="register-table">
+      <thead>
+        <!-- Row 0: Weeks -->
+        <tr class="row-weeks">
+          <th rowspan="3" class="col-num">م</th>
+          <th rowspan="2" class="col-name" style="text-align: center !important; color: #ffffff !important;">اسم الطالب</th>
+          <th colspan="5" class="col-week-end">الأسبوع الأول</th>
+          <th colspan="5" class="col-week-end">الأسبوع الثاني</th>
+          <th colspan="5" class="col-week-end">الأسبوع الثالث</th>
+          <th colspan="5" class="col-week-end">الأسبوع الرابع</th>
+          <th colspan="5" class="col-week-end">الأسبوع الخامس</th>
+        </tr>
+        <!-- Row 1: Days -->
+        <tr class="row-days">
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+          <th class="col-day">الأحد</th>
+          <th class="col-day">الاثنين</th>
+          <th class="col-day">الثلاثاء</th>
+          <th class="col-day">الأربعاء</th>
+          <th class="col-day col-week-end">الخميس</th>
+        </tr>
+        <!-- Row 2: Dates -->
+        <tr class="row-date">
+          <th class="col-name" style="text-align: center !important; background: #e2e8f0; color: #1e293b;">التاريخ</th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+          <th class="col-day col-week-end"><span class="date-placeholder">/&nbsp;&nbsp;/</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="student-row">
+          <td class="col-num">1</td>
+          <td class="col-name" title="أحمد رامي أحمد مصلح زعرب">أحمد رامي أحمد مصلح زعرب</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">2</td>
+          <td class="col-name" title="البراء رائد حامد احمد المغامسي">البراء رائد حامد احمد المغامسي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">3</td>
+          <td class="col-name" title="تركي ياسر يوسف عوض الاحمدي">تركي ياسر يوسف عوض الاحمدي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">4</td>
+          <td class="col-name" title="حمزة يزن خالد قرمان">حمزة يزن خالد قرمان</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">5</td>
+          <td class="col-name" title="راكان تركي احمد علي الزهراني">راكان تركي احمد علي الزهراني</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">6</td>
+          <td class="col-name" title="سعد فيصل سعد محمدعلي زرين">سعد فيصل سعد محمدعلي زرين</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">7</td>
+          <td class="col-name" title="سلطان فارس سالم سعد القحطاني">سلطان فارس سالم سعد القحطاني</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">8</td>
+          <td class="col-name" title="صالح محمد صالح العجمه الغامدي">صالح محمد صالح العجمه الغامدي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">9</td>
+          <td class="col-name" title="عبدالعزيز احمد عبدالعزيز حميدي السلامه">عبدالعزيز احمد عبدالعزيز حميدي السلامه</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">10</td>
+          <td class="col-name" title="عبدالعزيز أحمد عبدالعزيز الغامدي">عبدالعزيز أحمد عبدالعزيز الغامدي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">11</td>
+          <td class="col-name" title="عبدالملك عماد عباس حسن غندورة">عبدالملك عماد عباس حسن غندورة</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">12</td>
+          <td class="col-name" title="علي محمد علي عبدالرحيم علي">علي محمد علي عبدالرحيم علي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">13</td>
+          <td class="col-name" title="فهد ماجد سليمان عبدالله العجلان">فهد ماجد سليمان عبدالله العجلان</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">14</td>
+          <td class="col-name" title="فهد مخلد خلف الله سرور الهذلي">فهد مخلد خلف الله سرور الهذلي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">15</td>
+          <td class="col-name" title="محمد عادل حسن عباس شرقاوي">محمد عادل حسن عباس شرقاوي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">16</td>
+          <td class="col-name" title="محمد خالد دويل عوض بالعلا">محمد خالد دويل عوض بالعلا</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">17</td>
+          <td class="col-name" title="مصطفى عبدالباسط مصطفى زهرا">مصطفى عبدالباسط مصطفى زهرا</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">18</td>
+          <td class="col-name" title="مهدي محمد مهدي مسعود الوقداني">مهدي محمد مهدي مسعود الوقداني</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">19</td>
+          <td class="col-name" title="نايف ماجد علي يوسف المحمدي">نايف ماجد علي يوسف المحمدي</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">20</td>
+          <td class="col-name" title="وليد أحمد فريد احمد وهيب">وليد أحمد فريد احمد وهيب</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">21</td>
+          <td class="col-name" title="وليف ملاذ وليف فيرق">وليف ملاذ وليف فيرق</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">22</td>
+          <td class="col-name" title="يوسف أيمن طه محمدصالح الصبان">يوسف أيمن طه محمدصالح الصبان</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+        <tr class="student-row">
+          <td class="col-num">23</td>
+          <td class="col-name" title="يوسف نادر محمود حسن">يوسف نادر محمود حسن</td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day"></td>
+          <td class="col-day col-week-end"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-container">
+    <div class="legend-box">
+      <span class="legend-title">📌 مفتاح رموز المتابعة اليومية:</span>
+      <span class="legend-item"><span class="code code-t">[ت]</span> تأخير</span>
+      <span class="legend-item"><span class="code code-g">[غ]</span> غياب</span>
+      <span class="legend-item"><span class="code code-z">[ز]</span> تميز وإبداع</span>
+      <span class="legend-item"><span class="code code-s">[س]</span> سلوك ومواظبة</span>
+      <span class="legend-item"><span class="code code-w">[و]</span> واجب منزلي</span>
+      <span class="legend-item"><span class="code code-m">[م]</span> مشاركة صفية</span>
+      <span class="legend-item"><span class="code code-b">[ب]</span> مهمة أدائية / بحث</span>
+    </div>
+
+    <div class="signatures-grid">
+      <div>معلم المادة: <span style="color:#1e3a8a;">أ. محمد عبدالله جمعة</span></div>
+      <div>المشرف التربوي: <span class="sig-dots">...................................................</span></div>
+      <div>مدير المدرسة: <span class="sig-dots">...................................................</span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

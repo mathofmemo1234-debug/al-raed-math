@@ -1,0 +1,1422 @@
+/**
+ * ==========================================================================
+ * منصة الرائد التعليمية الذكية للرياضيات | أ. محمد عبدالله جمعة
+ * المدارس المتقدمة للتعلم الذكي بجدة
+ * Core Web Platform Controller & Interactive Logic
+ * ==========================================================================
+ */
+
+(function () {
+  'use strict';
+
+  // Global State
+  const state = {
+    currentLessonId: 'g6-t1-c1-l1',
+    activeView: 'cockpit', // 'cockpit' | 'question-bank' | 'exam-builder' | 'visual-tree' | 'suites' | 'vault' | 'builder'
+    activeLessonTab: 'objectives', // 'objectives' | 'plan' | 'summary' | 'worksheet' | 'tools' | 'quiz' | 'downloads'
+    termFilter: 'all',
+    searchQuery: '',
+    quizScores: {}, // lessonId -> { answeredCount, correctCount, userAnswers: {} }
+    expandedNodes: new Set(['elementary', 'g6', 'g6-term1', 'g6-t1-c1', 'intermediate', 'g1m', 'g1m-term1', 'g1m-t1-c1', 'g3m', 'g3m-term1', 'secondary', 'g1s', 'g1s-term1'])
+  };
+
+  function fmtNum(val, forceEastern) {
+    if (window.ArabicUtils) {
+      if (typeof val === 'string' && (val.indexOf('ar-pow') !== -1 || val.indexOf('^') !== -1)) {
+        return window.ArabicUtils.renderMathHtml(val);
+      }
+      if (forceEastern !== false) {
+        return window.ArabicUtils.toEasternDigits(val);
+      }
+    }
+    return String(val);
+  }
+
+  function escHtml(str) {
+    if (window.ArabicUtils && window.ArabicUtils.escapeHtml) {
+      return window.ArabicUtils.escapeHtml(str || '');
+    }
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function isFullBookLesson(lesson) {
+    return !!(lesson && lesson.id && (lesson.id.startsWith('g6') || lesson.id.startsWith('g1m')));
+  }
+
+  function mergeBookData() {
+    if (!window.CURRICULUM_DATA || !window.CURRICULUM_DATA.lessons) return;
+    if (window.GRADE6_BOOK_DATA && window.GRADE6_BOOK_DATA.lessons) {
+      Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE6_BOOK_DATA.lessons);
+    }
+    if (window.GRADE1M_BOOK_DATA && window.GRADE1M_BOOK_DATA.lessons) {
+      Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE1M_BOOK_DATA.lessons);
+    }
+  }
+
+  function openImageLightbox(src, caption) {
+    if (!src) return;
+    let lb = document.getElementById('raed-lightbox');
+    if (!lb) {
+      lb = document.createElement('div');
+      lb.id = 'raed-lightbox';
+      lb.className = 'raed-lightbox';
+      lb.innerHTML =
+        '<div class="raed-lightbox-dialog" onclick="event.stopPropagation()">' +
+          '<button type="button" class="raed-lightbox-close" onclick="window.Platform.closeImageLightbox()" aria-label="إغلاق">✖️</button>' +
+          '<img id="raed-lightbox-img" src="" alt="شكل تعليمي" />' +
+          '<div id="raed-lightbox-cap" class="raed-lightbox-cap"></div>' +
+        '</div>';
+      lb.addEventListener('click', closeImageLightbox);
+      document.body.appendChild(lb);
+    }
+    const imgEl = document.getElementById('raed-lightbox-img');
+    const capEl = document.getElementById('raed-lightbox-cap');
+    if (imgEl) imgEl.src = src;
+    if (capEl) {
+      capEl.textContent = caption ? fmtNum(caption, true) : '';
+      capEl.style.display = caption ? 'block' : 'none';
+    }
+    lb.classList.add('open');
+  }
+
+  function closeImageLightbox() {
+    const lb = document.getElementById('raed-lightbox');
+    if (lb) lb.classList.remove('open');
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeImageLightbox();
+    });
+  }
+
+  function renderQuestionFigure(item) {
+    if (!item || !item.image) return '';
+    const cap = item.imageCaption ? fmtNum(item.imageCaption, true) : '';
+    const altText = cap || 'شكل توضيحي للسؤال';
+    return `
+      <div class="q-figure-box">
+        <img
+          class="q-figure-img"
+          src="${escHtml(item.image)}"
+          alt="${escHtml(altText)}"
+          loading="lazy"
+          title="اضغط للتكبير"
+          onclick="window.Platform.openImageLightbox(this.getAttribute('src'), this.getAttribute('data-caption'))"
+          data-caption="${escHtml(cap)}"
+        />
+        ${cap ? `<div class="q-figure-caption">${escHtml(cap)}</div>` : ''}
+      </div>
+    `;
+  }
+
+  // DOM Elements
+  let sidebarTreeContainer;
+  let viewportArea;
+  let searchInput;
+
+  // Initialize
+  window.addEventListener('DOMContentLoaded', () => {
+    sidebarTreeContainer = document.getElementById('sidebar-tree');
+    viewportArea = document.getElementById('app-viewport');
+    searchInput = document.getElementById('nav-search');
+
+    mergeBookData();
+    if (window.ExamBuilder && window.ExamBuilder.updateBadge) {
+      window.ExamBuilder.updateBadge();
+    }
+
+    setupEventListeners();
+    renderTree();
+    renderCurrentView();
+  });
+
+  // Event Listeners
+  function setupEventListeners() {
+    // Term filter tabs
+    document.querySelectorAll('.term-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.term-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.termFilter = btn.dataset.term;
+        renderTree();
+        if (state.activeView === 'visual-tree') renderVisualTree();
+      });
+    });
+
+    // Search input & Ctrl+K shortcut
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value.trim().toLowerCase();
+        renderTree();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+        }
+      }
+    });
+
+    // View switcher tabs
+    document.querySelectorAll('.view-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.activeView = btn.dataset.view;
+        renderCurrentView();
+      });
+    });
+
+    // Dark Mode Toggle
+    const themeBtn = document.getElementById('btn-theme-toggle');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.body.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+          document.body.removeAttribute('data-theme');
+          themeBtn.innerHTML = '🌙 الوضع الليلي';
+        } else {
+          document.body.setAttribute('data-theme', 'dark');
+          themeBtn.innerHTML = '☀️ الوضع النهاري';
+        }
+      });
+    }
+  }
+
+  // ================= Tree Rendering =================
+  function renderTree() {
+    if (!sidebarTreeContainer || !window.CURRICULUM_DATA) return;
+    const stages = window.CURRICULUM_DATA.stages || [];
+    let html = '';
+
+    stages.forEach(stage => {
+      let stageMatches = false;
+      let gradesHtml = '';
+
+      stage.grades.forEach(grade => {
+        let gradeMatches = false;
+        let termsHtml = '';
+
+        grade.terms.forEach(term => {
+          if (state.termFilter !== 'all' && term.id !== state.termFilter) return;
+
+          let termMatches = false;
+          let chaptersHtml = '';
+
+          (term.chapters || []).forEach(chapter => {
+            let chapterMatches = false;
+            let lessonsHtml = '';
+
+            (chapter.lessons || []).forEach(lesson => {
+              const fullLesson = window.CURRICULUM_DATA.lessons[lesson.id];
+              const title = fullLesson ? fullLesson.title : lesson.title;
+              const matchesSearch = !state.searchQuery || title.toLowerCase().includes(state.searchQuery) || (fullLesson && fullLesson.objectives.some(o => o.toLowerCase().includes(state.searchQuery)));
+
+              if (matchesSearch) {
+                chapterMatches = true;
+                termMatches = true;
+                gradeMatches = true;
+                stageMatches = true;
+
+                const isCompleted = lesson.status === 'completed' || (fullLesson && fullLesson.status === 'completed');
+                const isActive = state.currentLessonId === lesson.id;
+
+                lessonsHtml += `
+                  <div class="tree-lesson-item ${isActive ? 'active' : ''}" onclick="window.Platform.selectLesson('${lesson.id}')">
+                    <span style="display:flex; align-items:center; gap:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                      <span class="lesson-status-dot ${isCompleted ? 'completed' : 'roadmap'}"></span>
+                      ${title}
+                    </span>
+                    <span style="font-size:0.68rem; color:${isCompleted ? '#86efac' : '#fcd34d'};">
+                      ${isCompleted ? '✓ مكتمل' : 'قيد الإدراج'}
+                    </span>
+                  </div>
+                `;
+              }
+            });
+
+            if (chapterMatches || !state.searchQuery) {
+              const isChapterOpen = state.expandedNodes.has(chapter.id) || !!state.searchQuery;
+              chaptersHtml += `
+                <div class="tree-chapter-node">
+                  <div class="tree-chapter-header" onclick="window.Platform.toggleNode('${chapter.id}')">
+                    <span>📖 ${chapter.number}: ${chapter.title}</span>
+                    <span class="node-arrow ${isChapterOpen ? 'open' : ''}">◀</span>
+                  </div>
+                  <div class="tree-chapter-content" style="display:${isChapterOpen ? 'block' : 'none'}; padding-right:8px;">
+                    ${lessonsHtml}
+                  </div>
+                </div>
+              `;
+            }
+          });
+
+          if (termMatches || !state.searchQuery) {
+            const isTermOpen = state.expandedNodes.has(grade.id + '-' + term.id) || !!state.searchQuery;
+            termsHtml += `
+              <div class="tree-term-node">
+                <div class="tree-term-header" onclick="window.Platform.toggleNode('${grade.id}-${term.id}')">
+                  <span>${term.icon || '📅'} ${term.name}</span>
+                  <span class="node-arrow ${isTermOpen ? 'open' : ''}">◀</span>
+                </div>
+                <div style="display:${isTermOpen ? 'block' : 'none'};">
+                  ${chaptersHtml}
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        if (gradeMatches || !state.searchQuery) {
+          const isGradeOpen = state.expandedNodes.has(grade.id) || !!state.searchQuery;
+          gradesHtml += `
+            <div class="tree-grade-node">
+              <div class="tree-grade-header" onclick="window.Platform.toggleNode('${grade.id}')">
+                <div class="tree-grade-title">
+                  <span>🎓 ${grade.name}</span>
+                  <span class="grade-badge">${grade.badge || ''}</span>
+                </div>
+                <span class="node-arrow ${isGradeOpen ? 'open' : ''}">◀</span>
+              </div>
+              <div style="display:${isGradeOpen ? 'block' : 'none'};">
+                ${termsHtml}
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      if (stageMatches || !state.searchQuery) {
+        html += `
+          <div class="tree-stage-group">
+            <div class="tree-stage-header">
+              <span>${stage.icon} ${stage.name}</span>
+            </div>
+            ${gradesHtml}
+          </div>
+        `;
+      }
+    });
+
+    sidebarTreeContainer.innerHTML = html || '<div style="padding:20px; color:#94a3b8; text-align:center;">لا توجد نتائج مطابقة لبحثك</div>';
+  }
+
+  // Toggle tree node collapse/expand
+  function toggleNode(nodeId) {
+    if (state.expandedNodes.has(nodeId)) {
+      state.expandedNodes.delete(nodeId);
+    } else {
+      state.expandedNodes.add(nodeId);
+    }
+    renderTree();
+  }
+
+  // Select Lesson
+  function selectLesson(lessonId) {
+    state.currentLessonId = lessonId;
+    state.activeView = 'cockpit';
+    
+    // update tabs
+    document.querySelectorAll('.view-tab-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.view === 'cockpit');
+    });
+
+    renderTree();
+    renderCurrentView();
+    // Scroll viewport to top smoothly
+    if (viewportArea) viewportArea.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ================= View Switcher Handler =================
+  function renderCurrentView() {
+    if (!viewportArea) return;
+
+    if (state.activeView === 'cockpit') {
+      renderLessonCockpit();
+    } else if (state.activeView === 'question-bank') {
+      if (window.QuestionBank) window.QuestionBank.render(viewportArea);
+    } else if (state.activeView === 'exam-builder') {
+      if (window.ExamBuilder) window.ExamBuilder.render(viewportArea);
+    } else if (state.activeView === 'visual-tree') {
+      renderVisualTree();
+    } else if (state.activeView === 'suites') {
+      renderSuitesView();
+    } else if (state.activeView === 'vault') {
+      renderVaultView();
+    } else if (state.activeView === 'builder') {
+      renderBuilderView();
+    }
+  }
+
+  function buildLessonQuestionPayload(lesson, type, idx) {
+    const utils = window.ArabicUtils;
+    if (!lesson) return null;
+    const inferredGradeId = lesson.gradeId || (lesson.id && lesson.id.startsWith('g1m') ? 'g1m' : 'g6');
+    if (type === 'mcq') {
+      const m = lesson.quiz.mcq[idx];
+      if (!m) return null;
+      return {
+        uid: lesson.id + '-mcq-' + (idx + 1),
+        type: 'mcq',
+        typeLabel: 'اختيار من متعدد',
+        gradeId: inferredGradeId,
+        chapterId: lesson.chapter_id || '',
+        chapterNumber: (lesson.chapter || '').split(':')[0] || '',
+        chapterTitle: lesson.chapter || '',
+        lessonId: lesson.id,
+        lessonNumber: lesson.number,
+        lessonTitle: lesson.title,
+        q: m.q,
+        options: m.options.slice(),
+        correct: m.correct,
+        explanation: m.explanation,
+        difficulty: m.difficulty || 'متوسط',
+        marks: m.marks || 1,
+        image: m.image || '',
+        imageCaption: m.imageCaption || ''
+      };
+    } else if (type === 'tf') {
+      const t = lesson.quiz.tf[idx];
+      if (!t) return null;
+      return {
+        uid: lesson.id + '-tf-' + (idx + 1),
+        type: 'tf',
+        typeLabel: 'صواب وخطأ',
+        gradeId: inferredGradeId,
+        chapterId: lesson.chapter_id || '',
+        chapterNumber: (lesson.chapter || '').split(':')[0] || '',
+        chapterTitle: lesson.chapter || '',
+        lessonId: lesson.id,
+        lessonNumber: lesson.number,
+        lessonTitle: lesson.title,
+        q: t.statement,
+        statement: t.statement,
+        is_true: t.is_true,
+        explanation: t.explanation,
+        difficulty: t.difficulty || 'سهل',
+        marks: t.marks || 1,
+        image: t.image || '',
+        imageCaption: t.imageCaption || ''
+      };
+    } else if (type === 'essay') {
+      const e = (lesson.quiz.essay || [])[idx];
+      if (!e) return null;
+      return {
+        uid: lesson.id + '-essay-' + (idx + 1),
+        type: 'essay',
+        typeLabel: 'مسألة مقالية',
+        gradeId: inferredGradeId,
+        chapterId: lesson.chapter_id || '',
+        chapterNumber: (lesson.chapter || '').split(':')[0] || '',
+        chapterTitle: lesson.chapter || '',
+        lessonId: lesson.id,
+        lessonNumber: lesson.number,
+        lessonTitle: lesson.title,
+        q: e.q,
+        ans: e.ans,
+        difficulty: e.difficulty || 'متوسط',
+        marks: e.marks || 2,
+        lines: e.lines || 3,
+        image: e.image || '',
+        imageCaption: e.imageCaption || ''
+      };
+    } else if (type === 'ws') {
+      const w = (lesson.worksheet && lesson.worksheet.questions || [])[idx];
+      if (!w) return null;
+      return {
+        uid: lesson.id + '-ws-' + (idx + 1),
+        type: 'essay',
+        typeLabel: 'مسألة استقصائية',
+        gradeId: inferredGradeId,
+        chapterId: lesson.chapter_id || '',
+        chapterNumber: (lesson.chapter || '').split(':')[0] || '',
+        chapterTitle: lesson.chapter || '',
+        lessonId: lesson.id,
+        lessonNumber: lesson.number,
+        lessonTitle: lesson.title,
+        q: w.q,
+        ans: w.ans,
+        difficulty: 'متوسط',
+        marks: 2,
+        lines: 3,
+        image: w.image || '',
+        imageCaption: w.imageCaption || ''
+      };
+    }
+    return null;
+  }
+
+  function copyLessonQuestionToWord(lessonId, type, idx) {
+    const lesson = window.CURRICULUM_DATA.lessons[lessonId];
+    const qObj = buildLessonQuestionPayload(lesson, type, idx);
+    if (qObj && window.ArabicUtils) {
+      window.ArabicUtils.copyQuestionsToWord([qObj], { includeAnswers: false, numbered: false });
+    }
+  }
+
+  function toggleLessonQuestionInExam(lessonId, type, idx) {
+    const lesson = window.CURRICULUM_DATA.lessons[lessonId];
+    const qObj = buildLessonQuestionPayload(lesson, type, idx);
+    if (!qObj || !window.ExamBuilder) return;
+    if (window.ExamBuilder.hasQuestion(qObj.uid)) {
+      window.ExamBuilder.removeQuestion(qObj.uid);
+      if (window.ArabicUtils) window.ArabicUtils.showToast('تمت إزالة السؤال من منشئ الاختبارات.', 'info');
+    } else {
+      window.ExamBuilder.addQuestion(qObj);
+    }
+    renderLessonCockpit();
+  }
+
+  function addAllLessonQuestionsToExam(lessonId) {
+    const lesson = window.CURRICULUM_DATA.lessons[lessonId];
+    if (!lesson || !window.ExamBuilder) return;
+    const all = [];
+    (lesson.quiz.mcq || []).forEach((_, i) => all.push(buildLessonQuestionPayload(lesson, 'mcq', i)));
+    (lesson.quiz.tf || []).forEach((_, i) => all.push(buildLessonQuestionPayload(lesson, 'tf', i)));
+    (lesson.quiz.essay || []).forEach((_, i) => all.push(buildLessonQuestionPayload(lesson, 'essay', i)));
+    window.ExamBuilder.addQuestions(all.filter(Boolean));
+    renderLessonCockpit();
+  }
+
+  // ================= Render Lesson Cockpit =================
+  function renderLessonCockpit() {
+    const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
+    if (!lesson) {
+      renderUnfinishedLessonPlaceholder(state.currentLessonId);
+      return;
+    }
+
+    const isG6 = isFullBookLesson(lesson);
+    const quiz = lesson.quiz || { mcq: [], tf: [], essay: [] };
+    const essays = quiz.essay || [];
+    const quizStats = state.quizScores[lesson.id] || { answeredCount: 0, correctCount: 0, userAnswers: {} };
+    const totalAutoQ = (quiz.mcq || []).length + (quiz.tf || []).length;
+    const examApi = window.ExamBuilder;
+
+    const lessonIdeaHtml = (lesson.lesson_idea || (lesson.vocabulary && lesson.vocabulary.length)) ? `
+      <div class="lesson-idea-box" style="background:var(--bg-page); border:1px solid var(--border-light); border-right:4px solid var(--primary); border-radius:8px; padding:14px 16px; margin-bottom:18px;">
+        ${lesson.lesson_idea ? `<div style="margin-bottom:8px;"><strong>💡 فكرة الدرس:</strong> ${lesson.lesson_idea}</div>` : ''}
+        ${(lesson.vocabulary && lesson.vocabulary.length) ? `
+          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+            <strong>🏷️ المفردات:</strong>
+            ${lesson.vocabulary.map(v => `<span class="qb-pill chapter-pill">${v}</span>`).join('')}
+          </div>
+        ` : ''}
+      </div>
+    ` : '';
+
+    let html = `
+      <!-- Cockpit Header Banner -->
+      <div class="lesson-cockpit-header">
+        <div class="breadcrumb-trail">
+          <span>🏫 ${lesson.stage}</span>
+          <span>/</span>
+          <span>🎓 ${lesson.grade}</span>
+          <span>/</span>
+          <span>📅 ${lesson.term}</span>
+          <span>/</span>
+          <span>📖 ${lesson.chapter}</span>
+        </div>
+        <div class="lesson-header-main">
+          <div class="lesson-title-area">
+            <h2>الدرس ${fmtNum(lesson.number, isG6)}: ${lesson.title}</h2>
+            <div class="lesson-subtitle">${lesson.english_title ? (lesson.english_title + ' • ') : ''}صفحات الكتاب المدرسي: ${fmtNum(lesson.pages, isG6)}</div>
+            <div class="lesson-meta-badges">
+              <span class="meta-badge green">✓ ${lesson.badge || 'مكتمل وشامل'}</span>
+              <span class="meta-badge" onclick="window.Platform.switchLessonTab('socratic')" style="cursor:pointer;" title="الانتقال إلى منصة سقراط التوليدية">🏛️ منصة سقراط الحوارية</span>
+              <span class="meta-badge" onclick="window.Platform.switchLessonTab('tools')" style="cursor:pointer;" title="الانتقال إلى الأدوات والمختبر التفاعلي">🛠️ ${(lesson.lesson_tools && lesson.lesson_tools.title) ? lesson.lesson_tools.title.split('(')[0].trim() : 'أدوات الدرس الذكية'}</span>
+              <span class="meta-badge">🎯 ${fmtNum(lesson.objectives.length, true)} أهداف تعليمية</span>
+              <span class="meta-badge orange">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
+              <span class="meta-badge">💡 إشراف: أ. محمد عبدالله جمعة</span>
+            </div>
+          </div>
+          <div class="lesson-header-actions">
+            ${isG6 ? `<button class="nav-btn" onclick="window.Platform.addAllLessonQuestionsToExam('${lesson.id}')">➕ أضف أسئلة الدرس للاختبار</button>` : ''}
+            <button class="nav-btn primary" onclick="window.print()">🖨️ طباعة كامل الدرس</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs for the Lesson -->
+      <div class="lesson-nav-tabs">
+        <button class="lesson-tab-button ${state.activeLessonTab === 'objectives' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('objectives')">
+          🎯 نواتج التعلم والأهداف الشاملة
+        </button>
+        <button class="lesson-tab-button ${state.activeLessonTab === 'plan' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('plan')">
+          📋 خطة التدريس STEM (الخماسية)
+        </button>
+        <button class="lesson-tab-button ${state.activeLessonTab === 'summary' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('summary')">
+          📚 الملخص ومطوية المفاهيم
+        </button>
+        <button class="lesson-tab-button ${state.activeLessonTab === 'worksheet' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('worksheet')">
+          📄 ورقة العمل الاستقصائية
+        </button>
+        <button class="lesson-tab-button ${state.activeLessonTab === 'socratic' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('socratic')">
+          🏛️ منصة سقراط التوليدية (الحوار والاستقصاء)
+        </button>
+        <button class="lesson-tab-button ${state.activeLessonTab === 'tools' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('tools')">
+          🖥️ المختبر والأدوات التفاعلية
+        </button>
+        <button class="lesson-tab-button ${state.activeLessonTab === 'quiz' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('quiz')">
+          📝 الاختبار المقنن (${fmtNum(quiz.mcq.length, true)} اختيارات + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''})
+        </button>
+      </div>
+
+      <!-- Tab 1: Objectives -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'objectives' ? 'active' : ''}" id="tab-objectives">
+        <div class="objectives-card">
+          <div class="card-section-title">
+            <span>🎯 نواتج التعلم والأهداف المعيارية للدرس</span>
+          </div>
+          ${lessonIdeaHtml}
+          <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:18px;">
+            تمت صياغة هذه الأهداف لتغطي كافة المستويات المعرفية والمهارية وفق معايير وزارة التعليم وهيئة تقويم التعليم والتدريب:
+          </p>
+          <div class="objectives-grid">
+            ${lesson.objectives.map((obj, i) => `
+              <div class="objective-item">
+                <span class="obj-number">${fmtNum(i + 1, true)}</span>
+                <span>${fmtNum(obj, isG6)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Lesson Plan STEM 5Es -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'plan' ? 'active' : ''}" id="tab-plan">
+        <div class="plan-container">
+          <div class="plan-5e-card">
+            <div class="plan-5e-header">
+              <span class="plan-5e-icon engage">🔥</span>
+              <span class="plan-5e-title">١. مرحلة الانخراط والتهيئة</span>
+            </div>
+            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.engage, isG6)}</div>
+          </div>
+          <div class="plan-5e-card">
+            <div class="plan-5e-header">
+              <span class="plan-5e-icon explore">🔍</span>
+              <span class="plan-5e-title">٢. مرحلة الاستكشاف التعاوني</span>
+            </div>
+            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.explore, isG6)}</div>
+          </div>
+          <div class="plan-5e-card">
+            <div class="plan-5e-header">
+              <span class="plan-5e-icon explain">💡</span>
+              <span class="plan-5e-title">٣. مرحلة الشرح والتفسير المعرفي</span>
+            </div>
+            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.explain, isG6)}</div>
+          </div>
+          <div class="plan-5e-card">
+            <div class="plan-5e-header">
+              <span class="plan-5e-icon elaborate">🚀</span>
+              <span class="plan-5e-title">٤. مرحلة الإثراء والتوسع وتكامل العلوم والرياضيات</span>
+            </div>
+            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.elaborate, isG6)}</div>
+          </div>
+          <div class="plan-5e-card">
+            <div class="plan-5e-header">
+              <span class="plan-5e-icon evaluate">📊</span>
+              <span class="plan-5e-title">٥. مرحلة التقويم والتغذية الراجعة</span>
+            </div>
+            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.evaluate, isG6)}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Summary & Concept Guide -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'summary' ? 'active' : ''}" id="tab-summary">
+        <div class="summary-container">
+          <div class="card-section-title">
+            <span>📚 الخلاصة المعرفية ومطوية المفاهيم والقوانين</span>
+          </div>
+          <div style="font-size:1.05rem; line-height:1.7; margin-bottom:16px;">
+            <strong>📌 المفهوم الأساسي:</strong> ${fmtNum(lesson.summary.concept, isG6)}
+          </div>
+          <div style="margin-bottom:16px;">
+            <strong style="color:var(--primary);">الطرق والخصائص الإجرائية:</strong>
+            <ul style="margin-right:24px; margin-top:8px; line-height:1.8;">
+              ${lesson.summary.methods.map(m => `<li>${fmtNum(m, isG6)}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="golden-rule-box">
+            <span class="golden-rule-icon">🌟</span>
+            <div>
+              <strong>القاعدة الذهبية للمعلم والطالب:</strong>
+              <div>${fmtNum(lesson.summary.golden_rule, isG6)}</div>
+            </div>
+          </div>
+          <div class="solved-example-box">
+            <div class="solved-example-title">
+              <span>✍️ مثال محلول تطبيقي شامل:</span>
+            </div>
+            <div class="solved-example-body">${fmtNum(lesson.summary.solved_example, isG6)}</div>
+          </div>
+          ${(lesson.figures && lesson.figures.length) ? `
+            <div style="margin-top:20px;">
+              <strong style="color:var(--primary); display:block; margin-bottom:10px;">🖼️ الأشكال والتمثيلات المعتمدة في الدرس (اضغط للتكبير):</strong>
+              <div class="lesson-figures-grid">
+                ${lesson.figures.map(fig => {
+                  const cap = fmtNum(fig.caption || '', isG6);
+                  return `
+                    <div class="lesson-figure-card">
+                      <img src="${escHtml(fig.image)}" alt="${escHtml(cap || 'شكل تعليمي')}" loading="lazy"
+                        onclick="window.Platform.openImageLightbox(this.getAttribute('src'), this.getAttribute('data-caption'))"
+                        data-caption="${escHtml(cap)}" />
+                      ${cap ? `<div class="lesson-figure-caption">${escHtml(cap)}</div>` : ''}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+
+      <!-- Tab 4: Inquiry Worksheet -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'worksheet' ? 'active' : ''}" id="tab-worksheet">
+        <div class="worksheet-container">
+          <div class="card-section-title" style="justify-content:space-between;">
+            <span>📄 ${fmtNum(lesson.worksheet.title, isG6)}</span>
+            <button class="nav-btn" onclick="window.Platform.toggleAllSolutions()">إظهار / إخفاء جميع الحلول</button>
+          </div>
+          ${lesson.worksheet.questions.map((q, idx) => `
+            <div class="ws-item">
+              <div class="ws-question-text">${fmtNum(q.q, isG6)}</div>
+              ${renderQuestionFigure(q)}
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <button class="ws-toggle-btn" onclick="window.Platform.toggleWsSolution('ws-sol-${idx}')">
+                  <span>💡 إظهار الحل النموذجي</span>
+                </button>
+                <button class="qb-act-btn copy-word-btn" type="button" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'ws', ${idx})">
+                  📋 نسخ لـ Word
+                </button>
+              </div>
+              <div class="ws-solution-box" id="ws-sol-${idx}">
+                <strong>الحل النموذجي:</strong> ${fmtNum(q.ans, isG6)}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Tab 5: Socratic Inquiry Platform (منصة سقراط التوليدية المخصصة للدرس) -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'socratic' ? 'active' : ''}" id="tab-socratic">
+        ${renderSocraticPane(lesson, isG6)}
+      </div>
+
+      <!-- Tab 6: Interactive Tools & Smart Boards (المختبر والأدوات التفاعلية المخصصة) -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'tools' ? 'active' : ''}" id="tab-tools">
+        ${renderLessonToolsPane(lesson, isG6)}
+      </div>
+
+      <!-- Tab 6: STANDARDIZED QUIZ (10 MCQs + 5 TF + Essay) -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'quiz' ? 'active' : ''}" id="tab-quiz">
+        <div class="quiz-cockpit">
+          <div class="quiz-header-banner">
+            <div>
+              <h3 style="font-size:1.25rem; font-weight:800; margin-bottom:4px;">📝 الاختبار المقنن والتقييم الإلكتروني الفوري</h3>
+              <p style="font-size:0.88rem; opacity:0.9;">مكون من ${fmtNum(quiz.mcq.length, true)} فقرات اختيار من متعدد بأربع خيارات أفقية + ${fmtNum(quiz.tf.length, true)} فقرات صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مسائل مقالية') : ''}</p>
+            </div>
+            <div class="quiz-score-badge" id="quiz-live-score">
+              الدرجة: ${fmtNum(quizStats.correctCount, true)} / ${fmtNum(totalAutoQ, true)}
+            </div>
+          </div>
+
+          <!-- Part 1: 10 MCQs with 4 Horizontal Options -->
+          <div class="quiz-part-title">
+            <span>🔹 القسم الأول: أسئلة الاختيار من متعدد (${fmtNum(quiz.mcq.length, true)} فقرات - ٤ خيارات أفقية)</span>
+            <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(لكل فقرة خيار واحد فقط صحيح)</span>
+          </div>
+
+          <div class="mcq-list">
+            ${quiz.mcq.map((mcq, qIdx) => {
+              const userAns = quizStats.userAnswers['mcq-' + qIdx];
+              const isAnswered = userAns !== undefined;
+              const uid = lesson.id + '-mcq-' + (qIdx + 1);
+              const inExam = examApi && examApi.hasQuestion(uid);
+              return `
+                <div class="question-card" id="card-mcq-${qIdx}">
+                  <div class="question-header" style="justify-content:space-between; width:100%;">
+                    <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
+                      <span class="q-badge">س ${fmtNum(qIdx + 1, true)}</span>
+                      <span class="q-text">${fmtNum(mcq.q, isG6)}</span>
+                    </div>
+                    <div class="q-inline-tools">
+                      ${mcq.difficulty ? `<span class="qb-pill">${mcq.difficulty}</span>` : ''}
+                      <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'mcq', ${qIdx})">📋 نسخ لـ Word</button>
+                      <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'mcq', ${qIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
+                    </div>
+                  </div>
+                  ${renderQuestionFigure(mcq)}
+                  <div class="mcq-options-horizontal">
+                    ${mcq.options.map((opt, optIdx) => {
+                      const letters = ['أ', 'ب', 'ج', 'د'];
+                      let btnClass = 'opt-btn';
+                      if (isAnswered) {
+                        if (optIdx === mcq.correct) btnClass += ' correct';
+                        else if (optIdx === userAns) btnClass += ' wrong';
+                      }
+                      return `
+                        <button class="${btnClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerMCQ(${qIdx}, ${optIdx})">
+                          <span class="opt-letter">${letters[optIdx]}</span>
+                          <span class="opt-text">${fmtNum(opt, isG6)}</span>
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
+                  <div class="q-explanation-box ${isAnswered ? 'show' : ''}" id="exp-mcq-${qIdx}">
+                    <strong>💡 التفسير الرياضي:</strong> ${fmtNum(mcq.explanation, isG6)}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Part 2: 5 True / False Questions -->
+          <div class="quiz-part-title">
+            <span>🔹 القسم الثاني: أسئلة الصواب والخطأ (${fmtNum(quiz.tf.length, true)} فقرات)</span>
+            <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(حدد صواب أو خطأ مع التبرير)</span>
+          </div>
+
+          <div class="tf-list">
+            ${quiz.tf.map((tf, qIdx) => {
+              const userAns = quizStats.userAnswers['tf-' + qIdx];
+              const isAnswered = userAns !== undefined;
+              const uid = lesson.id + '-tf-' + (qIdx + 1);
+              const inExam = examApi && examApi.hasQuestion(uid);
+              let trueClass = 'tf-btn opt-true';
+              let falseClass = 'tf-btn opt-false';
+
+              if (isAnswered) {
+                if (tf.is_true) {
+                  trueClass += ' correct';
+                  if (userAns === false) falseClass += ' wrong';
+                } else {
+                  falseClass += ' correct';
+                  if (userAns === true) trueClass += ' wrong';
+                }
+              }
+
+              return `
+                <div class="question-card" id="card-tf-${qIdx}">
+                  <div class="question-header" style="justify-content:space-between; width:100%;">
+                    <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
+                      <span class="q-badge" style="background:#059669;">س ${fmtNum(qIdx + quiz.mcq.length + 1, true)}</span>
+                      <span class="q-text">${fmtNum(tf.statement, isG6)}</span>
+                    </div>
+                    <div class="q-inline-tools">
+                      ${tf.difficulty ? `<span class="qb-pill">${tf.difficulty}</span>` : ''}
+                      <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'tf', ${qIdx})">📋 نسخ لـ Word</button>
+                      <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'tf', ${qIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
+                    </div>
+                  </div>
+                  ${renderQuestionFigure(tf)}
+                  <div class="tf-options-horizontal">
+                    <button class="${trueClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerTF(${qIdx}, true)">
+                      <span>✓ صواب</span>
+                    </button>
+                    <button class="${falseClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerTF(${qIdx}, false)">
+                      <span>✗ خطأ</span>
+                    </button>
+                  </div>
+                  <div class="q-explanation-box ${isAnswered ? 'show' : ''}" id="exp-tf-${qIdx}">
+                    <strong>💡 التفسير الرياضي:</strong> ${fmtNum(tf.explanation, isG6)}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          ${essays.length ? `
+            <!-- Part 3: Essay & Application Problems -->
+            <div class="quiz-part-title">
+              <span>🔹 القسم الثالث: المسائل المقالية والتطبيقية (${fmtNum(essays.length, true)} مسائل)</span>
+              <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(تُستخدم في الاختبارات الكتابية والنسخ لـ Word)</span>
+            </div>
+            <div class="tf-list">
+              ${essays.map((es, eIdx) => {
+                const uid = lesson.id + '-essay-' + (eIdx + 1);
+                const inExam = examApi && examApi.hasQuestion(uid);
+                return `
+                  <div class="question-card" id="card-essay-${eIdx}">
+                    <div class="question-header" style="justify-content:space-between; width:100%;">
+                      <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
+                        <span class="q-badge" style="background:#7c3aed;">س ${fmtNum(eIdx + quiz.mcq.length + quiz.tf.length + 1, true)}</span>
+                        <span class="q-text">${fmtNum(es.q, isG6)}</span>
+                      </div>
+                      <div class="q-inline-tools">
+                        <span class="qb-pill marks-pill">${window.ArabicUtils ? window.ArabicUtils.formatMark(es.marks || 2) : 'درجتان'}</span>
+                        <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'essay', ${eIdx})">📋 نسخ لـ Word</button>
+                        <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'essay', ${eIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
+                      </div>
+                    </div>
+                    ${renderQuestionFigure(es)}
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                      <button type="button" class="ws-toggle-btn" onclick="window.Platform.toggleWsSolution('essay-sol-${eIdx}')">💡 إظهار الحل النموذجي</button>
+                    </div>
+                    <div class="ws-solution-box" id="essay-sol-${eIdx}">
+                      <strong>الحل النموذجي:</strong> ${fmtNum(es.ans, isG6)}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          ` : ''}
+
+          <!-- Bottom Actions & Reset -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid var(--border-light); flex-wrap:wrap; gap:10px;">
+            <button class="nav-btn" onclick="window.Platform.resetQuiz('${lesson.id}')">🔄 إعادة الاختبار</button>
+            <div style="display:flex; gap:8px;">
+              ${isG6 ? `<button class="nav-btn" onclick="window.Platform.addAllLessonQuestionsToExam('${lesson.id}')">➕ إضافة كل أسئلة الدرس للاختبار</button>` : ''}
+              <button class="nav-btn primary" onclick="window.print()">🖨️ طباعة تقرير النتيجة</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    viewportArea.innerHTML = html;
+  }
+
+  // Fallback for roadmap lessons
+  function renderUnfinishedLessonPlaceholder(lessonId) {
+    viewportArea.innerHTML = `
+      <div class="objectives-card" style="text-align:center; padding:48px 24px;">
+        <span style="font-size:3.5rem;">🏗️</span>
+        <h2 style="font-size:1.6rem; font-weight:800; margin:16px 0 8px 0;">هذا الدرس مدرج في شجرة المنهج وجاهز للتوسعة</h2>
+        <p style="color:var(--text-muted); max-width:600px; margin:0 auto 24px auto;">
+          تم تسجيل هذا الدرس بكافة معاييره وتصنيفه الشجري حسب الفصلين الدراسيين (الأول والثاني). يمكنك استخدام "استوديو إضافة المناهج" لإدراج محتوى هذا الدرس أو اختباراته مباشرة!
+        </p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+          <button class="nav-btn primary" onclick="window.Platform.switchView('builder')">➕ إضافة محتوى الدرس الآن</button>
+          <button class="nav-btn" onclick="window.Platform.selectLesson('g6-t1-c4-l1')">الرجوع للدروس المكتملة</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // ================= Socratic Platform & Interactive Tools Panes =================
+  function renderSocraticPane(lesson, isG6) {
+    const s = lesson.socratic || {};
+    const dialogue = s.dialogue || [];
+    const probing = s.probing_questions || [];
+    const mb = s.misconception_buster || {};
+
+    return `
+      <div class="socratic-container">
+        <!-- Header Banner -->
+        <div class="socratic-header-card">
+          <div class="socratic-badge-pill">🏛️ منصة سقراط التوليدية • الحوار والاستقصاء المعرفي</div>
+          <h3 class="socratic-main-title">الدرس ${fmtNum(lesson.number, isG6)}: ${lesson.title}</h3>
+          <p class="socratic-lead">حوار فلسفي استقصائي يقود المتعلم لاكتشاف المفهوم وتصحيح التصورات البديلة عبر التفكير الناقد والبرهان المنطقي.</p>
+        </div>
+
+        <!-- Generating Inquiry Question -->
+        <div class="socratic-card inquiry-box">
+          <div class="socratic-card-header">
+            <span class="socratic-icon">❓</span>
+            <h4>السؤال التوليدي الاستقصائي للدرس</h4>
+          </div>
+          <div class="socratic-card-body inquiry-text">
+            ${s.inquiry_question || 'كيف يمثل هذا الدرس مدخلاً لفهم النماذج الرياضية في واقع الحياة؟'}
+          </div>
+        </div>
+
+        <!-- Conceptual Dilemma -->
+        ${s.conceptual_dilemma ? `
+          <div class="socratic-card dilemma-box">
+            <div class="socratic-card-header">
+              <span class="socratic-icon">⚡</span>
+              <h4>المأزق المفاهيمي (Cognitive Dissonance)</h4>
+            </div>
+            <div class="socratic-card-body dilemma-text">
+              ${s.conceptual_dilemma}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Multi-Turn Socratic Dialogue -->
+        <div class="socratic-card dialogue-box">
+          <div class="socratic-card-header">
+            <span class="socratic-icon">💬</span>
+            <h4>الحوار السقراطي المعياري الموجه</h4>
+          </div>
+          <div class="socratic-dialogue-list">
+            ${dialogue.map(turn => `
+              <div class="dialogue-turn ${turn.role || 'teacher'}">
+                <div class="turn-avatar">${turn.avatar || (turn.role === 'teacher' ? '🏛️' : '🎓')}</div>
+                <div class="turn-bubble">
+                  <div class="turn-speaker">${turn.speaker}</div>
+                  <div class="turn-content">${turn.text}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Probing Questions -->
+        ${probing.length ? `
+          <div class="socratic-card probing-box">
+            <div class="socratic-card-header">
+              <span class="socratic-icon">🔍</span>
+              <h4>أسئلة السبر والتعميق المعرفي للحوار الصفي</h4>
+            </div>
+            <div class="socratic-probing-list">
+              ${probing.map((q, idx) => `
+                <div class="probing-item">
+                  <span class="probing-num">${fmtNum(idx + 1, true)}</span>
+                  <span>${q}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Misconception Buster -->
+        ${mb.misconception ? `
+          <div class="socratic-card buster-box">
+            <div class="socratic-card-header">
+              <span class="socratic-icon">🛡️</span>
+              <h4>مفكك المفاهيم الخاطئة (Misconception Buster)</h4>
+            </div>
+            <div class="socratic-card-body buster-grid">
+              <div class="buster-side wrong">
+                <div class="buster-title">❌ الفهم الخاطئ الشائع:</div>
+                <div>${mb.misconception}</div>
+              </div>
+              <div class="buster-side right">
+                <div class="buster-title">✓ التصحيح والبرهان الرياضي:</div>
+                <div>${mb.correction}</div>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  function renderLessonToolsPane(lesson, isG6) {
+    const tools = lesson.lesson_tools || {};
+    const features = tools.features || [];
+    const actions = tools.quick_actions || [];
+    const toolUrl = getRelevantToolFile(lesson.id);
+
+    return `
+      <div class="lesson-tools-container">
+        <!-- Tools Header Banner -->
+        <div class="tools-header-card" style="background:var(--bg-card); border:1px solid var(--border-light); border-radius:12px; padding:18px 20px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div class="socratic-badge-pill" style="background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe;">🛠️ ${tools.widget_badge || 'بيئة التعلم الرقمية والمختبر النشط'}</div>
+              <h3 style="font-size:1.25rem; font-weight:800; margin:6px 0; color:var(--text-main);">${tools.title || ('مختبر ' + lesson.title)}</h3>
+              <p style="color:var(--text-muted); font-size:0.92rem; max-width:700px;">${tools.description || 'أداة تفاعلية مخصصة تدمج النمذجة البصرية بالاستقصاء الرياضي النشط.'}</p>
+            </div>
+            <div>
+              <a href="${toolUrl}" target="_blank" class="nav-btn primary">
+                ↗️ فتح الأداة في شاشة كاملة
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          ${actions.length ? `
+            <div class="tools-actions-bar" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; border-top:1px solid var(--border-light); padding-top:12px;">
+              ${actions.map(act => `
+                <button class="nav-btn" type="button" onclick="window.Platform.runToolAction('${act.id}', '${lesson.id}')">
+                  <span>${act.icon}</span>
+                  <span>${act.label}</span>
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Features Grid -->
+        ${features.length ? `
+          <div class="tools-features-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin-bottom:16px;">
+            ${features.map(f => `
+              <div style="background:var(--bg-card); border:1px solid var(--border-light); border-radius:8px; padding:10px 14px; font-size:0.88rem; display:flex; align-items:center; gap:8px;">
+                <span style="color:var(--primary); font-weight:bold;">✦</span>
+                <span>${f}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <!-- Interactive Whiteboard & Tool IFrame -->
+        <div class="tool-embed-container">
+          <iframe class="tool-embed-iframe" src="${toolUrl}" title="${tools.title || 'المختبر التفاعلي'}"></iframe>
+        </div>
+      </div>
+    `;
+  }
+
+  function runToolAction(actionId, lessonId) {
+    const lesson = window.CURRICULUM_DATA.lessons[lessonId];
+    if (!lesson) return;
+    const tools = lesson.lesson_tools || {};
+    if (actionId === 'whiteboard') {
+      window.open('عرض_السبورة_التفاعلي_الشامل_المثلثات_SSS_SAS.html', '_blank');
+    } else if (actionId === 'simulate') {
+      const url = getRelevantToolFile(lessonId);
+      window.open(url, '_blank');
+    } else if (actionId === 'generate') {
+      alert(`🎯 تم توليد مسألة استقصائية جديدة لدرس: ${lesson.title}!\nيمكنك الآن استكشاف الحل ومناقشته في منصة سقراط.`);
+    } else {
+      const url = getRelevantToolFile(lessonId);
+      window.open(url, '_blank');
+    }
+  }
+
+  // Determine relevant micro-app file based on lesson ID
+  function getRelevantToolFile(lessonId) {
+    if (lessonId.startsWith('g6')) return 'منصة_سقراط_للرياضيات_سادس_ابتدائي.html';
+    if (lessonId.startsWith('g1s')) return 'عرض_السبورة_التفاعلي_الشامل_المثلثات_SSS_SAS.html';
+    if (lessonId.startsWith('g3m')) return 'صيغ_معادلة_المستقيم_حقيبة_تفاعلية.html';
+    return 'منصة_سقراط_للرياضيات_سادس_ابتدائي.html';
+  }
+
+  // ================= Quiz Logic =================
+  function answerMCQ(qIdx, optIdx) {
+    const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
+    if (!lesson) return;
+    const mcq = lesson.quiz.mcq[qIdx];
+    if (!mcq) return;
+
+    if (!state.quizScores[lesson.id]) {
+      state.quizScores[lesson.id] = { answeredCount: 0, correctCount: 0, userAnswers: {} };
+    }
+    const qState = state.quizScores[lesson.id];
+    if (qState.userAnswers['mcq-' + qIdx] !== undefined) return; // already answered
+
+    qState.userAnswers['mcq-' + qIdx] = optIdx;
+    qState.answeredCount++;
+    if (optIdx === mcq.correct) {
+      qState.correctCount++;
+    }
+
+    renderLessonCockpit();
+  }
+
+  function answerTF(qIdx, boolAns) {
+    const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
+    if (!lesson) return;
+    const tf = lesson.quiz.tf[qIdx];
+    if (!tf) return;
+
+    if (!state.quizScores[lesson.id]) {
+      state.quizScores[lesson.id] = { answeredCount: 0, correctCount: 0, userAnswers: {} };
+    }
+    const qState = state.quizScores[lesson.id];
+    if (qState.userAnswers['tf-' + qIdx] !== undefined) return;
+
+    qState.userAnswers['tf-' + qIdx] = boolAns;
+    qState.answeredCount++;
+    if (boolAns === tf.is_true) {
+      qState.correctCount++;
+    }
+
+    renderLessonCockpit();
+  }
+
+  function resetQuiz(lessonId) {
+    if (state.quizScores[lessonId]) {
+      delete state.quizScores[lessonId];
+    }
+    renderLessonCockpit();
+  }
+
+  // Toggle Worksheet Solution
+  function toggleWsSolution(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('open');
+  }
+
+  function toggleAllSolutions() {
+    document.querySelectorAll('.ws-solution-box').forEach(box => {
+      box.classList.toggle('open');
+    });
+  }
+
+  function switchLessonTab(tabName) {
+    state.activeLessonTab = tabName;
+    renderLessonCockpit();
+  }
+
+  function switchView(viewName) {
+    state.activeView = viewName;
+    document.querySelectorAll('.view-tab-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.view === viewName);
+    });
+    renderCurrentView();
+  }
+
+  // ================= Visual Tree View =================
+  function renderVisualTree() {
+    const stages = window.CURRICULUM_DATA.stages || [];
+    let html = `
+      <div class="visual-tree-container">
+        <div class="tree-canvas-header">
+          <div>
+            <h2 style="font-size:1.4rem; font-weight:800; color:var(--text-main);">🌳 خريطة المناهج الشجرية التفاعلية الكاملة</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">استعراض شجري شامل لكافة المراحل والصفوف الدراسية والفصول الثلاثة والأبواب والدروس:</p>
+          </div>
+          <button class="nav-btn primary" onclick="window.print()">🖨️ طباعة المخطط الشجري</button>
+        </div>
+        <div class="tree-chart-wrapper">
+    `;
+
+    stages.forEach(stage => {
+      html += `
+        <div style="margin-bottom:32px; background:var(--bg-page); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:20px;">
+          <h3 style="font-size:1.2rem; font-weight:800; color:#1e3a8a; margin-bottom:16px;">${stage.icon} ${stage.name}</h3>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+      `;
+
+      stage.grades.forEach(grade => {
+        html += `
+          <div class="tree-node-card">
+            <h4 style="font-size:1.05rem; font-weight:800; color:var(--text-main); margin-bottom:8px;">🎓 ${grade.name}</h4>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+        `;
+
+        grade.terms.forEach(term => {
+          if (state.termFilter !== 'all' && term.id !== state.termFilter) return;
+          const chapters = term.chapters || [];
+          html += `
+            <div style="background:var(--bg-card); border-right:3px solid #3b82f6; padding:8px 12px; border-radius:6px;">
+              <div style="font-weight:700; font-size:0.85rem; color:#1e40af; margin-bottom:4px;">${term.icon || '📅'} ${term.name}</div>
+              <div style="font-size:0.78rem; color:var(--text-muted);">
+                ${chapters.map(ch => `<span style="display:block; padding:2px 0;">• ${ch.number}: ${ch.title}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+      `;
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+
+    viewportArea.innerHTML = html;
+  }
+
+  // ================= Specialized Suites View =================
+  function renderSuitesView() {
+    const tools = window.CURRICULUM_DATA.tools || [];
+    let html = `
+      <div class="visual-tree-container">
+        <div class="tree-canvas-header">
+          <div>
+            <h2 style="font-size:1.4rem; font-weight:800; color:var(--text-main);">🌟 الأجنحة والأدوات التفاعلية المدمجة</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">مختبرات الذكاء الاصطناعي والسبورات الذكية وميادين المسابقات وسجلات المتابعة:</p>
+          </div>
+        </div>
+        <div class="vault-grid">
+          ${tools.map(tool => `
+            <div class="vault-item-card">
+              <div>
+                <div style="font-size:2.2rem; margin-bottom:10px;">${tool.icon}</div>
+                <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-main); margin-bottom:6px;">${tool.title}</h3>
+                <span class="meta-badge" style="margin-bottom:10px;">${tool.target}</span>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.6;">${tool.desc}</p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <a href="${tool.file}" target="_blank" class="nav-btn primary" style="flex:1; justify-content:center;">
+                  🚀 تشغيل الأداة
+                </a>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    viewportArea.innerHTML = html;
+  }
+
+  // ================= Vault & PDF Downloads View =================
+  function renderVaultView() {
+    const downloads = window.CURRICULUM_DATA.vault_downloads || [];
+    let html = `
+      <div class="visual-tree-container">
+        <div class="tree-canvas-header">
+          <div>
+            <h2 style="font-size:1.4rem; font-weight:800; color:var(--text-main);">📥 مركز التحميل والطباعة (PDF Vault)</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">تحميل وتصفح الحقائب الشاملة وسجلات المتابعة والشهادات الرسمية بجودة طباعة كاملة:</p>
+          </div>
+        </div>
+        <div class="vault-grid">
+          ${downloads.map(item => `
+            <div class="vault-item-card">
+              <div>
+                <span class="meta-badge green" style="margin-bottom:8px;">${item.badge}</span>
+                <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-main); line-height:1.5;">${item.title}</h3>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <a href="${item.pdf}" download class="nav-btn primary" style="flex:1; justify-content:center;">
+                  📥 تحميل PDF
+                </a>
+                <a href="${item.html}" target="_blank" class="nav-btn" style="flex:1; justify-content:center;">
+                  🌐 معاينة الويب
+                </a>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    viewportArea.innerHTML = html;
+  }
+
+  // ================= Builder View =================
+  function renderBuilderView() {
+    let html = `
+      <div class="objectives-card">
+        <div class="card-section-title">
+          <span>➕ استوديو توسيع المناهج وإدراج الدروس الجديدة</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:20px;">
+          يتيح هذا الاستوديو للمعلم (أ. محمد عبدالله جمعة) إدراج وحدات ودروس جديدة في شجرة المنهج مع خططها وأسئلتها وحفظها محلياً:
+        </p>
+        <form onsubmit="window.Platform.saveNewLesson(event)" style="display:flex; flex-direction:column; gap:16px; max-width:700px;">
+          <div>
+            <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">الصف والمرحلة الدراسية:</label>
+            <select id="new-lesson-grade" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-light);">
+              <option value="g6">الصف السادس الابتدائي</option>
+              <option value="g1m">الصف الأول المتوسط</option>
+              <option value="g2m">الصف الثاني المتوسط</option>
+              <option value="g3m">الصف الثالث المتوسط</option>
+              <option value="g1s">الصف الأول الثانوي (مسارات)</option>
+              <option value="g2s">الصف الثاني الثانوي (مسارات)</option>
+              <option value="g3s">الصف الثالث الثانوي (مسارات)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">الفصل الدراسي:</label>
+            <select id="new-lesson-term" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-light);">
+              <option value="term1">الفصل الدراسي الأول</option>
+              <option value="term2">الفصل الدراسي الثاني</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">عنوان الدرس الجديد:</label>
+            <input id="new-lesson-title" type="text" placeholder="مثال: الدرس ٥-١: مساحة المثلث" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-light);">
+          </div>
+          <div>
+            <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">أهداف الدرس (كل هدف في سطر):</label>
+            <textarea id="new-lesson-objectives" rows="4" placeholder="الهدف الأول...&#10;الهدف الثاني..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-light);"></textarea>
+          </div>
+          <button type="submit" class="nav-btn primary" style="padding:12px; font-size:1rem; justify-content:center;">
+            💾 حفظ الدرس وإدراجه في الشجرة
+          </button>
+        </form>
+      </div>
+    `;
+    viewportArea.innerHTML = html;
+  }
+
+  function saveNewLesson(e) {
+    e.preventDefault();
+    const title = document.getElementById('new-lesson-title').value.trim();
+    const grade = document.getElementById('new-lesson-grade').value;
+    const term = document.getElementById('new-lesson-term').value;
+    const objsText = document.getElementById('new-lesson-objectives').value.trim();
+    const objs = objsText.split('\n').filter(o => o.trim());
+
+    const newId = `custom-${Date.now()}`;
+    const newLessonObj = {
+      id: newId,
+      number: 'جديد',
+      title: title,
+      grade: grade,
+      term: term,
+      chapter: 'وحدة مضافة حديثاً',
+      pages: 'ص مخصصة',
+      status: 'completed',
+      badge: 'مضاف حديثاً',
+      objectives: objs.length ? objs : ['تحقيق إتقان المفاهيم الرياضية المستهدفة.'],
+      plan_5es: {
+        engage: 'تهيئة جاذبة لربط المفاهيم.',
+        explore: 'استقصاء تعاوني.',
+        explain: 'تفسير القوانين.',
+        elaborate: 'ربط حياتي وتطبيقات.',
+        evaluate: 'تقويم ختامي.'
+      },
+      summary: {
+        concept: title,
+        methods: ['مراجعة القوانين والتمارين'],
+        golden_rule: 'الدقة والتدريب المستمر يصنعان التميز الرياضي.',
+        solved_example: 'تطبيق تدريبي مباشر.'
+      },
+      worksheet: {
+        title: `ورقة عمل: ${title}`,
+        questions: [{"q": "مسألة تدريبية أولى", "ans": "إجابة المسألة الأولى"}]
+      },
+      quiz: {
+        mcq: [
+          {
+            "q": `السؤال الأول حول ${title}:`,
+            "options": ["خيار أ", "خيار ب", "خيار ج", "خيار د"],
+            "correct": 0,
+            "explanation": "الشرح والتفسير الرياضي."
+          }
+        ],
+        tf: [
+          {
+            "statement": "هذه العبارة الرياضية صحيحة.",
+            "is_true": true,
+            "explanation": "تفسير الصواب والخطأ."
+          }
+        ]
+      }
+    };
+
+    window.CURRICULUM_DATA.lessons[newId] = newLessonObj;
+    alert('تم حفظ وإدراج الدرس الجديد بنجاح في الشجرة الدراسية!');
+    selectLesson(newId);
+  }
+
+  // Export Platform API
+  window.Platform = {
+    selectLesson,
+    toggleNode,
+    switchLessonTab,
+    switchView,
+    answerMCQ,
+    answerTF,
+    resetQuiz,
+    toggleWsSolution,
+    toggleAllSolutions,
+    saveNewLesson,
+    copyLessonQuestionToWord,
+    toggleLessonQuestionInExam,
+    addAllLessonQuestionsToExam,
+    openImageLightbox,
+    closeImageLightbox,
+    runToolAction
+  };
+
+})();

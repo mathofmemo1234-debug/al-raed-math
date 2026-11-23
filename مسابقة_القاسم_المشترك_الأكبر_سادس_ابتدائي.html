@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مسابقة فرسان القاسم المشترك الأكبر (ق.م.أ) - الصف السادس الابتدائي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #1e3a8a;
+        --primary-dark: #0f172a;
+        --accent: #d97706;
+        --accent-light: #fef3c7;
+        --secondary: #059669;
+        --secondary-light: #ecfdf5;
+        --border-color: #cbd5e1;
+        --bg-light: #f8fafc;
+        --text-dark: #1e293b;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Tajawal', sans-serif;
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--text-dark);
+        background-color: #f1f5f9;
+        padding: 20px;
+        direction: rtl;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 35px 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        border: 2px solid #e2e8f0;
+    }
+
+    /* Header styling */
+    .header {
+        border-bottom: 3px double var(--primary);
+        padding-bottom: 20px;
+        margin-bottom: 25px;
+    }
+
+    .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .header-info {
+        font-size: 0.95em;
+        font-weight: 700;
+        color: #475569;
+        line-height: 1.5;
+    }
+
+    .header-logos {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .header-logos img {
+        height: 60px;
+        object-fit: contain;
+    }
+
+    .header-title-box {
+        text-align: center;
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+    }
+
+    .header-title-box h1 {
+        font-family: 'Cairo', sans-serif;
+        font-size: 1.85em;
+        font-weight: 900;
+        margin-bottom: 4px;
+        letter-spacing: -0.5px;
+    }
+
+    .header-title-box p {
+        font-size: 1.05em;
+        opacity: 0.95;
+        font-weight: 700;
+    }
+
+    /* Meta student info box */
+    .meta-box {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 15px;
+        background: var(--bg-light);
+        border: 1.5px dashed var(--border-color);
+        padding: 14px 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
+    .meta-item span {
+        color: var(--primary);
+    }
+
+    /* Math and horizontal fraction formatting */
+    .ar-math {
+        direction: rtl;
+        unicode-bidi: isolate;
+        font-weight: 800;
+        color: var(--primary);
+        font-size: 1.1em;
+    }
+
+    .ar-frac {
+        display: inline-flex !important;
+        flex-direction: column !important;
+        vertical-align: middle !important;
+        text-align: center !important;
+        padding: 0 5px !important;
+        font-size: 1.1em !important;
+        line-height: 1.05 !important;
+        font-weight: 800;
+    }
+
+    .ar-frac .num {
+        display: block !important;
+        border-bottom: 2px solid currentColor !important;
+        padding-bottom: 2px !important;
+    }
+
+    .ar-frac .denom {
+        display: block !important;
+        padding-top: 2px !important;
+    }
+
+    /* Round / Stage Cards */
+    .round-card {
+        margin-bottom: 30px;
+        border: 1.5px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #ffffff;
+        page-break-inside: avoid;
+    }
+
+    .round-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        font-family: 'Cairo', sans-serif;
+        font-weight: 800;
+        font-size: 1.15em;
+        color: white;
+    }
+
+    .round-1-h { background: linear-gradient(90deg, #1e3a8a, #3b82f6); }
+    .round-2-h { background: linear-gradient(90deg, #b45309, #f59e0b); }
+    .round-3-h { background: linear-gradient(90deg, #047857, #10b981); }
+    .round-4-h { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+    .round-5-h { background: linear-gradient(90deg, #be123c, #f43f5e); }
+
+    .round-score-pill {
+        background: rgba(255, 255, 255, 0.25);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 700;
+    }
+
+    .round-body {
+        padding: 20px;
+    }
+
+    .round-instruction {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 16px;
+        background: #f8fafc;
+        padding: 8px 14px;
+        border-right: 4px solid var(--primary);
+        border-radius: 0 8px 8px 0;
+    }
+
+    /* Question items */
+    .q-item {
+        margin-bottom: 18px;
+        padding: 12px 16px;
+        background: #fdfdfe;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+    }
+
+    .q-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .q-title {
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: #0f172a;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .option-btn {
+        background: #f8fafc;
+        border: 1.5px solid #cbd5e1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.05em;
+    }
+
+    /* Fractions competition table */
+    .frac-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .frac-table th {
+        background: #f1f5f9;
+        color: #1e293b;
+        font-weight: 800;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+    }
+
+    .frac-table td {
+        padding: 12px 8px;
+        border: 1px solid #cbd5e1;
+        vertical-align: middle;
+        font-weight: 700;
+    }
+
+    .frac-work-cell {
+        min-width: 140px;
+        color: #64748b;
+        font-size: 0.95em;
+    }
+
+    /* Factorization box */
+    .factor-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 10px;
+    }
+
+    .factor-card {
+        border: 1.5px dashed #cbd5e1;
+        border-radius: 8px;
+        padding: 14px;
+        background: #fafafa;
+    }
+
+    .factor-title {
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 8px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 4px;
+    }
+
+    /* Answer Key Box (Collapsible / Printable) */
+    .answer-key-section {
+        margin-top: 35px;
+        background: #eff6ff;
+        border: 2px solid #3b82f6;
+        border-radius: 12px;
+        padding: 24px;
+        page-break-before: always;
+    }
+
+    .answer-key-header {
+        font-family: 'Cairo', sans-serif;
+        font-weight: 900;
+        font-size: 1.4em;
+        color: #1e3a8a;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #bfdbfe;
+        padding-bottom: 10px;
+    }
+
+    .answer-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .ans-card {
+        background: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid #bfdbfe;
+    }
+
+    .ans-card strong {
+        color: #1e40af;
+    }
+
+    /* Print Controls */
+    .no-print {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        font-size: 1em;
+        font-weight: 800;
+        font-family: 'Tajawal', sans-serif;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        transition: 0.2s;
+    }
+
+    .btn:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background: #475569;
+        margin-right: 10px;
+    }
+
+    .btn-secondary:hover {
+        background: #334155;
+    }
+
+    @media print {
+        body {
+            background: white;
+            padding: 0;
+            font-size: 15px;
+        }
+        .container {
+            border: none;
+            box-shadow: none;
+            padding: 10px 15px;
+            max-width: 100%;
+        }
+        .no-print {
+            display: none !important;
+        }
+        .round-card {
+            border: 1.5px solid #000;
+            margin-bottom: 18px;
+        }
+        .round-header {
+            color: black !important;
+            background: #e2e8f0 !important;
+            border-bottom: 1px solid black;
+        }
+        .round-score-pill {
+            border: 1px solid black;
+            color: black;
+            background: white;
+        }
+        .header-title-box {
+            background: #f1f5f9 !important;
+            color: black !important;
+            border: 2px solid #000;
+            box-shadow: none;
+        }
+        .ar-math {
+            color: black !important;
+        }
+        .answer-key-section {
+            page-break-before: always;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+    <button class="btn" onclick="window.print()">🖨️ طباعة المسابقة (PDF / ورق A4)</button>
+    <button class="btn btn-secondary" onclick="toggleAnswerKey()">👁️ إظهار / إخفاء دليل الإجابات النموذجية</button>
+</div>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-top">
+            <div class="header-info">
+                المملكة العربية السعودية<br>
+                وزارة التعليم<br>
+                مادة: الرياضيات | الصف: السادس الابتدائي
+            </div>
+            <div class="header-logos">
+                <img src="moe_logo_2025.png" alt="وزارة التعليم" onerror="this.style.display='none'">
+                <img src="motaqadimah_logo_clean.png" alt="شعار المدرسة" onerror="this.style.display='none'">
+            </div>
+        </div>
+
+        <div class="header-title-box">
+            <h1>🏆 مسابقة: فرسان القاسم المشترك الأكبر (ق.م.أ) 🏆</h1>
+            <p>الفصل الرابع: الكسور الاعتيادية | الصف السادس الابتدائي | المنهج السعودي</p>
+        </div>
+    </div>
+
+    <!-- Student Metadata -->
+    <div class="meta-box">
+        <div class="meta-item">اسم الطالب / الفريق: <span>.......................................................</span></div>
+        <div class="meta-item">الفصل: <span>٦ / ......</span></div>
+        <div class="meta-item">الدرجة الإجمالية: <span>...... / ٢٥</span></div>
+    </div>
+
+    <!-- ROUND 1 -->
+    <div class="round-card">
+        <div class="round-header round-1-h">
+            <span>⚡ الجولة الأولى: سرعة الانطلاق (قوائم القواسم المشتركة)</span>
+            <span class="round-score-pill">٤ درجات</span>
+        </div>
+        <div class="round-body">
+            <div class="round-instruction">اختر الإجابة الصحيحة من بين الخيارات المعطاة لكل فقرة:</div>
+
+            <div class="q-item">
+                <div class="q-title">١) القواسم المشتركة للعددين ( ١٢ ، ١٨ ) هي:</div>
+                <div class="options-grid">
+                    <div class="option-btn">أ) { ١ ، ٢ ، ٣ ، ٦ }</div>
+                    <div class="option-btn">ب) { ١ ، ٢ ، ٤ }</div>
+                    <div class="option-btn">ج) { ١ ، ٣ ، ٩ }</div>
+                    <div class="option-btn">د) { ٢ ، ٦ ، ١٢ }</div>
+                </div>
+            </div>
+
+            <div class="q-item">
+                <div class="q-title">٢) القاسم المشترك الأكبر (ق.م.أ) للعددين ( ١٥ ، ٢٥ ) هو:</div>
+                <div class="options-grid">
+                    <div class="option-btn">أ) ٣</div>
+                    <div class="option-btn">ب) ٥</div>
+                    <div class="option-btn">ج) ١٠</div>
+                    <div class="option-btn">د) ١٥</div>
+                </div>
+            </div>
+
+            <div class="q-item">
+                <div class="q-title">٣) القاسم المشترك الأكبر (ق.م.أ) للعددين ( ٨ ، ٢٤ ) هو:</div>
+                <div class="options-grid">
+                    <div class="option-btn">أ) ٢</div>
+                    <div class="option-btn">ب) ٤</div>
+                    <div class="option-btn">ج) ٨</div>
+                    <div class="option-btn">د) ٢٤</div>
+                </div>
+            </div>
+
+            <div class="q-item">
+                <div class="q-title">٤) ما هو القاسم المشترك الأكبر (ق.م.أ) لأي عددين أوليين مختلفين مثل ( ٧ ، ١١ )؟</div>
+                <div class="options-grid">
+                    <div class="option-btn">أ) ١</div>
+                    <div class="option-btn">ب) ٧</div>
+                    <div class="option-btn">ج) ١١</div>
+                    <div class="option-btn">د) ٧٧</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROUND 2 -->
+    <div class="round-card">
+        <div class="round-header round-2-h">
+            <span>🎯 الجولة الثانية: تحدي شرطة الكسر الأفقية (تبسيط الكسور الاعتيادية)</span>
+            <span class="round-score-pill">٦ درجات</span>
+        </div>
+        <div class="round-body">
+            <div class="round-instruction">
+                قاعدة ذهبية: يكون الكسر في أبسط صورة عندما يكون (ق.م.أ) لبسطه ومقامه هو ١.<br>
+                أوجد (ق.م.أ) للبسط والمقام، ثم اقسم كلاً منهما عليه لتكتب الكسر في أبسط صورة:
+            </div>
+
+            <table class="frac-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">الكسر المعطى</th>
+                        <th style="width: 25%;">(ق.م.أ) للبسط والمقام</th>
+                        <th style="width: 35%;">خطوات القسمة على (ق.م.أ)</th>
+                        <th style="width: 25%;">الكسر في أبسط صورة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="ar-frac"><span class="num">١٢</span><span class="denom">١٨</span></span></td>
+                        <td>ق.م.أ = <span class="frac-work-cell">.............</span></td>
+                        <td>
+                            <span class="ar-math">
+                                <span class="ar-frac">
+                                    <span class="num">١٢ ÷ ......</span>
+                                    <span class="denom">١٨ ÷ ......</span>
+                                </span>
+                            </span>
+                        </td>
+                        <td><span class="ar-frac"><span class="num">......</span><span class="denom">......</span></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="ar-frac"><span class="num">١٥</span><span class="denom">٤٥</span></span></td>
+                        <td>ق.م.أ = <span class="frac-work-cell">.............</span></td>
+                        <td>
+                            <span class="ar-math">
+                                <span class="ar-frac">
+                                    <span class="num">١٥ ÷ ......</span>
+                                    <span class="denom">٤٥ ÷ ......</span>
+                                </span>
+                            </span>
+                        </td>
+                        <td><span class="ar-frac"><span class="num">......</span><span class="denom">......</span></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="ar-frac"><span class="num">٢٤</span><span class="denom">٣٦</span></span></td>
+                        <td>ق.م.أ = <span class="frac-work-cell">.............</span></td>
+                        <td>
+                            <span class="ar-math">
+                                <span class="ar-frac">
+                                    <span class="num">٢٤ ÷ ......</span>
+                                    <span class="denom">٣٦ ÷ ......</span>
+                                </span>
+                            </span>
+                        </td>
+                        <td><span class="ar-frac"><span class="num">......</span><span class="denom">......</span></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="ar-frac"><span class="num">١٦</span><span class="denom">٢٨</span></span></td>
+                        <td>ق.م.أ = <span class="frac-work-cell">.............</span></td>
+                        <td>
+                            <span class="ar-math">
+                                <span class="ar-frac">
+                                    <span class="num">١٦ ÷ ......</span>
+                                    <span class="denom">٢٨ ÷ ......</span>
+                                </span>
+                            </span>
+                        </td>
+                        <td><span class="ar-frac"><span class="num">......</span><span class="denom">......</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ROUND 3 -->
+    <div class="round-card">
+        <div class="round-header round-3-h">
+            <span>🌳 الجولة الثالثة: شجرة العوامل والتحليل الأولي</span>
+            <span class="round-score-pill">٥ درجات</span>
+        </div>
+        <div class="round-body">
+            <div class="round-instruction">أوجد (ق.م.أ) باستخدام طريقة التحليل إلى العوامل الأولية:</div>
+
+            <div class="factor-box">
+                <div class="factor-card">
+                    <div class="factor-title">السؤال الأول: للعددين ( ٣٦ ، ٤٨ )</div>
+                    <p>• تحليل العدد ٣٦ إلى عوامله الأولية:<br>
+                    ٣٦ = ..............................................................</p>
+                    <p style="margin-top: 8px;">• تحليل العدد ٤٨ إلى عوامله الأولية:<br>
+                    ٤٨ = ..............................................................</p>
+                    <p style="margin-top: 8px;">• العوامل الأولية المشتركة: ................................</p>
+                    <p style="margin-top: 8px; font-weight: 800; color: var(--primary);">
+                        ق.م.أ ( ٣٦ ، ٤٨ ) = .........................................
+                    </p>
+                </div>
+
+                <div class="factor-card">
+                    <div class="factor-title">السؤال الثاني: لثلاثة أعداد ( ١٢ ، ١٨ ، ٣٠ )</div>
+                    <p>• تحليل العدد ١٢ = ...........................................</p>
+                    <p>• تحليل العدد ١٨ = ...........................................</p>
+                    <p>• تحليل العدد ٣٠ = ...........................................</p>
+                    <p style="margin-top: 8px;">• العوامل الأولية المشتركة بين الأعداد الثلاثة:<br>
+                    ...........................................................................</p>
+                    <p style="margin-top: 8px; font-weight: 800; color: var(--primary);">
+                        ق.م.أ ( ١٢ ، ١٨ ، ٣٠ ) = .................................
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROUND 4 -->
+    <div class="round-card">
+        <div class="round-header round-4-h">
+            <span>🌴 الجولة الرابعة: عباقرة المسائل الواقعية (من البيئة السعودية)</span>
+            <span class="round-score-pill">٦ درجات</span>
+        </div>
+        <div class="round-body">
+            <div class="round-instruction">اقرأ المسألة بعناية ثم استعمل القاسم المشترك الأكبر للحل:</div>
+
+            <div class="q-item">
+                <div class="q-title">١) مسألة مهرجان التمور بالقصيم:</div>
+                <p>لدى تاجر تمور <span class="ar-math">٢٤</span> كجم من تمر السكري الفاخر، و <span class="ar-math">٣٦</span> كجم من تمر الخلاص. يريد تعبئتها في صناديق متماثلة تماماً دون خلط نوعين، ودون أن يتبقى أي تمر.</p>
+                <div style="margin-top: 10px; padding: 10px; background: #f8fafc; border-radius: 6px;">
+                    <strong>أ) ما أكبر وزن ممكن (بالكيلوجرام) للصندوق الواحد؟</strong><br>
+                    الحل: (ق.م.أ للعددين ٢٤ و ٣٦) = .......................................... كجم.<br><br>
+                    <strong>ب) كم صندوقاً سيحتاج التاجر لتعبئة كل نوع؟</strong><br>
+                    - عدد صناديق السكري = ٢٤ ÷ ...... = ......... صناديق.<br>
+                    - عدد صناديق الخلاص = ٣٦ ÷ ...... = ......... صناديق.<br>
+                    - إجمالي عدد الصناديق = ......... + ......... = ......... صندوقاً.
+                </div>
+            </div>
+
+            <div class="q-item">
+                <div class="q-title">٢) مسألة توزيع الهدايا في يوم التأسيس:</div>
+                <p>قامت المدرسة بتجهيز <span class="ar-math">٣٠</span> شارة وطنية و <span class="ar-math">٤٥</span> دفتراً تذكارياً لتوزيعها في أكياس هدايا متماثلة على الطلاب المتميزين دون أن يتبقى شيء.</p>
+                <div style="margin-top: 10px; padding: 10px; background: #f8fafc; border-radius: 6px;">
+                    <strong>ما أكبر عدد ممكن من أكياس الهدايا يمكن للمدرسة تجهيزه؟ وما محتويات كل كيس؟</strong><br>
+                    - أكبر عدد من الأكياس = ق.م.أ ( ٣٠ ، ٤٥ ) = ......... كيساً.<br>
+                    - في كل كيس: ......... شارات وطنية، وَ ......... دفاتر تذكارية.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROUND 5 -->
+    <div class="round-card">
+        <div class="round-header round-5-h">
+            <span>🧠 الجولة الخامسة: قناص الأخطاء (صواب أم خطأ مع التعليل)</span>
+            <span class="round-score-pill">٤ درجات</span>
+        </div>
+        <div class="round-body">
+            <div class="round-instruction">ضع علامة ( ✔ ) أمام العبارة الصحيحة وعلامة ( ✘ ) أمام العبارة الخاطئة مع ذكر السبب أو مثال مضاد:</div>
+
+            <div class="q-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>١) القاسم المشترك الأكبر (ق.م.أ) لأي عددين زوجيين هو دائماً عدد زوجي.</span>
+                    <span style="font-weight: 800; font-size: 1.1em;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</span>
+                </div>
+                <div style="margin-top: 6px; color: #64748b; font-size: 0.9em;">التعليل: ....................................................................................................</div>
+            </div>
+
+            <div class="q-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>٢) القاسم المشترك الأكبر للعددين ( ٩ ، ٢٧ ) هو ٢٧ لأن ٢٧ من مضاعفات ٩.</span>
+                    <span style="font-weight: 800; font-size: 1.1em;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</span>
+                </div>
+                <div style="margin-top: 6px; color: #64748b; font-size: 0.9em;">التعليل: ....................................................................................................</div>
+            </div>
+
+            <div class="q-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>٣) الكسر <span class="ar-frac"><span class="num">٩</span><span class="denom">١٦</span></span> مكتوب في أبسط صورة.</span>
+                    <span style="font-weight: 800; font-size: 1.1em;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</span>
+                </div>
+                <div style="margin-top: 6px; color: #64748b; font-size: 0.9em;">التعليل: ....................................................................................................</div>
+            </div>
+
+            <div class="q-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>٤) القاسم المشترك الأكبر لعددين أحدهما فردي والآخر زوجي هو دائماً عدد زوجي.</span>
+                    <span style="font-weight: 800; font-size: 1.1em;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</span>
+                </div>
+                <div style="margin-top: 6px; color: #64748b; font-size: 0.9em;">التعليل: ....................................................................................................</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANSWER KEY (MODEL SOLUTIONS) -->
+    <div class="answer-key-section" id="answerKey">
+        <div class="answer-key-header">
+            <span>📋 دليل الإجابات النموذجية وسلم تصحيح المسابقة (للمعلم والمحكّم)</span>
+            <span style="font-size: 0.75em; background: #2563eb; color: white; padding: 4px 10px; border-radius: 6px;">نموذج معتمد</span>
+        </div>
+
+        <div class="answer-grid">
+            <div class="ans-card">
+                <strong>حل الجولة الأولى (٤ درجات):</strong><br>
+                ١) الخيار <strong>(أ)</strong> { ١ ، ٢ ، ٣ ، ٦ }.<br>
+                ٢) الخيار <strong>(ب)</strong> ٥ (قواسم ١٥: ١، ٣، ٥، ١٥ | قواسم ٢٥: ١، ٥، ٢٥).<br>
+                ٣) الخيار <strong>(ج)</strong> ٨ (لأن ٨ قاسم للعدد ٢٤).<br>
+                ٤) الخيار <strong>(أ)</strong> ١ (العددان الأوليان لا يقبلان القسمة إلا على ١ ونفسهما).
+            </div>
+
+            <div class="ans-card">
+                <strong>حل الجولة الثانية: تبسيط الكسور (٦ درجات):</strong><br>
+                • الكسر <span class="ar-frac"><span class="num">١٢</span><span class="denom">١٨</span></span>: ق.م.أ = <strong>٦</strong> ⟵ 
+                <span class="ar-math"><span class="ar-frac"><span class="num">١٢ ÷ ٦</span><span class="denom">١٨ ÷ ٦</span></span> = <span class="ar-frac"><span class="num">٢</span><span class="denom">٣</span></span></span>.<br>
+                • الكسر <span class="ar-frac"><span class="num">١٥</span><span class="denom">٤٥</span></span>: ق.م.أ = <strong>١٥</strong> ⟵ 
+                <span class="ar-math"><span class="ar-frac"><span class="num">١٥ ÷ ١٥</span><span class="denom">٤٥ ÷ ١٥</span></span> = <span class="ar-frac"><span class="num">١</span><span class="denom">٣</span></span></span>.<br>
+                • الكسر <span class="ar-frac"><span class="num">٢٤</span><span class="denom">٣٦</span></span>: ق.م.أ = <strong>١٢</strong> ⟵ 
+                <span class="ar-math"><span class="ar-frac"><span class="num">٢٤ ÷ ١٢</span><span class="denom">٣٦ ÷ ١٢</span></span> = <span class="ar-frac"><span class="num">٢</span><span class="denom">٣</span></span></span>.<br>
+                • الكسر <span class="ar-frac"><span class="num">١٦</span><span class="denom">٢٨</span></span>: ق.م.أ = <strong>٤</strong> ⟵ 
+                <span class="ar-math"><span class="ar-frac"><span class="num">١٦ ÷ ٤</span><span class="denom">٢٨ ÷ ٤</span></span> = <span class="ar-frac"><span class="num">٤</span><span class="denom">٧</span></span></span>.
+            </div>
+
+            <div class="ans-card">
+                <strong>حل الجولة الثالثة: شجرة العوامل (٥ درجات):</strong><br>
+                <strong>السؤال الأول (٣٦ ، ٤٨):</strong><br>
+                - تحليل ٣٦ = ٢ × ٢ × ٣ × ٣.<br>
+                - تحليل ٤٨ = ٢ × ٢ × ٢ × ٢ × ٣.<br>
+                - العوامل الأولية المشتركة: ٢ ، ٢ ، ٣.<br>
+                - ق.م.أ = ٢ × ٢ × ٣ = <strong>١٢</strong>.<br>
+                <strong>السؤال الثاني (١٢ ، ١٨ ، ٣٠):</strong><br>
+                - تحليل ١٢ = ٢ × ٢ × ٣.<br>
+                - تحليل ١٨ = ٢ × ٣ × ٣.<br>
+                - تحليل ٣٠ = ٢ × ٣ × ٥.<br>
+                - العوامل المشتركة للثلاثة أعداد معاً: ٢ و ٣.<br>
+                - ق.م.أ = ٢ × ٣ = <strong>٦</strong>.
+            </div>
+
+            <div class="ans-card">
+                <strong>حل الجولة الرابعة: المسائل الواقعية (٦ درجات):</strong><br>
+                <strong>مسألة التمور:</strong><br>
+                - أكبر وزن ممكن للصندوق الواحد = ق.م.أ ( ٢٤ ، ٣٦ ) = <strong>١٢ كجم</strong>.<br>
+                - عدد صناديق السكري = ٢٤ ÷ ١٢ = <strong>٢ صندوق</strong>.<br>
+                - عدد صناديق الخلاص = ٣٦ ÷ ١٢ = <strong>٣ صناديق</strong>.<br>
+                - إجمالي الصناديق = ٢ + ٣ = <strong>٥ صناديق</strong>.<br>
+                <strong>مسألة الهدايا:</strong><br>
+                - قواسم ٣٠: ١، ٢، ٣، ٥، ٦، ١٠، ١٥، ٣٠ | قواسم ٤٥: ١، ٣، ٥، ٩، ١٥، ٤٥.<br>
+                - أكبر عدد من الأكياس = ق.م.أ ( ٣٠ ، ٤٥ ) = <strong>١٥ كيساً</strong>.<br>
+                - محتويات كل كيس: (٣٠ ÷ ١٥) = <strong>٢ شارة</strong> ، وَ (٤٥ ÷ ١٥) = <strong>٣ دفاتر</strong>.
+            </div>
+
+            <div class="ans-card">
+                <strong>حل الجولة الخامسة: قناص الأخطاء (٤ درجات):</strong><br>
+                ١) <strong>( ✔ ) صواب</strong>: لأن أي عددين زوجيين يقبلان القسمة على ٢، لذا فإن قاسمها المشترك يحتوي على ٢ دائماً فهو زوجي.<br>
+                ٢) <strong>( ✘ ) خطأ</strong>: القاسم المشترك الأكبر هو <strong>٩</strong> وليس ٢٧ (لأن القاسم لا يمكن أن يكون أكبر من العدد الأصغر ٩).<br>
+                ٣) <strong>( ✔ ) صواب</strong>: لأن قواسم ٩ هي (١، ٣، ٩) وقواسم ١٦ هي (١، ٢، ٤، ٨، ١٦)، والقاسم المشترك الأكبر لهما هو ١.<br>
+                ٤) <strong>( ✘ ) خطأ</strong>: مستحيل أن يكون زوجياً لأن العدد الفردي لا يقبل القسمة على أي عدد زوجي. الصحيح: ق.م.أ يكون عدداً فردياً دائماً. (مثال: ق.م.أ للعددين ٦ و ٩ هو ٣ وهو فردي).
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleAnswerKey() {
+        const ak = document.getElementById('answerKey');
+        if (ak.style.display === 'none') {
+            ak.style.display = 'block';
+        } else {
+            ak.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

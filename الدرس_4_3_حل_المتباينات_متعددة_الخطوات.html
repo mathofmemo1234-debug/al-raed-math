@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملخص الطالب | الدرس 4-3: حل المتباينات متعددة الخطوات</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4338ca;
+            --primary-light: #e0e7ff;
+            --secondary: #0891b2;
+            --accent: #d97706;
+            --danger: #dc2626;
+            --dark: #0f172a;
+            --gray-100: #f8fafc;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.7;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #3730a3, #4f46e5);
+            color: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.05rem;
+        }
+
+        .print-btn {
+            position: absolute;
+            left: 24px;
+            top: 24px;
+            background: var(--white);
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+
+        .print-btn:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .card-header h2 {
+            font-size: 1.35rem;
+            color: var(--primary);
+        }
+
+        /* Algorithm Steps */
+        .algo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin: 16px 0;
+        }
+
+        .algo-box {
+            background: #f8fafc;
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 16px;
+            position: relative;
+            border-top: 4px solid var(--primary);
+        }
+
+        .algo-step-num {
+            position: absolute;
+            top: -12px;
+            right: 12px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .algo-box h3 {
+            font-size: 1.05rem;
+            margin: 8px 0 6px;
+            color: var(--dark);
+        }
+
+        /* Special cases */
+        .cases-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 768px) {
+            .cases-grid { grid-template-columns: 1fr; }
+        }
+
+        .case-card {
+            padding: 18px;
+            border-radius: 10px;
+            border-right: 5px solid;
+        }
+
+        .case-empty {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        .case-reals {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+
+        .case-empty h3 { color: #991b1b; }
+        .case-reals h3 { color: #166534; }
+
+        /* Frayer Model */
+        .frayer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 2px solid var(--gray-200);
+        }
+
+        .frayer-cell {
+            background: var(--white);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .frayer-cell h4 {
+            color: var(--secondary);
+            margin-bottom: 6px;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 4px;
+        }
+
+        .frayer-center {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: var(--primary);
+            color: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* Examples */
+        .example-box {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .math-line {
+            direction: ltr;
+            text-align: right;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            color: #1e293b;
+            padding: 4px 8px;
+            background: #ffffff;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 3px 0;
+        }
+
+        /* Quiz */
+        .quiz-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+
+        .quiz-btn {
+            background: var(--secondary);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .quiz-answer {
+            display: none;
+            background: #ecfdf5;
+            color: #065f46;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            border-right: 3px solid #10b981;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--gray-600);
+            font-size: 0.85rem;
+            margin-top: 24px;
+            padding: 12px;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .print-btn { display: none; }
+            .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+            .quiz-answer { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header>
+        <button class="print-btn" onclick="window.print()">🖨️ طباعة الملخص</button>
+        <span class="badge">رياضيات الصف الثالث المتوسط | الفصل الدراسي الثاني</span>
+        <h1>الدرس (4-3): حل المتباينات متعددة الخطوات</h1>
+        <p>خوارزمية الحل المنهجية، خاصية التوزيع، الحالات الخاصة (الخالية وح مجموعة الحقيقيات) وتطبيقات STEM</p>
+    </header>
+
+    <!-- Algorithm of Solution -->
+    <div class="card">
+        <div class="card-header">
+            <h2>⚙️ خوارزمية حل المتباينة متعددة الخطوات (الخطوات الـ 4)</h2>
+        </div>
+        <div class="algo-grid">
+            <div class="algo-box">
+                <span class="algo-step-num">خطوة 1</span>
+                <h3>فك الأقواس (التوزيع)</h3>
+                <p>إذا كانت المتباينة تحوي أقواس، استعمل خاصية التوزيع للتخلص منها أولاً: <br><code>أ(ب + جـ) = أب + أجـ</code></p>
+            </div>
+            <div class="algo-box">
+                <span class="algo-step-num">خطوة 2</span>
+                <h3>تجميع المتغيرات</h3>
+                <p>إذا كان المتغير موجوداً في الطرفين، اطرح أو اجمع الحد الأصغر للمتغير من الطرفين لتجميعه في جهة واحدة.</p>
+            </div>
+            <div class="algo-box">
+                <span class="algo-step-num">خطوة 3</span>
+                <h3>التخلص من الجمع/الطرح</h3>
+                <p>استعمل الخاصية العكسية للجمع أو الطرح لنقل الثوابت إلى الطرف الآخر بمفردها.</p>
+            </div>
+            <div class="algo-box">
+                <span class="algo-step-num">خطوة 4</span>
+                <h3>التخلص من المعامل (× أو ÷)</h3>
+                <p>اقسم أو اضرب في معامل المتغير. <strong>تذكير:</strong> إذا كان المعامل سالباً، اقلب اتجاه المتباينة فوراً!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Special Cases -->
+    <div class="card">
+        <div class="card-header">
+            <h2>⚠️ الحالات الخاصة الحاسمة (عندما يختفي المتغير تماماً)</h2>
+        </div>
+        <p>عند تبسيط المتباينة وحذف المتغير من الطرفين، يتبقى عددان فقط؛ انظر إلى صحة العبارة الناتجة:</p>
+        <div class="cases-grid">
+            <div class="case-card case-empty">
+                <h3>1. المجموعة الخالية ( ∅ )</h3>
+                <p><strong>تنتج إذا كانت العبارة العددية خاطئة وغير صحيحة أبداً.</strong></p>
+                <p>• مثال: $2س + 5 < 2س - 3 \implies 5 < -3$ (عبارة خاطئة!)</p>
+                <p>• <strong>مجموعة الحل:</strong> المجموعة الخالية $\emptyset$ (لا يوجد أي عدد يحقق المتباينة، وخط الأعداد يظل فارغاً تماماً).</p>
+            </div>
+            <div class="case-card case-reals">
+                <h3>2. مجموعة جميع الأعداد الحقيقية ( ح أو ℝ )</h3>
+                <p><strong>تنتج إذا كانت العبارة متطابقة وصحيحة دائماً.</strong></p>
+                <p>• مثال: $3(س + 2) \ge 3س + 1 \implies 3س + 6 \ge 3س + 1 \implies 6 \ge 1$ (صحيحة دائماً!)</p>
+                <p>• <strong>مجموعة الحل:</strong> $\{ س \mid س \in \mathbb{R} \}$ (أي عدد حقيقي يحققها، وخط الأعداد يُظلل بالكامل بسهمين متعاكسين).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frayer Model -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🧩 نموذج فراير (Frayer Model): المتباينة متعددة الخطوات</h2>
+        </div>
+        <div class="frayer-grid">
+            <div class="frayer-center">المفهوم: المتباينة متعددة الخطوات (Multi-Step Inequality)</div>
+            <div class="frayer-cell">
+                <h4>التعريف الدقيق</h4>
+                <p>متباينة جبرية يتطلب إيجاد مجموعة حلها إجراء أكثر من عملية جبرية عكسية واحدة (مثل: الجمع مع الضرب، أو التوزيع مع الطرح والقسمة) لعزل المتغير بمفرده في طرف.</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>الخصائص المميزة</h4>
+                <p>• تعتمد على ترتيب العمليات المعكوس (الجمع/الطرح أولاً ثم الضرب/القسمة).<br>• قد تحتوي على أقواس تستوجب التوزيع.<br>• قد تحتوي على متغيرات في الطرفين.<br>• تحتمل الحالات الخاصة ($\emptyset$ أو $\mathbb{R}$).</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>أمثلة منتمية</h4>
+                <p>• $3س + 4 \ge 16$<br>• $2(ص - 3) < 4ص + 8$<br>• $-\frac{1}{2}م - 5 > 9$</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>لا أمثلة</h4>
+                <p>• $س + 7 < 12$ (متباينة خطوة واحدة - جمع وطرح).<br>• $5ص \ge 25$ (متباينة خطوة واحدة - قسمة فقط).<br>• $<span class="ar-pow"><span class="ar-base">س</span><sup class="ar-exp">٢</sup></span> - 4 = 0$ (معادلة تربيعية وليست متباينة).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Solved Step-by-Step Examples -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📘 أمثلة نموذجية محلولة من الكتاب</h2>
+        </div>
+
+        <div class="example-box">
+            <strong>مثال 1: متباينة تتضمن خاصية التوزيع (ص 136)</strong>
+            <p><strong>المسألة:</strong> حل المتباينة: $3(ت + 1) - 4ت \ge -5$</p>
+            <p>1. نوزع الرقم $3$ داخل القوس: $3ت + 3 - 4ت \ge -5$</p>
+            <p>2. نجمع الحدود المتشابهة ($3ت - 4ت = -ت$): $-ت + 3 \ge -5$</p>
+            <p>3. نطرح $3$ من الطرفين: $-ت \ge -8$</p>
+            <p>4. نقسم على $(-1)$ ونعكس إشارة المتباينة فوراً: $ت \le 8$</p>
+            <p><strong>مجموعة الحل:</strong> $\{ ت \mid ت \le 8 \}$</p>
+        </div>
+
+        <div class="example-box">
+            <strong>مثال 2: وجود متغير في كلا الطرفين وحالة خاصة (ص 137)</strong>
+            <p><strong>المسألة:</strong> حل المتباينة: $2(ص + 4) > 2ص + 10$</p>
+            <p>1. التوزيع: $2ص + 8 > 2ص + 10$</p>
+            <p>2. طرح $2ص$ من الطرفين: $8 > 10$</p>
+            <p>3. التحليل: العبارة $8 > 10$ خاطئة تماماً وغير ممكنة رياضياً.</p>
+            <p><strong>مجموعة الحل:</strong> المجموعة الخالية $\emptyset$</p>
+        </div>
+    </div>
+
+    <!-- STEM Application -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🚀 الربط بمنهجية STEM وحسابات التكلفة التشغيلية</h2>
+        </div>
+        <p><strong>الهندسة المالية والإنتاجية (Break-even analysis):</strong></p>
+        <p>يريد مهندس مصنع تحديد عدد الساعات $س$ لتشغيل خط إنتاج آلي بحيث تكون التكلفة الإجمالية للآلة الأولى أقل من تكلفة الآلة الثانية. إذا كانت تكلفة الآلة الأولى: $150س + 2000$ ريال، وتكلفة الآلة الثانية: $220س + 600$ ريال، فإن المتباينة تكون:</p>
+        <div style="background:#eef2ff; padding:10px; border-radius:6px; margin:8px 0; font-weight:bold;">
+            $150س + 2000 < 220س + 600 \implies 1400 < 70س \implies س > 20 \text{ ساعة}$
+        </div>
+        <p>أي أن تشغيل الخط لأكثر من 20 ساعة يجعل الآلة الأولى أكثر كفاءة واقتصادية من الناحية الهندسية والمالية.</p>
+    </div>
+
+    <!-- Self-Assessment Quiz -->
+    <div class="card">
+        <div class="card-header">
+            <h2>✍️ اختبر فهمك الذاتي</h2>
+        </div>
+
+        <div class="quiz-item">
+            <p><strong>س1:</strong> ما مجموعة حل المتباينة $4(س - 2) \ge 4س - 15$؟</p>
+            <button class="quiz-btn" onclick="toggleAnswer('qans1')">عرض الإجابة والتحليل</button>
+            <div id="qans1" class="quiz-answer">
+                <strong>الإجابة:</strong> مجموعة جميع الأعداد الحقيقية $\{ س \mid س \in \mathbb{R} \}$<br>
+                <strong>السبب:</strong> بعد فك القوس ينتج $4س - 8 \ge 4س - 15 \implies -8 \ge -15$. وبما أن $-8$ بالفعل أكبر من $-15$ فالعبارة متطابقة وصحيحة دائماً.
+            </div>
+        </div>
+
+        <div class="quiz-item">
+            <p><strong>س2:</strong> ما الخطوة الأولى في حل المتباينة $\frac{ن - 3}{5} \le 4$؟</p>
+            <button class="quiz-btn" onclick="toggleAnswer('qans2')">عرض الإجابة والتحليل</button>
+            <div id="qans2" class="quiz-answer">
+                <strong>الإجابة:</strong> ضرب كلا الطرفين في المقام $(5)$ للتخلص من الكسر أولاً، فتصبح $ن - 3 \le 20 \implies ن \le 23$.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        تصميم خبير التعليم وفق منهجية STEM | مقرر رياضيات 3م - وزارة التعليم 2026
+    </footer>
+</div>
+
+<script>
+    function toggleAnswer(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === "block") {
+            el.style.display = "none";
+        } else {
+            el.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

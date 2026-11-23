@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الرائد التعليمية الذكية للرياضيات | أ. محمد عبدالله جمعة | المدارس المتقدمة للتعلم الذكي</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Readex+Pro:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="assets/css/platform.css">
+  
+  <link rel="icon" type="image/png" href="assets/img/logo.png">
+</head>
+<body>
+
+  <!-- ================= Top Navigation Bar ================= -->
+  <header class="platform-navbar">
+    <div class="nav-brand" onclick="window.Platform.switchView('cockpit')">
+      <img src="assets/img/logo.png" alt="شعار المدارس المتقدمة" class="nav-logo" onerror="this.style.display='none'">
+      <div class="nav-titles">
+        <h1>
+          منصة الرائد التعليمية الذكية للرياضيات
+          <span class="nav-badge-pill">الإصدار الشامل ٢.٠</span>
+        </h1>
+        <p>إعداد خبير الرياضيات: أ. محمد عبدالله جمعة • المدارس المتقدمة للتعلم الذكي بجدة</p>
+      </div>
+    </div>
+
+    <!-- Real-time Curriculum Search -->
+    <div class="nav-center-search">
+      <span class="nav-search-icon">🔍</span>
+      <input type="text" id="nav-search" class="nav-search-input" placeholder="ابحث في شجرة المناهج (اسم الدرس، الهدف، المفهوم، رقم الصفحة)...">
+      <span class="nav-search-kbd">Ctrl K</span>
+    </div>
+
+    <!-- Quick Navigation Actions -->
+    <div class="nav-actions">
+      <button class="nav-btn nav-action-tile" id="btn-theme-toggle" title="الوضع الليلي">
+        <span class="nav-icon-container">🌙</span>
+        <span class="nav-btn-label">الوضع الليلي</span>
+      </button>
+      <button class="nav-btn nav-action-tile" onclick="window.Platform.switchView('question-bank')" title="بنك الأسئلة">
+        <span class="nav-icon-container">🏦</span>
+        <span class="nav-btn-label">بنك الأسئلة</span>
+      </button>
+      <button class="nav-btn nav-action-tile primary" onclick="window.Platform.switchView('exam-builder')" title="منشئ الاختبارات">
+        <span class="nav-icon-container">
+          📝
+          <span class="exam-count-badge" id="nav-exam-count-badge">٠</span>
+        </span>
+        <span class="nav-btn-label">منشئ الاختبارات</span>
+      </button>
+      <button class="nav-btn nav-action-tile" onclick="window.Platform.switchView('suites')" title="الأجنحة التفاعلية">
+        <span class="nav-icon-container">🌟</span>
+        <span class="nav-btn-label">الأجنحة التفاعلية</span>
+      </button>
+      <button class="nav-btn nav-action-tile" onclick="window.Platform.switchView('vault')" title="مركز التحميل">
+        <span class="nav-icon-container">📥</span>
+        <span class="nav-btn-label">مركز التحميل</span>
+      </button>
+      <button class="nav-btn nav-action-tile" onclick="window.Platform.switchView('builder')" title="إضافة درس">
+        <span class="nav-icon-container">➕</span>
+        <span class="nav-btn-label">إضافة درس</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= App Container ================= -->
+  <div class="app-container">
+    
+    <!-- Sidebar: Hierarchical Curriculum Tree -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title-row">
+          <div class="sidebar-title">
+            <span>🌳 شجرة المناهج الدراسية</span>
+          </div>
+          <span style="font-size:0.75rem; color:#93c5fd; background:rgba(30,58,138,0.6); padding:2px 8px; border-radius:12px;">الفصلان الدراسيان</span>
+        </div>
+
+        <!-- Term Filter Tabs -->
+        <div class="term-filter-tabs">
+          <button class="term-tab-btn active" data-term="all">الكل</button>
+          <button class="term-tab-btn" data-term="term1">🍂 الفصل ١</button>
+          <button class="term-tab-btn" data-term="term2">❄️ الفصل ٢</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Tree Structure -->
+      <div class="sidebar-scrollable" id="sidebar-tree">
+        <!-- Rendered dynamically by platform.js -->
+      </div>
+    </aside>
+
+    <!-- Main Viewport Content Area -->
+    <main class="app-viewport">
+      
+      <!-- View Switcher Group -->
+      <div class="viewport-top-tabs">
+        <div class="view-switcher-group">
+          <button class="view-tab-btn active" data-view="cockpit">
+            🎯 مركز الدرس التفاعلي
+          </button>
+          <button class="view-tab-btn" data-view="question-bank">
+            🏦 بنك الأسئلة الشامل (١ م / ٦ ب)
+          </button>
+          <button class="view-tab-btn" data-view="exam-builder">
+            📝 منشئ الاختبارات (فترة / نهائي) <span class="exam-count-badge" id="exam-count-badge">٠</span>
+          </button>
+          <button class="view-tab-btn" data-view="visual-tree">
+            🌳 خريطة المناهج الشجرية
+          </button>
+          <button class="view-tab-btn" data-view="suites">
+            🌟 الأجنحة والمختبرات الذكية
+          </button>
+          <button class="view-tab-btn" data-view="vault">
+            📥 مركز التحميل والطباعة (PDF)
+          </button>
+          <button class="view-tab-btn" data-view="builder">
+            ➕ استوديو توسيع المناهج
+          </button>
+        </div>
+        <div>
+          <button class="nav-btn" onclick="window.print()">🖨️ طباعة الصفحة الحالية</button>
+        </div>
+      </div>
+
+      <!-- Dynamic Content Injection Container -->
+      <div id="app-viewport">
+        <!-- Content injected dynamically by platform.js -->
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/arabic_utils.js"></script>
+  <script src="assets/js/grade6_book_data.js"></script>
+  <script src="assets/js/grade1m_book_data.js"></script>
+  <script src="assets/js/curriculum_tree.js"></script>
+  <script src="assets/js/exam_exporter.js"></script>
+  <script src="assets/js/question_bank.js"></script>
+  <script src="assets/js/exam_builder.js"></script>
+  <script src="assets/js/platform.js"></script>
+
+</body>
+</html>

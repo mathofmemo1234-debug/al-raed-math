@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بطاقة الانخراط والتفاعل الصفي: إثبات تطابق المثلثات (SSS, SAS)</title>
+    <!-- Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { cairo: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a' },
+                        brand: { 50: '#f0f9ff', 100: '#e0f2fe', 600: '#0284c7', 700: '#0369a1' },
+                        accent: { 50: '#fff7ed', 600: '#ea580c', 700: '#c2410c' },
+                        success: { 50: '#f0fdf4', 600: '#16a34a', 700: '#15803d' },
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .dense-card {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 0.85rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            page-break-inside: avoid;
+        }
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+        .fill-blank {
+            display: inline-block;
+            min-width: 4rem;
+            padding: 0.1rem 0.4rem;
+            border-bottom: 2px solid #0284c7;
+            background-color: #f0f9ff;
+            border-radius: 0.25rem;
+            text-align: center;
+            font-weight: 800;
+            color: #0369a1;
+        }
+        .check-box-square {
+            width: 1rem;
+            height: 1rem;
+            border: 1.5px solid #64748b;
+            border-radius: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: white;
+        }
+        @media print {
+            body { background: white !important; padding: 0 !important; }
+            .no-print { display: none !important; }
+            .page-break-after { page-break-after: always; }
+            .print-container {
+                max-width: 100% !important;
+                padding: 0.5cm !important;
+                margin: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="py-4 px-2 sm:px-4">
+
+    <!-- Digital Actions Bar -->
+    <div class="max-w-5xl mx-auto mb-4 flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-slate-300 shadow-xs no-print">
+        <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-black text-sm">
+                <i class="fa-solid fa-compass"></i>
+            </span>
+            <div>
+                <h1 class="text-xs sm:text-sm font-black text-slate-900">بطاقة الانخراط والتفاعل الصفي النشط (Interactive Student Handout)</h1>
+                <p class="text-[11px] text-slate-500">مكثفة، خالية من الفراغات الميتة، وجاهزة للاستخدام الصفي والطباعة على ورقة واحدة وجهين</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleSolutions()" class="px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition flex items-center gap-1">
+                <i class="fa-solid fa-eye text-amber-600"></i>
+                <span id="sol-btn-text">إظهار الإجابات المرجعية</span>
+            </button>
+            <button onclick="window.print()" class="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-black shadow-xs transition flex items-center gap-1.5">
+                <i class="fa-solid fa-print"></i>
+                <span>طباعة الورقة (A4)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Handout Printable Sheet -->
+    <div class="print-container max-w-5xl mx-auto bg-white border border-slate-300 rounded-2xl p-4 sm:p-6 shadow-sm space-y-3.5">
+
+        <!-- Header: Sleek & Compact Metadata -->
+        <header class="border-b-2 border-slate-800 pb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-lg bg-navy-900 text-white flex items-center justify-center font-black text-base">
+                        <i class="fa-solid fa-shapes"></i>
+                    </span>
+                    <div>
+                        <div class="text-[10px] text-slate-500 font-bold">المملكة العربية السعودية • وزارة التعليم • رياضيات 1-2 مسارات</div>
+                        <h1 class="text-sm sm:text-base font-black text-slate-900 leading-tight">بوصلة الانخراط الصفي: إثبات تطابق المثلثات (SSS, SAS)</h1>
+                    </div>
+                </div>
+
+                <!-- Student Fill-in Info -->
+                <div class="flex flex-wrap items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 font-bold text-xs">
+                    <div>الطالب: <span class="border-b-2 border-dotted border-slate-500 inline-block w-28"></span></div>
+                    <div>الفصل: <span class="border-b-2 border-dotted border-slate-500 inline-block w-12"></span></div>
+                    <div>المجموعة: <span class="border-b-2 border-dotted border-slate-500 inline-block w-12"></span></div>
+                    <div class="text-brand-700">الدرس: 3-4 (ص 170-177)</div>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- ============================================================== -->
+        <!-- الوجه 1: بطاقة التفاعل والبرهان النشط -->
+        <!-- ============================================================== -->
+
+        <!-- 1. محطة التهيئة (Engage) ومفارقة الصلابة -->
+        <section class="dense-card p-3 border-amber-300 bg-amber-50/20">
+            <div class="flex items-center justify-between border-b border-amber-200 pb-1 mb-2">
+                <span class="badge-pill bg-amber-500 text-white">
+                    <i class="fa-solid fa-bolt"></i> 1. الشرارة والاستثارة (Engage)
+                </span>
+                <span class="text-[11px] font-bold text-amber-900">مفارقة الصلابة: المربع مقابل المثلث والسبورة A (ص 170)</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center text-xs">
+                <!-- Visual comparison -->
+                <div class="sm:col-span-4 bg-white p-2 rounded-lg border border-amber-200 flex items-center justify-around text-center">
+                    <div>
+                        <svg class="w-16 h-14 mx-auto" viewBox="0 0 60 50" fill="none">
+                            <polygon points="10,40 50,40 42,10 2,10" fill="rgba(244,63,94,0.15)" stroke="#e11d48" stroke-width="2"/>
+                            <text x="30" y="47" font-size="7" font-weight="bold" fill="#e11d48" text-anchor="middle">مربع يتشوه!</text>
+                        </svg>
+                    </div>
+                    <div class="text-slate-400 font-bold text-sm">VS</div>
+                    <div>
+                        <svg class="w-16 h-14 mx-auto" viewBox="0 0 60 50" fill="none">
+                            <polygon points="10,40 50,40 30,10" fill="rgba(16,185,129,0.15)" stroke="#059669" stroke-width="2.5"/>
+                            <line x1="20" y1="25" x2="40" y2="25" stroke="#0284c7" stroke-width="2"/>
+                            <text x="30" y="47" font-size="7" font-weight="bold" fill="#059669" text-anchor="middle">مثلث صلب (SSS)</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Engagement Task -->
+                <div class="sm:col-span-8 space-y-1">
+                    <p class="font-bold text-slate-800">
+                        <span class="text-amber-700">التحدي الذهني:</span> لماذا تثبت السبورة المزدوجة حرف A تماماً بمجرد تثبيت الذراعين المتساويين في الطول؟
+                    </p>
+                    <div class="flex flex-wrap items-center gap-2 pt-0.5 text-[11px]">
+                        <span class="text-slate-600 font-semibold">اختر التفسير الهندسي:</span>
+                        <label class="inline-flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-slate-300">
+                            <input type="radio" name="eng_choice" class="text-amber-600">
+                            <span>لأن زوايا المثلث قائمة</span>
+                        </label>
+                        <label class="inline-flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-amber-400 font-bold text-amber-900">
+                            <input type="radio" name="eng_choice" checked class="text-amber-600">
+                            <span>تطابق الأضلاع الثلاثة يثبت الزوايا حتماً (SSS)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 2. محطة الاستكشاف (Explore) ومختبر الزاوية المحصورة -->
+        <section class="dense-card p-3 border-teal-300 bg-teal-50/20">
+            <div class="flex items-center justify-between border-b border-teal-200 pb-1 mb-2">
+                <span class="badge-pill bg-teal-600 text-white">
+                    <i class="fa-solid fa-compass-drafting"></i> 2. مختبر الاستكشاف (Explore)
+                </span>
+                <span class="text-[11px] font-bold text-teal-900">كاشف الزاوية المحصورة (Included Angle) — عقارب الساعة ص 172</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <!-- Mini task 1 -->
+                <div class="bg-white p-2 rounded-lg border border-teal-200 space-y-1">
+                    <span class="font-bold text-teal-950 block">1. ما الزاوية المحصورة بين:</span>
+                    <div class="flex items-center justify-between">
+                        <span>$\overline{AB}$ و $\overline{BC}$ في $\triangle ABC$</span>
+                        <span class="fill-blank w-16">$\angle B$</span>
+                    </div>
+                    <div class="text-[10px] text-slate-500 font-bold">السر: رأس الزاوية هو الحرف المشترك!</div>
+                </div>
+
+                <!-- Mini task 2 -->
+                <div class="bg-white p-2 rounded-lg border border-teal-200 space-y-1">
+                    <span class="font-bold text-teal-950 block">2. ما الزاوية المحصورة بين:</span>
+                    <div class="flex items-center justify-between">
+                        <span>$\overline{XY}$ و $\overline{XZ}$ في $\triangle XYZ$</span>
+                        <span class="fill-blank w-16">$\angle X$</span>
+                    </div>
+                    <div class="text-[10px] text-slate-500 font-bold">السر: الرأس المشترك هو $X$</div>
+                </div>
+
+                <!-- Mini task 3 -->
+                <div class="bg-white p-2 rounded-lg border border-teal-200 space-y-1">
+                    <span class="font-bold text-teal-950 block">3. في عقارب الساعة (ص 172):</span>
+                    <p class="text-[11px] text-slate-600">كلما شكل العقربان زاوية القياس نفسه، فإن المسافة بين طرفيهما تكون: <span class="fill-blank w-16 text-teal-800">متساوية</span>.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 3. محطة الشرح (Explain): حقيبة أدوات البرهان والتمارين المشروحة -->
+        <section class="dense-card p-3 border-blue-300 bg-blue-50/15 space-y-2.5">
+            <div class="flex items-center justify-between border-b border-blue-200 pb-1">
+                <span class="badge-pill bg-blue-600 text-white">
+                    <i class="fa-solid fa-toolbox"></i> 3. شفرة البرهان (Explain)
+                </span>
+                <span class="text-[11px] font-bold text-blue-900">حقيبة أدوات التبرير الهندسي المعتمدة في كتاب الطالب</span>
+            </div>
+
+            <!-- Toolkit Cheat Sheet: The 4 Golden Reasons -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[11px] text-center">
+                <div class="bg-white p-1.5 rounded-lg border border-blue-200 font-bold">
+                    <span class="text-blue-600 block text-[10px]">1. الضلع المشترك</span>
+                    $\overline{XZ} \cong \overline{ZX}$ (خاصية الانعكاس)
+                </div>
+                <div class="bg-white p-1.5 rounded-lg border border-amber-200 font-bold">
+                    <span class="text-amber-600 block text-[10px]">2. نقطة المنتصف</span>
+                    $L$ منتصف $\overline{GK} \implies \overline{GL} \cong \overline{KL}$
+                </div>
+                <div class="bg-white p-1.5 rounded-lg border border-purple-200 font-bold">
+                    <span class="text-purple-600 block text-[10px]">3. التقابل بالرأس</span>
+                    الزاويتان المتقابلتان بالرأس متطابقتان
+                </div>
+                <div class="bg-white p-1.5 rounded-lg border border-emerald-200 font-bold">
+                    <span class="text-emerald-600 block text-[10px]">4. التوازي والقاطع</span>
+                    تبادل داخلي $\implies \angle 1 \cong \angle 2$
+                </div>
+            </div>
+
+            <!-- Exercise 1: Flow Proof SSS (Example 1, p. 170) -->
+            <div class="bg-white p-2.5 rounded-xl border border-slate-300 space-y-1.5 text-xs">
+                <div class="flex items-center justify-between font-bold">
+                    <span class="text-blue-950">تطبيق (أ) مثال 1 ص 170: أكمل الفراغات في مخطط البرهان التسلسلي لـ $\triangle GHL \cong \triangle KJL$:</span>
+                    <span class="text-[10px] text-slate-500">مسلمة SSS</span>
+                </div>
+
+                <div class="flex items-center justify-between gap-1 text-center font-mono">
+                    <div class="flex-1 p-1 bg-slate-50 rounded border border-slate-200 text-[11px]">
+                        <strong>$\overline{GH} \cong \overline{KJ}$</strong><br><span class="text-[9px] text-slate-500">معطى</span>
+                    </div>
+                    <span class="text-slate-400">➔</span>
+                    <div class="flex-1 p-1 bg-amber-50 rounded border border-amber-300 text-[11px]">
+                        $L$ منتصف $\overline{GK} \implies$ <span class="fill-blank w-20 text-xs">$\overline{GL} \cong \overline{KL}$</span><br>
+                        <span class="text-[9px] text-amber-700 font-bold">(تعريف نقطة المنتصف)</span>
+                    </div>
+                    <span class="text-slate-400">➔</span>
+                    <div class="flex-1 p-1 bg-slate-50 rounded border border-slate-200 text-[11px]">
+                        <strong>$\overline{HL} \cong \overline{JL}$</strong><br><span class="text-[9px] text-slate-500">معطى</span>
+                    </div>
+                    <span class="text-blue-600 font-bold text-sm">➔</span>
+                    <div class="flex-1 p-1.5 bg-blue-600 text-white rounded-lg text-xs font-black shadow-xs">
+                        $\triangle GHL \cong \triangle KJL$<br><span class="text-[9px] text-blue-200 font-bold">مسلمة SSS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise 2: Two-Column Proof SAS (Scaffold, p. 173) -->
+            <div class="bg-white p-2.5 rounded-xl border border-slate-300 space-y-1.5 text-xs">
+                <div class="flex items-center justify-between font-bold">
+                    <span class="text-blue-950">تطبيق (ب) مثال 3 ص 173: أكمل برهان دعامات السقالة حاملة المصابيح بمسلمة SAS:</span>
+                    <span class="text-[10px] text-slate-500">برهان ذو عمودين</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-[11px]">
+                        <thead class="bg-slate-100 font-bold text-slate-700">
+                            <tr>
+                                <th class="p-1 w-6 text-center">#</th>
+                                <th class="p-1">العبارات (Statements)</th>
+                                <th class="p-1">المبررات (Reasons)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 font-mono">
+                            <tr>
+                                <td class="p-1 text-center text-slate-400">1</td>
+                                <td>$\overline{WX} \cong \overline{ZY} \quad , \quad \overline{WX} \parallel \overline{ZY}$</td>
+                                <td class="font-sans text-slate-600">معطيات (Given)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-1 text-center text-slate-400">2</td>
+                                <td class="font-bold text-amber-800">$\angle WXZ \cong \angle XZY$</td>
+                                <td class="font-sans font-bold text-amber-800"><span class="fill-blank w-48">نظرية الزوايا الداخلية المتبادلة</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-1 text-center text-slate-400">3</td>
+                                <td class="font-bold text-blue-800"><span class="fill-blank w-28">$\overline{XZ} \cong \overline{ZX}$</span></td>
+                                <td class="font-sans text-slate-600">خاصية الانعكاس للتطابق (ضلع مشترك)</td>
+                            </tr>
+                            <tr class="bg-blue-50/60 font-black">
+                                <td class="p-1 text-center text-blue-700">4</td>
+                                <td class="text-blue-900">$\triangle WXZ \cong \triangle YZX$</td>
+                                <td class="font-sans text-blue-900"><span class="fill-blank w-28">مسلمة SAS</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- الوجه 2: التوسع، تفكيك الأخطاء، وتذكرة الخروج -->
+        <!-- ============================================================== -->
+
+        <!-- 4. محطة التوسع (Elaborate): تفكيك مغالطة SSA ومسائل الجبر -->
+        <section class="dense-card p-3 border-purple-300 bg-purple-50/20 space-y-2">
+            <div class="flex items-center justify-between border-b border-purple-200 pb-1">
+                <span class="badge-pill bg-purple-600 text-white">
+                    <i class="fa-solid fa-shield-halved"></i> 4. التوسع وتفكيك الأخطاء (Elaborate)
+                </span>
+                <span class="text-[11px] font-bold text-purple-900">محاكمة الأخطاء الشائعة والربط الجبري (ص 176 وص 177)</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
+                <!-- Mythbuster: SSA vs SAS -->
+                <div class="sm:col-span-8 bg-white p-2.5 rounded-xl border border-rose-200 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-rose-900"><i class="fa-solid fa-triangle-exclamation text-amber-500 ml-1"></i>كاشف الأخطاء: مناظرة أحمد وخالد (سؤال 24 ص 177)</span>
+                    </div>
+                    <p class="text-[11px] text-slate-700 leading-relaxed">
+                        قال <strong>أحمد</strong>: المثلثان متطابقان بحسب $SAS$ لوجود زاوية $59°$ وضلعين متطابقين. فاعترض <strong>خالد</strong> وقال: المعلومات غير كافية!
+                    </p>
+                    <div class="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-[11px] text-rose-950">
+                        <strong>حكم المحقق الرياضي:</strong> إجابة <span class="fill-blank w-14 font-black">خالد</span> هي الصحيحة؛ لأن الزاوية المعطاة <span class="fill-blank w-24">ليست محصورة</span> (حالة $SSA$ الخاطئة)، وتأرجح الضلع يولد أكثر من مثلث.
+                    </div>
+                </div>
+
+                <!-- Quick Algebra Task (p. 176) -->
+                <div class="sm:col-span-4 bg-white p-2.5 rounded-xl border border-slate-300 space-y-1 text-center">
+                    <span class="font-bold text-slate-800 block text-[11px]">تحدي الجبر السريع (مسألة 21 ص 176)</span>
+                    <p class="text-[11px] text-slate-600">إذا كان $3y + 7 = 19$، فإن:</p>
+                    <div class="font-mono text-sm font-black text-purple-800 bg-purple-50 py-1 rounded border border-purple-200">
+                        $3y = 12 \implies \mathbf{y = 4}$
+                    </div>
+                    <div class="text-[10px] text-slate-500">والزاوية: $20(4)+10 = 90°$</div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 5. محطة التقويم وتذكرة الخروج (Evaluate) وشجرة القرار -->
+        <section class="dense-card p-3 border-rose-300 bg-rose-50/20 space-y-2">
+            <div class="flex items-center justify-between border-b border-rose-200 pb-1">
+                <span class="badge-pill bg-rose-600 text-white">
+                    <i class="fa-solid fa-trophy"></i> 5. تذكرة الخروج المعيارية (Evaluate)
+                </span>
+                <span class="text-[11px] font-bold text-rose-900">سؤال الاختبار المعياري (سؤال 26 ص 177) — القياس والتحصيلي</span>
+            </div>
+
+            <!-- Decision Tree + Exit Ticket Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs items-center">
+                
+                <!-- Quick Decision Tree Mini Flow -->
+                <div class="sm:col-span-5 bg-white p-2 rounded-xl border border-slate-300 space-y-1 text-center text-[10px]">
+                    <span class="font-bold text-slate-800 block text-[11px]">بوصلة اتخاذ القرار في 3 ثوانٍ</span>
+                    <div class="grid grid-cols-2 gap-1 font-bold">
+                        <div class="p-1 rounded bg-blue-50 border border-blue-200 text-blue-900">
+                            3 أضلاع متناظرة؟<br><span class="text-blue-700 font-black text-xs">➔ SSS</span>
+                        </div>
+                        <div class="p-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-900">
+                            ضلعان وزاوية بينهما؟<br><span class="text-emerald-700 font-black text-xs">➔ SAS</span>
+                        </div>
+                    </div>
+                    <div class="p-1 rounded bg-rose-50 text-rose-900 border border-rose-200">
+                        زاوية غير محصورة؟ ➔ <span class="font-black text-rose-700">توقف! (SSA غير كافية)</span>
+                    </div>
+                </div>
+
+                <!-- The Actual Standardized Question 26 -->
+                <div class="sm:col-span-7 bg-white p-2.5 rounded-xl border border-rose-200 space-y-1.5">
+                    <p class="text-[11px] font-bold text-slate-800 leading-snug">
+                        في الشكلين: $\overline{AC} \cong \overline{XZ}$ و $\angle C \cong \angle Z$. ما المعلومة الإضافية لإثبات $\triangle ABC \cong \triangle XYZ$ بمسلمة $SAS$؟
+                    </p>
+                    <div class="grid grid-cols-2 gap-1 text-[11px] font-mono font-bold">
+                        <label class="flex items-center gap-1.5 p-1 rounded border border-emerald-400 bg-emerald-50/80 text-emerald-950 cursor-pointer">
+                            <span class="check-box-square border-emerald-600 bg-emerald-600 text-white text-[9px] flex items-center justify-center">✓</span>
+                            <span>(A) $\overline{BC} \cong \overline{YZ}$ (محصورة)</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 p-1 rounded border border-slate-200 bg-white text-slate-700">
+                            <span class="check-box-square"></span>
+                            <span>(B) $\overline{AB} \cong \overline{XY}$</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 p-1 rounded border border-slate-200 bg-white text-slate-700">
+                            <span class="check-box-square"></span>
+                            <span>(C) $\overline{BC} \cong \overline{XZ}$</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 p-1 rounded border border-slate-200 bg-white text-slate-700">
+                            <span class="check-box-square"></span>
+                            <span>(D) $\overline{XZ} \cong \overline{XY}$</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- Compact Footer: Self-Check & Teacher Signature -->
+        <footer class="pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between text-[11px] text-slate-600 font-bold gap-2">
+            <div class="flex items-center gap-2">
+                <span>تقييمي لنفسي اليوم:</span>
+                <span class="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">⭐⭐⭐ بطل التطابق</span>
+                <span class="bg-blue-50 text-blue-800 px-2 py-0.5 rounded border border-blue-300">⭐⭐ متمكن</span>
+                <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-300">⭐ أحتاج تدريباً</span>
+            </div>
+            <div>
+                توقيع المعلم والملاحظة: <span class="border-b border-slate-400 inline-block w-40"></span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Toggle Script for Digital Display -->
+    <script>
+        let showSol = false;
+        function toggleSolutions() {
+            showSol = !showSol;
+            const blanks = document.querySelectorAll('.fill-blank');
+            blanks.forEach(b => {
+                if (showSol) {
+                    b.style.backgroundColor = '#dcfce7';
+                    b.style.color = '#15803d';
+                    b.style.borderColor = '#16a34a';
+                } else {
+                    b.style.backgroundColor = '#f0f9ff';
+                    b.style.color = '#0369a1';
+                    b.style.borderColor = '#0284c7';
+                }
+            });
+            const btn = document.getElementById('sol-btn-text');
+            if (btn) btn.innerText = showSol ? 'إخفاء الإجابات' : 'إظهار الإجابات المرجعية';
+        }
+    </script>
+</body>
+</html>

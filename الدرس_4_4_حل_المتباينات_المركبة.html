@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملخص الطالب | الدرس 4-4: حل المتباينات المركبة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #ccfbf1;
+            --secondary: #2563eb;
+            --accent: #f59e0b;
+            --danger: #e11d48;
+            --dark: #0f172a;
+            --gray-100: #f8fafc;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.7;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #115e59, #0d9488);
+            color: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.05rem;
+        }
+
+        .print-btn {
+            position: absolute;
+            left: 24px;
+            top: 24px;
+            background: var(--white);
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+
+        .print-btn:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .card-header h2 {
+            font-size: 1.35rem;
+            color: var(--primary);
+        }
+
+        /* Comparison Box */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid { grid-template-columns: 1fr; }
+        }
+
+        .comp-card {
+            border-radius: 10px;
+            padding: 18px;
+            border: 2px solid;
+        }
+
+        .comp-and {
+            background: #f0fdfa;
+            border-color: #14b8a6;
+        }
+
+        .comp-or {
+            background: #eff6ff;
+            border-color: #3b82f6;
+        }
+
+        .comp-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .comp-and h3 { color: #0f766e; }
+        .comp-or h3 { color: #1d4ed8; }
+
+        .tag {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .tag-and { background: #ccfbf1; color: #0f766e; }
+        .tag-or { background: #dbeafe; color: #1e40af; }
+
+        /* Frayer Model */
+        .frayer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 2px solid var(--gray-200);
+        }
+
+        .frayer-cell {
+            background: var(--white);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .frayer-cell h4 {
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 4px;
+        }
+
+        .frayer-center {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: var(--primary);
+            color: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* Number Line Visualizer mock */
+        .number-line-box {
+            background: #f8fafc;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 14px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .number-line-svg {
+            width: 100%;
+            max-width: 500px;
+            height: 60px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        /* Vocabulary Table */
+        .vocab-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+
+        .vocab-table th, .vocab-table td {
+            border: 1px solid var(--gray-200);
+            padding: 10px 14px;
+            text-align: right;
+        }
+
+        .vocab-table th {
+            background: #f1f5f9;
+            color: var(--dark);
+        }
+
+        /* Quiz */
+        .quiz-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+
+        .quiz-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .quiz-answer {
+            display: none;
+            background: #ecfdf5;
+            color: #065f46;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            border-right: 3px solid #10b981;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--gray-600);
+            font-size: 0.85rem;
+            margin-top: 24px;
+            padding: 12px;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .print-btn { display: none; }
+            .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+            .quiz-answer { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header>
+        <button class="print-btn" onclick="window.print()">🖨️ طباعة الملخص</button>
+        <span class="badge">رياضيات الصف الثالث المتوسط | الفصل الدراسي الثاني</span>
+        <h1>الدرس (4-4): حل المتباينات المركبة</h1>
+        <p>متباينة الوصل (و - تقاطع)، متباينة الفصل (أو - اتحاد)، التمثيل البياني الدقيق وتطبيقات STEM الهندسية</p>
+    </header>
+
+    <!-- AND vs OR Comparison -->
+    <div class="card">
+        <div class="card-header">
+            <h2>⚖️ المقارنة الجوهرية: متباينة الوصل (و) مقابل متباينة الفصل (أو)</h2>
+        </div>
+        <div class="comparison-grid">
+            <!-- AND -->
+            <div class="comp-card comp-and">
+                <h3>متباينة الوصل ( الرابط "و" ) <span class="tag tag-and">التقاطع ∩</span></h3>
+                <p><strong>المعنى المنطقي:</strong> تكون صحيحة فقط إذا كانت <u>العبارتان معاً صحيحتين</u> في نفس الوقت.</p>
+                <p><strong>الصيغة المتصلة:</strong> يمكن كتابتها في جملة واحدة مثل: $-2 \le س < 5$</p>
+                <p><strong>التمثيل البياني:</strong> منطقة التداخل المحصورة بين النقطتين.</p>
+                <div class="number-line-box">
+                    <svg class="number-line-svg" viewBox="0 0 400 50">
+                        <line x1="20" y1="25" x2="380" y2="25" stroke="#94a3b8" stroke-width="3" />
+                        <polygon points="15,25 25,20 25,30" fill="#94a3b8" />
+                        <polygon points="385,25 375,20 375,30" fill="#94a3b8" />
+                        <!-- Highlight segment -->
+                        <line x1="120" y1="25" x2="280" y2="25" stroke="#0d9488" stroke-width="6" />
+                        <!-- Left point (closed) -->
+                        <circle cx="120" cy="25" r="6" fill="#0d9488" stroke="#042f2e" stroke-width="2" />
+                        <text x="120" y="45" font-size="12" text-anchor="middle" font-weight="bold">-2</text>
+                        <!-- Right point (open) -->
+                        <circle cx="280" cy="25" r="6" fill="#ffffff" stroke="#0d9488" stroke-width="2" />
+                        <text x="280" y="45" font-size="12" text-anchor="middle" font-weight="bold">5</text>
+                    </svg>
+                    <small>التمثيل البياني لـ $-2 \le س < 5$ (مغلقة عند $-2$ ومفتوحة عند $5$)</small>
+                </div>
+            </div>
+
+            <!-- OR -->
+            <div class="comp-card comp-or">
+                <h3>متباينة الفصل ( الرابط "أو" ) <span class="tag tag-or">الاتحاد ∪</span></h3>
+                <p><strong>المعنى المنطقي:</strong> تكون صحيحة إذا كانت <u>إحدى العبارتين على الأقل صحيحة</u>.</p>
+                <p><strong>الصيغة:</strong> تكتب بفاصل كلمة "أو" صراحة: $س < -1 \text{ أو } س \ge 3$</p>
+                <p><strong>التمثيل البياني:</strong> اتحاد المنطقتين (سهمان في اتجاهين متعاكسين).</p>
+                <div class="number-line-box">
+                    <svg class="number-line-svg" viewBox="0 0 400 50">
+                        <line x1="20" y1="25" x2="380" y2="25" stroke="#94a3b8" stroke-width="3" />
+                        <!-- Left ray -->
+                        <line x1="120" y1="25" x2="30" y2="25" stroke="#2563eb" stroke-width="6" />
+                        <polygon points="20,25 32,20 32,30" fill="#2563eb" />
+                        <circle cx="120" cy="25" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                        <text x="120" y="45" font-size="12" text-anchor="middle" font-weight="bold">-1</text>
+                        <!-- Right ray -->
+                        <line x1="280" y1="25" x2="370" y2="25" stroke="#2563eb" stroke-width="6" />
+                        <polygon points="380,25 368,20 368,30" fill="#2563eb" />
+                        <circle cx="280" cy="25" r="6" fill="#2563eb" stroke="#1e3a8a" stroke-width="2" />
+                        <text x="280" y="45" font-size="12" text-anchor="middle" font-weight="bold">3</text>
+                    </svg>
+                    <small>التمثيل البياني لـ $س < -1 \text{ أو } س \ge 3$</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Math Vocabulary in Real Problems -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📖 مفردات لغوية حاسمة في المسائل اللفظية (ص 144)</h2>
+        </div>
+        <table class="vocab-table">
+            <thead>
+                <tr>
+                    <th>العبارة اللفظية</th>
+                    <th>الرمز الرياضي المقابل</th>
+                    <th>نوع النقطة بيانياً</th>
+                    <th>مثال تطبيقي</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>على الأقل / لا يقل عن</strong></td>
+                    <td>$\ge$ (أكبر من أو يساوي)</td>
+                    <td>دائرة مغلقة (ممتلئة) ●</td>
+                    <td>درجة النجاح 60 على الأقل $\implies س \ge 60$</td>
+                </tr>
+                <tr>
+                    <td><strong>على الأكثر / لا يزيد عن</strong></td>
+                    <td>$\le$ (أصغر من أو يساوي)</td>
+                    <td>دائرة مغلقة (ممتلئة) ●</td>
+                    <td>حمولة المصعد 800 كجم على الأكثر $\implies و \le 800$</td>
+                </tr>
+                <tr>
+                    <td><strong>يقع بين / محصور بين</strong></td>
+                    <td>$أ < س < ب$ (أكبر من وأصغر من)</td>
+                    <td>دائرتان مفتوحتان ○</td>
+                    <td>حرارة الغرفة تقع بين 20 و 25 $\implies 20 < د < 25$</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Frayer Model -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🧩 نموذج فراير (Frayer Model): المتباينة المركبة</h2>
+        </div>
+        <div class="frayer-grid">
+            <div class="frayer-center">المفهوم: المتباينة المركبة (Compound Inequality)</div>
+            <div class="frayer-cell">
+                <h4>التعريف الدقيق</h4>
+                <p>عبارة رياضية تتكون من متباينتين بسيطتين مربوطتين إما بحرف العطف "و" (تقاطع شروطهما) أو بحرف العطف "أو" (اتحاد شروطهما).</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>الخصائص والسمات</h4>
+                <p>• متباينة "و" تمثل منطقة التداخل وإذا لم يتقاطعا فالحل $\emptyset$.<br>• متباينة "أو" تمثل دمج المنطقتين.<br>• تكتب "و" في صورة ثلاثية الأطراف ($أ < س \le ب$).</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>أمثلة منتمية</h4>
+                <p>• $-3 < 2س + 1 \le 9$<br>• $س + 3 < 1 \text{ أو } س - 2 \ge 4$<br>• $18 \le \text{درجة الحرارة} \le 24$</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>لا أمثلة</h4>
+                <p>• $3س + 5 > 11$ (متباينة بسيطة وليست مركبة).<br>• $س = 5 \text{ أو } س = -2$ (معادلة وليست متباينة).<br>• $-5 < س$ (متباينة أحادية الطرف).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Solved Step-by-Step Examples -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📘 أمثلة محلولة خطوة بخطوة من الكتاب</h2>
+        </div>
+
+        <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:12px; border-left:4px solid var(--primary);">
+            <strong>مثال 1: حل متباينة الوصل ثلاثية الأطراف (ص 143)</strong>
+            <p><strong>المسألة:</strong> حل المتباينة: $-2 \le س - 3 < 4$</p>
+            <p>1. لإبقاء $س$ بمفردها في الوسط، نضيف $+3$ إلى الأطراف الثلاثة معاً:</p>
+            <p><code>-2 + 3 ≤ س - 3 + 3 < 4 + 3</code></p>
+            <p>2. التبسيط: $1 \le س < 7$</p>
+            <p><strong>مجموعة الحل:</strong> $\{ س \mid 1 \le س < 7 \}$ (دائرة مغلقة عند $1$ ومفتوحة عند $7$ وتظليل المسافة بينهما).</p>
+        </div>
+
+        <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:12px; border-left:4px solid var(--secondary);">
+            <strong>مثال 2: حل متباينة الفصل بالرابط "أو" (ص 145)</strong>
+            <p><strong>المسألة:</strong> حل المتباينة: $2ك + 1 > 7 \text{ أو } 3ك - 5 \le -11$</p>
+            <p>1. نحل المتباينة الأولى: $2ك > 6 \implies ك > 3$</p>
+            <p>2. نحل المتباينة الثانية: $3ك \le -6 \implies ك \le -2$</p>
+            <p><strong>مجموعة الحل:</strong> $\{ ك \mid ك \le -2 \text{ أو } ك > 3 \}$ (سهم من $-2$ لليسار وسهم من $3$ لليمين).</p>
+        </div>
+    </div>
+
+    <!-- STEM in Depth -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🚀 ركن STEM والهندسة الذكية (أنظمة التكييف وإنترنت الأشياء IoT)</h2>
+        </div>
+        <p><strong>هندسة أنظمة التحكم والتحسس الذكي (Smart Sensors):</strong></p>
+        <p>في غرف الخوادم ومراكز البيانات السحابية (Data Centers)، تتم برمجة أنظمة التبريد الذكية بمتباينة مركبة للتحكم التلقائي:</p>
+        <div style="background:#f0fdfa; border-right:4px solid var(--primary); padding:12px; margin:8px 0;">
+            • <strong>النطاق الآمن (الرابط و):</strong> $18°\text{C} \le \text{Temp} \le 22°\text{C}$ (المكيفات تعمل في الوضع الاقتصادي المعتدل).<br>
+            • <strong>نطاق الخطر وإطلاق الإنذار (الرابط أو):</strong> $\text{Temp} < 10°\text{C} \text{ أو } \text{Temp} > 30°\text{C}$ (تشغيل مراوح الطوارئ وإرسال تنبيه فوري لهواتف المهندسين).
+        </div>
+    </div>
+
+    <!-- Self-Assessment Quiz -->
+    <div class="card">
+        <div class="card-header">
+            <h2>✍️ اختبر فهمك الذاتي</h2>
+        </div>
+
+        <div class="quiz-item">
+            <p><strong>س1:</strong> ما مجموعة حل المتباينة المركبة: $س < 2 \text{ و } س > 6$؟</p>
+            <button class="quiz-btn" onclick="toggleAnswer('c_ans1')">عرض الإجابة والتحليل</button>
+            <div id="c_ans1" class="quiz-answer">
+                <strong>الإجابة:</strong> المجموعة الخالية $\emptyset$<br>
+                <strong>السبب:</strong> الرابط "و" يتطلب وجود منطقة مشتركة (تقاطع)، ولا يوجد أي عدد في الكون يكون أصغر من $2$ وأكبر من $6$ في الوقت نفسه!
+            </div>
+        </div>
+
+        <div class="quiz-item">
+            <p><strong>س2:</strong> عبارة "معدل سرعة المركبة على الطريق لا يقل عن 80 كم/س ولا يزيد عن 120 كم/س"، كيف نكتبها كمتباينة مركبة؟</p>
+            <button class="quiz-btn" onclick="toggleAnswer('c_ans2')">عرض الإجابة والتحليل</button>
+            <div id="c_ans2" class="quiz-answer">
+                <strong>الإجابة:</strong> $80 \le ع \le 120$<br>
+                <strong>السبب:</strong> لا يقل عن تعني $\ge 80$، ولا يزيد عن تعني $\le 120$، وتدمج بصيغة الوصل المتصلة.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        تصميم خبير التعليم وفق منهجية STEM | مقرر رياضيات 3م - وزارة التعليم 2026
+    </footer>
+</div>
+
+<script>
+    function toggleAnswer(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === "block") {
+            el.style.display = "none";
+        } else {
+            el.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

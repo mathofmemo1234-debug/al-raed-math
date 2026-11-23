@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مختبر الرياضيات التفاعلي: إثبات تطابق المثلثات (SSS, SAS)</title>
+    <!-- Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { cairo: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        amberGold: { 500: '#f59e0b', 600: '#d97706' },
+                        emeraldGreen: { 500: '#10b981', 600: '#059669' },
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .canvas-container {
+            position: relative;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .tool-draggable {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+            z-index: 40;
+            touch-action: none;
+        }
+        .tool-draggable:active {
+            cursor: grabbing;
+        }
+        .tab-btn.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-600 selection:text-white min-h-screen flex flex-col">
+
+    <!-- Top Whiteboard Header (Light & Vibrant) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 sm:px-6 py-3 shadow-xs">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Branding & Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 text-xl font-black">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-black">رياضيات 1-2 • مسارات</span>
+                        <span class="text-xs text-slate-500 font-bold">الدرس (3-4) ص 170 – 177</span>
+                    </div>
+                    <h1 class="text-lg sm:text-2xl font-black text-slate-900 leading-tight">مختبر المحاكاة التفاعلي: إثبات تطابق المثلثات (SSS, SAS)</h1>
+                </div>
+            </div>
+
+            <!-- Virtual Tools Ribbon & Controls -->
+            <div class="flex items-center gap-2">
+                <!-- Protractor Toggle -->
+                <button onclick="toggleTool('virtual-protractor')" class="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 shadow-xs transition flex items-center gap-1.5" title="إظهار المنقلة التفاعلية">
+                    <i class="fa-solid fa-compass-drafting text-amber-500 text-sm"></i>
+                    <span class="hidden sm:inline">المنقلة الافتراضية</span>
+                </button>
+
+                <!-- Ruler Toggle -->
+                <button onclick="toggleTool('virtual-ruler')" class="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 shadow-xs transition flex items-center gap-1.5" title="إظهار المسطرة التفاعلية">
+                    <i class="fa-solid fa-ruler-combined text-blue-500 text-sm"></i>
+                    <span class="hidden sm:inline">المسطرة الافتراضية</span>
+                </button>
+
+                <!-- Timer -->
+                <div class="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                    <i class="fa-regular fa-clock text-blue-600"></i>
+                    <span id="board-timer" class="font-mono text-sm font-black text-slate-800">00:00</span>
+                    <button onclick="toggleBoardTimer()" id="board-timer-btn" class="text-xs bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button onclick="resetBoardTimer()" class="text-xs bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded text-slate-700">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+                <!-- Fullscreen -->
+                <button onclick="toggleFullScreen()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl text-xs font-bold shadow-xs transition" title="ملء الشاشة">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 6Es Navigation Tab Ribbon -->
+        <div class="max-w-7xl mx-auto mt-3 overflow-x-auto pb-1">
+            <div class="flex items-center gap-2 min-w-max bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button onclick="showSection('stage-engage')" id="btn-stage-engage" class="tab-btn active px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black transition flex items-center gap-1.5">
+                    <span>⚡ 1. لغز المربع والمثلث (Engage)</span>
+                </button>
+                <button onclick="showSection('stage-explore')" id="btn-stage-explore" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>🔬 2. مختبر SSS و SAS وفخ SSA (Explore)</span>
+                </button>
+                <button onclick="showSection('stage-explain')" id="btn-stage-explain" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>📐 3. شفرة البرهان التسلسلي (Explain)</span>
+                </button>
+                <button onclick="showSection('stage-engineer')" id="btn-stage-engineer" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>🏗️ 4. التحدي الإنشائي: الجسور والسقالات (Engineer)</span>
+                </button>
+                <button onclick="showSection('stage-elaborate')" id="btn-stage-elaborate" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>⚔️ 5. مناظرة أحمد وخالد والتحدي الإحداثي (Elaborate)</span>
+                </button>
+                <button onclick="showSection('stage-evaluate')" id="btn-stage-evaluate" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                    <span>🏆 6. تذكرة الخروج المعيارية (Evaluate)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Draggable Virtual Tools -->
+
+    <!-- 1. Virtual Transparent Protractor (منقلة تفاعلية قابلة للتحريك والدوران) -->
+    <div id="virtual-protractor" class="tool-draggable hidden" style="top: 150px; left: 60px;">
+        <div class="relative group">
+            <!-- Close button -->
+            <button onclick="toggleTool('virtual-protractor')" class="absolute -top-3 -right-3 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs shadow-md z-50">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <!-- Rotate handle -->
+            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow flex items-center gap-1 cursor-ew-resize" id="protractor-rotator">
+                <i class="fa-solid fa-arrows-rotate"></i> تدوير: <span id="rot-angle-val">0°</span>
+            </div>
+            <!-- Protractor SVG Graphic -->
+            <svg id="protractor-svg" class="w-72 h-36 drop-shadow-2xl transition-transform" viewBox="0 0 300 150" fill="none">
+                <!-- Body -->
+                <path d="M 10 140 A 140 140 0 0 1 290 140 Z" fill="rgba(254, 243, 199, 0.75)" stroke="#d97706" stroke-width="2.5"/>
+                <!-- Center Point -->
+                <circle cx="150" cy="140" r="4" fill="#b45309"/>
+                <line x1="140" y1="140" x2="160" y2="140" stroke="#b45309" stroke-width="1.5"/>
+                <line x1="150" y1="130" x2="150" y2="140" stroke="#b45309" stroke-width="1.5"/>
+                <!-- Outer Arc Marks -->
+                <path d="M 30 140 A 120 120 0 0 1 270 140" stroke="#b45309" stroke-width="1" stroke-dasharray="2 4"/>
+                <!-- Degree Labels -->
+                <text x="150" y="25" font-size="11" font-weight="900" fill="#92400e" text-anchor="middle">90°</text>
+                <text x="50" y="115" font-size="10" font-weight="bold" fill="#92400e">30°</text>
+                <text x="80" y="65" font-size="10" font-weight="bold" fill="#92400e">60°</text>
+                <text x="215" y="65" font-size="10" font-weight="bold" fill="#92400e">120°</text>
+                <text x="245" y="115" font-size="10" font-weight="bold" fill="#92400e">150°</text>
+                <text x="20" y="135" font-size="10" font-weight="bold" fill="#92400e">0°</text>
+                <text x="272" y="135" font-size="10" font-weight="bold" fill="#92400e">180°</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- 2. Virtual Ruler (مسطرة تفاعلية شفافة) -->
+    <div id="virtual-ruler" class="tool-draggable hidden" style="top: 280px; left: 80px;">
+        <div class="relative">
+            <button onclick="toggleTool('virtual-ruler')" class="absolute -top-3 -right-3 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs shadow-md z-50">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-80 h-14 bg-blue-50/85 backdrop-blur border-2 border-blue-400 rounded-lg shadow-2xl flex flex-col justify-between p-1.5 select-none text-[9px] font-mono font-bold text-blue-900">
+                <!-- Ruler centimeter ticks -->
+                <div class="flex justify-between items-start h-5 border-b border-blue-300">
+                    <span class="border-r border-blue-600 h-4 pl-0.5">0 cm</span>
+                    <span class="border-r border-blue-400 h-2"></span>
+                    <span class="border-r border-blue-600 h-4 pl-0.5">2</span>
+                    <span class="border-r border-blue-400 h-2"></span>
+                    <span class="border-r border-blue-600 h-4 pl-0.5">4</span>
+                    <span class="border-r border-blue-400 h-2"></span>
+                    <span class="border-r border-blue-600 h-4 pl-0.5">6</span>
+                    <span class="border-r border-blue-400 h-2"></span>
+                    <span class="border-r border-blue-600 h-4 pl-0.5">8</span>
+                    <span class="border-r border-blue-400 h-2"></span>
+                    <span class="border-r border-blue-600 h-4 pl-0.5">10 cm</span>
+                </div>
+                <div class="text-center text-[10px] text-blue-700 font-sans font-black tracking-wide">مسطرة القياس الهندسية الرقمية (قابلة للسحب)</div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main Stages Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+        <!-- ============================================================== -->
+        <!-- المحطة 1: ENGAGE - محاكاة حركة المربع القابل للتشوه مقابل المثلث الصلب -->
+        <!-- ============================================================== -->
+        <section id="stage-engage" class="stage-section space-y-6">
+            <!-- Challenge Intro -->
+            <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-3xl p-6 text-white shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 1: التحدي الديناميكي</span>
+                        <h2 class="text-xl sm:text-3xl font-black">صلابة المثلث الفولاذية مقابل مرونة المربع القابل للتشوه</h2>
+                    </div>
+                    <span class="text-xs bg-black/20 backdrop-blur px-3 py-1.5 rounded-xl font-bold">حرك الزر ولاحظ حركة الأضلاع والزوايا</span>
+                </div>
+            </div>
+
+            <!-- Side-by-Side Dynamic Simulator -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- 1. The Deformable Square / Rhombus -->
+                <div class="canvas-container p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-black">
+                                <i class="fa-solid fa-triangle-exclamation ml-1"></i>المضلع الرباعي (4 أضلاع ثابتة)
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">الأضلاع متساوية = 100 وحدة</span>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-800 mb-1">المربع غير الصلب: يتشوه وتتغير زواياه مع ثبات أضلاعه!</h3>
+                        <p class="text-xs text-slate-500 mb-4">اسحب المؤشر لتدفع رأس المربع جانبياً وشاهد كيف تتغير زواياه دون أن يتغير طول أي ضلع:</p>
+                    </div>
+
+                    <!-- SVG Square Dynamic Canvas -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center justify-center my-2">
+                        <svg class="w-full max-w-[280px] h-52" viewBox="0 0 300 220" fill="none">
+                            <!-- Floor -->
+                            <line x1="20" y1="190" x2="280" y2="190" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 4"/>
+                            <!-- Deforming Polygon -->
+                            <polygon id="square-poly" points="80,190 200,190 200,70 80,70" fill="rgba(244, 63, 94, 0.08)" stroke="#f43f5e" stroke-width="3.5" stroke-linejoin="round"/>
+                            <!-- Vertices Dots -->
+                            <circle id="sq-p1" cx="80" cy="190" r="5" fill="#f43f5e"/>
+                            <circle id="sq-p2" cx="200" cy="190" r="5" fill="#f43f5e"/>
+                            <circle id="sq-p3" cx="200" cy="70" r="5" fill="#f43f5e"/>
+                            <circle id="sq-p4" cx="80" cy="70" r="5" fill="#f43f5e"/>
+                            <!-- Live Angle readout text -->
+                            <text id="sq-angle-text" x="140" y="140" font-size="14" font-weight="900" fill="#be123c" text-anchor="middle">الزاوية: 90°</text>
+                            <text x="140" y="210" font-size="11" font-weight="bold" fill="#64748b" text-anchor="middle">قاعدة المربع ثابتة</text>
+                        </svg>
+                    </div>
+
+                    <!-- Interactive Slider for Square -->
+                    <div class="space-y-2 mt-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-600">
+                            <span>ادفع المربع لليمين أو اليسار:</span>
+                            <span id="sq-skew-display" class="font-mono text-rose-600 font-black">إزاحة: 0 px</span>
+                        </div>
+                        <input type="range" id="sq-skew-slider" min="-60" max="60" value="0" oninput="updateSquareShear(this.value)" class="w-full accent-rose-600 cursor-pointer">
+                        <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 font-bold">
+                            النتيجة: ثبات الأضلاع الأربعة لم يمنع تشوه الشكل وتغير زواياه!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. The Unbreakable Rigid Triangle (SSS Rigidity) -->
+                <div class="canvas-container p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">
+                                <i class="fa-solid fa-lock ml-1"></i>المثلث الصلب (3 أضلاع SSS)
+                            </span>
+                            <span class="text-xs font-bold text-slate-500">الأضلاع محددة تماماً</span>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-800 mb-1">المثلث غير القابل للتشوه: شكل صلب وحيد في الفراغ!</h3>
+                        <p class="text-xs text-slate-500 mb-4">حاول دفع قمة المثلث... هل يستطيع التحرك أو تغيير زواياه دون كسر أحد أضلاعه؟</p>
+                    </div>
+
+                    <!-- SVG Triangle Rigid Canvas -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center justify-center my-2">
+                        <svg class="w-full max-w-[280px] h-52" viewBox="0 0 300 220" fill="none">
+                            <line x1="20" y1="190" x2="280" y2="190" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 4"/>
+                            <!-- Rigid Triangle ABC -->
+                            <polygon id="tri-poly" points="60,190 240,190 150,50" fill="rgba(16, 185, 129, 0.1)" stroke="#059669" stroke-width="4" stroke-linejoin="round"/>
+                            <!-- Vertex Points -->
+                            <circle cx="60" cy="190" r="5" fill="#059669"/>
+                            <circle cx="240" cy="190" r="5" fill="#059669"/>
+                            <circle id="tri-top" cx="150" cy="50" r="6" fill="#059669"/>
+                            <!-- Labels -->
+                            <text x="50" y="205" font-size="12" font-weight="900" fill="#0f172a">A</text>
+                            <text x="245" y="205" font-size="12" font-weight="900" fill="#0f172a">B</text>
+                            <text x="150" y="38" font-size="12" font-weight="900" fill="#0f172a" text-anchor="middle">C (القمة الثابتة)</text>
+                            <!-- Lock Icon -->
+                            <text x="150" y="130" font-size="13" font-weight="900" fill="#059669" text-anchor="middle">🔒 صلب لا يتشوه إطلاقاً!</text>
+                        </svg>
+                    </div>
+
+                    <!-- Interactive Push Button -->
+                    <div class="space-y-2 mt-2">
+                        <button onclick="attemptPushTriangle()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-hand-fist"></i>
+                            <span>محاولة دفع قمة المثلث بقوة</span>
+                        </button>
+                        <div id="tri-push-alert" class="hidden p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-900 font-bold text-center">
+                            ⚡ تنبيه الفيزياء والهندسة: المثلث مقفل تماماً! لا يمكن للزوايا أن تتغير ما دامت الأضلاع الثلاثة ثابتة ($SSS$).
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- المحطة 2: EXPLORE - مقارنة تفاعلية: SSS و SAS وخدعة الضلع المتأرجح SSA -->
+        <!-- ============================================================== -->
+        <section id="stage-explore" class="stage-section hidden space-y-6">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 2: المقارنة البصرية الحية</span>
+                        <h2 class="text-xl sm:text-3xl font-black">لماذا تنتج SSS و SAS مثلثاً وحيداً، بينما تنتج SSA مثلثين مختلفين؟</h2>
+                    </div>
+                    <span class="text-xs bg-black/20 backdrop-blur px-3 py-1.5 rounded-xl font-bold">محاكاة الضلع المتأرجح (The Swinging Arm)</span>
+                </div>
+            </div>
+
+            <!-- The Big Interactive Showcase -->
+            <div class="canvas-container p-6 space-y-6">
+
+                <!-- Mode Select Buttons -->
+                <div class="flex flex-wrap items-center justify-center gap-3 border-b border-slate-200 pb-4">
+                    <button onclick="setSimMode('sss')" id="btn-mode-sss" class="px-5 py-2.5 rounded-2xl bg-blue-600 text-white font-black text-sm shadow transition">
+                        حالة الأضلاع الثلاثة (SSS) — مثلث وحيد
+                    </button>
+                    <button onclick="setSimMode('sas')" id="btn-mode-sas" class="px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm transition">
+                        ضلعان والزاوية المحصورة (SAS) — مثلث وحيد
+                    </button>
+                    <button onclick="setSimMode('ssa')" id="btn-mode-ssa" class="px-5 py-2.5 rounded-2xl bg-rose-100 hover:bg-rose-200 text-rose-800 font-black text-sm transition border border-rose-300">
+                        ⚠️ خديعة SSA (ضلعان وزاوية غير محصورة) — مثلثان مختلفان!
+                    </button>
+                </div>
+
+                <!-- Simulation Canvas & Live Angle HUD -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    
+                    <!-- SVG Interactive Canvas -->
+                    <div class="lg:col-span-8 bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col items-center justify-center relative min-h-[320px]">
+                        
+                        <svg id="geom-sim-svg" class="w-full max-w-[500px] h-72" viewBox="0 0 500 280" fill="none">
+                            <!-- Baseline Ray -->
+                            <line x1="50" y1="230" x2="450" y2="230" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="460" y="235" font-size="12" fill="#64748b" font-weight="bold">مستقيم القاعدة</text>
+
+                            <!-- Fixed Angle at A -->
+                            <path id="sim-angle-arc" d="M 90 230 A 40 40 0 0 0 80 200" stroke="#f59e0b" stroke-width="3" fill="none"/>
+                            <text id="sim-angle-label" x="95" y="215" font-size="12" font-weight="900" fill="#d97706">30°</text>
+
+                            <!-- Side b (from A to C) -->
+                            <line id="sim-side-b" x1="60" y1="230" x2="200" y2="90" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+                            <text id="sim-side-b-label" x="110" y="150" font-size="12" font-weight="900" fill="#1d4ed8">الضلع b = 8 cm</text>
+
+                            <!-- The Swinging / Second Side a -->
+                            <line id="sim-side-a" x1="200" y1="90" x2="350" y2="230" stroke="#e11d48" stroke-width="4" stroke-linecap="round"/>
+                            <text id="sim-side-a-label" x="290" y="150" font-size="12" font-weight="900" fill="#be123c">الضلع a = 6 cm</text>
+
+                            <!-- Optional second intersection line for SSA (Alternate Triangle) -->
+                            <line id="sim-side-a2" x1="200" y1="90" x2="135" y2="230" stroke="#e11d48" stroke-width="3" stroke-dasharray="4 4" stroke-linecap="round" class="hidden"/>
+                            <text id="sim-side-a2-label" x="145" y="180" font-size="11" font-weight="bold" fill="#be123c" class="hidden">الموقع البديل للضلع</text>
+
+                            <!-- Swing circular path (for SSA demonstration) -->
+                            <path id="sim-swing-circle" d="M 360 230 A 155 155 0 0 1 125 230" stroke="#fda4af" stroke-width="2" stroke-dasharray="3 3" fill="none" class="hidden"/>
+
+                            <!-- Vertices Points -->
+                            <circle cx="60" cy="230" r="6" fill="#1e293b"/>
+                            <text x="50" y="250" font-size="14" font-weight="900" fill="#1e293b">A</text>
+
+                            <circle cx="200" cy="90" r="6" fill="#2563eb"/>
+                            <text x="200" y="75" font-size="14" font-weight="900" fill="#2563eb" text-anchor="middle">C</text>
+
+                            <circle id="sim-point-b1" cx="350" cy="230" r="6" fill="#e11d48"/>
+                            <text id="sim-label-b1" x="350" y="250" font-size="14" font-weight="900" fill="#e11d48">B₁ (المثلث الحاد)</text>
+
+                            <circle id="sim-point-b2" cx="135" cy="230" r="6" fill="#be123c" class="hidden"/>
+                            <text id="sim-label-b2" x="135" y="250" font-size="14" font-weight="900" fill="#be123c" class="hidden">B₂ (المثلث المنفرج)</text>
+                        </svg>
+
+                        <!-- Swinging Control Bar (Active in SSA) -->
+                        <div id="ssa-swing-ctrl" class="hidden w-full max-w-md mt-2 flex items-center justify-between gap-3 bg-white p-3 rounded-xl border border-rose-200">
+                            <span class="text-xs font-bold text-rose-800">تأرجح الضلع الحر:</span>
+                            <button onclick="toggleSwingArm()" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-arrows-left-right"></i>
+                                <span>أرجح الضلع واكتشف المثلث الثاني!</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Live Angle HUD / معداد الزوايا والبيانات -->
+                    <div class="lg:col-span-4 bg-white p-5 rounded-2xl border-2 border-slate-200 space-y-4">
+                        <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                            <i class="fa-solid fa-gauge-high text-blue-600 text-lg"></i>
+                            <h4 class="text-sm font-black text-slate-800">معداد الزوايا والبيانات الحية (Angle HUD)</h4>
+                        </div>
+
+                        <!-- Real-time telemetry readouts -->
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between p-2 rounded-lg bg-blue-50 border border-blue-100">
+                                <span class="font-bold text-blue-900">طول الضلع الأول ($b$):</span>
+                                <span class="font-mono font-black text-blue-700">8.0 cm (ثابت)</span>
+                            </div>
+                            <div class="flex justify-between p-2 rounded-lg bg-rose-50 border border-rose-100">
+                                <span class="font-bold text-rose-900">طول الضلع الثاني ($a$):</span>
+                                <span class="font-mono font-black text-rose-700">6.0 cm (ثابت)</span>
+                            </div>
+                            <div class="flex justify-between p-2 rounded-lg bg-amber-50 border border-amber-100">
+                                <span class="font-bold text-amber-900">الزاوية $\angle A$:</span>
+                                <span class="font-mono font-black text-amber-700">30° (ثابتة)</span>
+                            </div>
+                        </div>
+
+                        <!-- Mathematical Diagnosis Badge -->
+                        <div id="sim-diagnosis" class="p-3.5 rounded-xl bg-slate-100 text-xs font-bold text-slate-800 leading-relaxed border-r-4 border-blue-600">
+                            <strong>التشخيص الرياضي:</strong> الأضلاع والزوايا تحدد موقعاً وحيداً للنقطة $B$. لا يمكن رسم إلا مثلث واحد مطابق تماماً ($SSS$ / $SAS$).
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- المحطة 3: EXPLAIN - شفرة البرهان التسلسلي والعمودين -->
+        <!-- ============================================================== -->
+        <section id="stage-explain" class="stage-section hidden space-y-6">
+            <div class="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="space-y-1">
+                    <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 3: شفرة البرهان</span>
+                    <h2 class="text-xl sm:text-3xl font-black">خطوات كتابة البرهان الهندسي بدقة متناهية</h2>
+                </div>
+            </div>
+
+            <!-- Flow Proof Interactive Card -->
+            <div class="canvas-container p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h3 class="text-base font-black text-slate-800">برهان مثال 1 ص 170: توظيف نقطة المنتصف لإثبات SSS</h3>
+                    <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold font-mono">Flowchart Logic</span>
+                </div>
+
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <strong>المعطيات:</strong> $\overline{GH} \cong \overline{KJ}$ ، $\overline{HL} \cong \overline{JL}$ ، والنقطة $L$ هي منتصف $\overline{GK}$.<br>
+                    <strong>المطلوب:</strong> إثبات أن $\triangle GHL \cong \triangle KJL$.
+                </p>
+
+                <!-- Interactive Step Reveal for Students -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-center pt-2">
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] text-slate-400 font-bold block mb-1">الضلع الأول</span>
+                        <div class="font-mono text-sm font-black text-blue-600">$\overline{GH} \cong \overline{KJ}$</div>
+                        <span class="text-[11px] text-slate-500 mt-1 block">معطى</span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                        <span class="text-[10px] text-amber-600 font-bold block mb-1">الوسيط المنطقي</span>
+                        <div class="font-mono text-sm font-black text-amber-700">$\overline{GL} \cong \overline{KL}$</div>
+                        <span class="text-[11px] text-amber-800 mt-1 block">تعريف نقطة المنتصف</span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] text-slate-400 font-bold block mb-1">الضلع الثالث</span>
+                        <div class="font-mono text-sm font-black text-blue-600">$\overline{HL} \cong \overline{JL}$</div>
+                        <span class="text-[11px] text-slate-500 mt-1 block">معطى</span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-emerald-600 text-white shadow-md">
+                        <span class="text-[10px] text-emerald-100 font-bold block mb-1">الاستنتاج الحاسم</span>
+                        <div class="font-mono text-sm font-black">$\triangle GHL \cong \triangle KJL$</div>
+                        <span class="text-[11px] text-emerald-100 font-bold mt-1 block">مسلمة SSS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- المحطة 4: ENGINEER - التحدي الإنشائي (السقالات وجسر الرياض) -->
+        <!-- ============================================================== -->
+        <section id="stage-engineer" class="stage-section hidden space-y-6">
+            <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="space-y-1">
+                    <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 4: التطبيق الإنشائي الواقعي</span>
+                    <h2 class="text-xl sm:text-3xl font-black">هندسة الجسور المعلقة وسقالات الإضاءة السينمائية</h2>
+                </div>
+            </div>
+
+            <!-- Two-Column Proof Scaffold (Example 3, p. 173) -->
+            <div class="canvas-container p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h3 class="text-base font-black text-slate-800">برهان ذو عمودين لدعامات السقالة (ص 173)</h3>
+                    <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Two-Column Proof</span>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-right text-xs sm:text-sm">
+                        <thead class="bg-slate-100 text-slate-700 font-black">
+                            <tr>
+                                <th class="p-3 w-12 text-center text-blue-600">#</th>
+                                <th class="p-3 w-1/2">العبارات (Statements)</th>
+                                <th class="p-3 w-1/2">المبررات (Reasons)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 bg-white font-mono text-slate-800">
+                            <tr>
+                                <td class="p-3 text-center font-bold text-slate-400 font-sans">1</td>
+                                <td class="p-3 font-semibold">$\overline{WX} \cong \overline{ZY}$</td>
+                                <td class="p-3 text-slate-600 font-sans">معطى (Given)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 text-center font-bold text-slate-400 font-sans">2</td>
+                                <td class="p-3 font-semibold">$\overline{WX} \parallel \overline{ZY}$</td>
+                                <td class="p-3 text-slate-600 font-sans">معطى (Given)</td>
+                            </tr>
+                            <tr class="bg-amber-50/50">
+                                <td class="p-3 text-center font-bold text-amber-600 font-sans">3</td>
+                                <td class="p-3 font-bold text-amber-700">$\angle WXZ \cong \angle XZY$</td>
+                                <td class="p-3 text-amber-800 font-sans">نظرية الزوايا الداخلية المتبادلة</td>
+                            </tr>
+                            <tr class="bg-blue-50/50">
+                                <td class="p-3 text-center font-bold text-blue-600 font-sans">4</td>
+                                <td class="p-3 font-bold text-blue-700">$\overline{XZ} \cong \overline{ZX}$</td>
+                                <td class="p-3 text-blue-800 font-sans">خاصية الانعكاس للتطابق (ضلع مشترك)</td>
+                            </tr>
+                            <tr class="bg-emerald-100/70">
+                                <td class="p-3 text-center font-bold text-emerald-800 font-sans">5</td>
+                                <td class="p-3 font-black text-emerald-900">$\triangle WXZ \cong \triangle YZX$</td>
+                                <td class="p-3 font-black text-emerald-900 font-sans">مسلمة التطابق بضلعين والزاوية المحصورة (SAS)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- المحطة 5: ELABORATE - مناظرة أحمد وخالد وتحدي الإحداثيات -->
+        <!-- ============================================================== -->
+        <section id="stage-elaborate" class="stage-section hidden space-y-6">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="space-y-1">
+                    <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 5: التفكير الناقد والفرسان</span>
+                    <h2 class="text-xl sm:text-3xl font-black">محاكمة الأخطاء الهندسية (اكتشف الخطأ ص 177)</h2>
+                </div>
+            </div>
+
+            <!-- Debate Card -->
+            <div class="canvas-container p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                    <h3 class="text-base font-black text-slate-800">مناظرة صيفية حامية: أحمد في مواجهة خالد!</h3>
+                    <span class="px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-bold">DOK 4</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-1">
+                        <strong class="text-amber-800 text-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-user"></i> كلام أحمد:
+                        </strong>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                            "المثلثان متطابقان بحسب مسلمة SAS؛ لأن لدينا ضلعين وزاوية متطابقة!"
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-1">
+                        <strong class="text-emerald-800 text-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-user-shield"></i> رد خالد:
+                        </strong>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                            "لا توجد معلومات كافية لإثبات التطابق؛ إجابتك غير صحيحة يا أحمد!"
+                        </p>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="toggleAnswer('debate-verdict')" class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-black transition shadow">
+                        اكشف حكم المحكمة الرياضية
+                    </button>
+                    <div id="debate-verdict" class="hidden mt-3 p-4 rounded-2xl bg-slate-100 border-2 border-purple-300 text-right text-xs sm:text-sm text-slate-800 space-y-1">
+                        <strong class="text-emerald-700 text-sm block">الحكم القطعي: خالد على صواب 100%!</strong>
+                        <p class="leading-relaxed">
+                            الزاوية المعطاة في الشكل <strong>ليست محصورة</strong> بين الضلعين؛ إنها حالة (SSA)، وكما رأينا في المحاكاة السابقة، تأرجح الضلع غير المقيد يسمح بوجود مثلثين مختلفين تماماً، فلا يتحقق التطابق.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- المحطة 6: EVALUATE - تذكرة الخروج التفاعلية على السبورة -->
+        <!-- ============================================================== -->
+        <section id="stage-evaluate" class="stage-section hidden space-y-6">
+            <div class="bg-gradient-to-r from-rose-600 to-red-600 rounded-3xl p-6 text-white shadow-md">
+                <div class="space-y-1">
+                    <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider">المحطة 6: تذكرة النصر والتقويم</span>
+                    <h2 class="text-xl sm:text-3xl font-black">تذكرة الخروج التفاعلية: سؤال الاختبار المعياري (ص 177)</h2>
+                </div>
+            </div>
+
+            <!-- Exit Ticket Card -->
+            <div class="canvas-container p-6 sm:p-8 space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h3 class="text-base sm:text-lg font-black text-slate-800">سؤال 26 من كتاب الطالب ص 177</h3>
+                    <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-bold">اختبار تحصيلي</span>
+                </div>
+
+                <p class="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
+                    في الشكلين أدناه، إذا كان $\overline{AC} \cong \overline{XZ}$ و $\angle C \cong \angle Z$.<br>
+                    ما المعلومة الإضافية التي يمكن استعمالها لإثبات أن $\triangle ABC \cong \triangle XYZ$ بمسلمة $SAS$؟
+                </p>
+
+                <!-- Options -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                        <input type="radio" name="opt_ticket" value="A" class="w-5 h-5 text-rose-600 focus:ring-rose-500">
+                        <span class="text-sm font-black text-slate-800 font-mono">(A) $\overline{BC} \cong \overline{YZ}$</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                        <input type="radio" name="opt_ticket" value="B" class="w-5 h-5 text-rose-600 focus:ring-rose-500">
+                        <span class="text-sm font-black text-slate-800 font-mono">(B) $\overline{AB} \cong \overline{XY}$</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                        <input type="radio" name="opt_ticket" value="C" class="w-5 h-5 text-rose-600 focus:ring-rose-500">
+                        <span class="text-sm font-black text-slate-800 font-mono">(C) $\overline{BC} \cong \overline{XZ}$</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                        <input type="radio" name="opt_ticket" value="D" class="w-5 h-5 text-rose-600 focus:ring-rose-500">
+                        <span class="text-sm font-black text-slate-800 font-mono">(D) $\overline{XZ} \cong \overline{XY}$</span>
+                    </label>
+                </div>
+
+                <button onclick="checkTicketAnswer()" class="px-6 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-sm shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>تصحيح الإجابة فورياً على السبورة</span>
+                </button>
+
+                <div id="ticket-feedback" class="hidden p-4 rounded-2xl text-xs sm:text-sm leading-relaxed"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive JavaScript Engine -->
+    <script>
+        // Tab Section Switcher
+        function showSection(stageId) {
+            document.querySelectorAll('.stage-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(stageId);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById('btn-' + stageId);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // 1. Dynamic Square Shear Simulation
+        function updateSquareShear(val) {
+            const skew = parseFloat(val);
+            const x1 = 80 + skew;
+            const x2 = 200 + skew;
+            const poly = document.getElementById('square-poly');
+            const p3 = document.getElementById('sq-p3');
+            const p4 = document.getElementById('sq-p4');
+            const displayText = document.getElementById('sq-skew-display');
+            const angleText = document.getElementById('sq-angle-text');
+
+            if (poly) poly.setAttribute('points', `80,190 200,190 ${x2},70 ${x1},70`);
+            if (p3) { p3.setAttribute('cx', x2); }
+            if (p4) { p4.setAttribute('cx', x1); }
+
+            if (displayText) displayText.innerText = `إزاحة: ${skew} px`;
+
+            // Calculate approximate angle
+            const angleDeg = Math.round(90 - Math.atan(skew / 120) * (180 / Math.PI));
+            if (angleText) angleText.innerText = `الزاوية: ${angleDeg}°`;
+        }
+
+        function attemptPushTriangle() {
+            const alert = document.getElementById('tri-push-alert');
+            if (alert) alert.classList.remove('hidden');
+        }
+
+        // 2. Geometry Simulation Mode Switcher (SSS vs SAS vs SSA)
+        let swingState = false;
+        function setSimMode(mode) {
+            const ssaCtrl = document.getElementById('ssa-swing-ctrl');
+            const swingPath = document.getElementById('sim-swing-circle');
+            const sideA2 = document.getElementById('sim-side-a2');
+            const labelA2 = document.getElementById('sim-side-a2-label');
+            const ptB2 = document.getElementById('sim-point-b2');
+            const lblB2 = document.getElementById('sim-label-b2');
+            const diagnosis = document.getElementById('sim-diagnosis');
+
+            // Reset buttons
+            ['sss', 'sas', 'ssa'].forEach(m => {
+                const b = document.getElementById('btn-mode-' + m);
+                if (b) {
+                    b.className = 'px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm transition';
+                }
+            });
+
+            const activeBtn = document.getElementById('btn-mode-' + mode);
+            if (mode === 'ssa') {
+                if (activeBtn) activeBtn.className = 'px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-black text-sm shadow transition';
+                if (ssaCtrl) ssaCtrl.classList.remove('hidden');
+                if (swingPath) swingPath.classList.remove('hidden');
+                if (sideA2) sideA2.classList.remove('hidden');
+                if (labelA2) labelA2.classList.remove('hidden');
+                if (ptB2) ptB2.classList.remove('hidden');
+                if (lblB2) lblB2.classList.remove('hidden');
+                if (diagnosis) {
+                    diagnosis.className = 'p-3.5 rounded-xl bg-rose-50 text-xs font-bold text-rose-900 leading-relaxed border-r-4 border-rose-600';
+                    diagnosis.innerHTML = '<strong>خديعة SSA:</strong> الدائرة المارة برأس الضلع تقطع القاعدة في نقطتين $B_1$ و $B_2$! ينتج مثلثان مختلفان تماماً يحملان نفس المعطيات ($\triangle AB_1C$ حاد، و $\triangle AB_2C$ منفرج). إذن حالة SSA فاشلة ولا تثبت التطابق!';
+                }
+            } else {
+                if (activeBtn) activeBtn.className = 'px-5 py-2.5 rounded-2xl bg-blue-600 text-white font-black text-sm shadow transition';
+                if (ssaCtrl) ssaCtrl.classList.add('hidden');
+                if (swingPath) swingPath.classList.add('hidden');
+                if (sideA2) sideA2.classList.add('hidden');
+                if (labelA2) labelA2.classList.add('hidden');
+                if (ptB2) ptB2.classList.add('hidden');
+                if (lblB2) lblB2.classList.add('hidden');
+                if (diagnosis) {
+                    diagnosis.className = 'p-3.5 rounded-xl bg-slate-100 text-xs font-bold text-slate-800 leading-relaxed border-r-4 border-blue-600';
+                    if (mode === 'sss') {
+                        diagnosis.innerHTML = '<strong>مسلمة SSS:</strong> الأضلاع الثلاثة تثبت المثلث في تشكيلة فراغية وحيدة وفريدة. المثلثان متطابقان دائماً دون أي تردد.';
+                    } else {
+                        diagnosis.innerHTML = '<strong>مسلمة SAS:</strong> الزاوية محصورة بين الضلعين؛ لذلك يتحدد الضلع الثالث بدقة جبرية وهندسية واحدة. المثلث فريد ومتطابق حتماً!';
+                    }
+                }
+            }
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([diagnosis]);
+            }
+        }
+
+        function toggleSwingArm() {
+            swingState = !swingState;
+            const sideA = document.getElementById('sim-side-a');
+            const ptB1 = document.getElementById('sim-point-b1');
+            const lblB1 = document.getElementById('sim-label-b1');
+
+            if (swingState) {
+                if (sideA) { sideA.setAttribute('x2', '135'); sideA.setAttribute('stroke', '#be123c'); }
+                if (ptB1) { ptB1.setAttribute('cx', '135'); }
+                if (lblB1) { lblB1.setAttribute('x', '135'); lblB1.textContent = 'المثلث المنفرج البديل!'; }
+            } else {
+                if (sideA) { sideA.setAttribute('x2', '350'); sideA.setAttribute('stroke', '#e11d48'); }
+                if (ptB1) { ptB1.setAttribute('cx', '350'); }
+                if (lblB1) { lblB1.setAttribute('x', '350'); lblB1.textContent = 'B₁ (المثلث الحاد)'; }
+            }
+        }
+
+        // 3. Virtual Tools Drag & Rotate Engine
+        function toggleTool(toolId) {
+            const tool = document.getElementById(toolId);
+            if (tool) tool.classList.toggle('hidden');
+        }
+
+        function makeDraggable(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+            el.onmousedown = dragMouseDown;
+            el.ontouchstart = dragTouchStart;
+
+            function dragMouseDown(e) {
+                if (e.target.closest('button') || e.target.closest('#protractor-rotator')) return;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                el.style.top = (el.offsetTop - pos2) + "px";
+                el.style.left = (el.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+
+            function dragTouchStart(e) {
+                if (e.target.closest('button')) return;
+                const touch = e.touches[0];
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                document.ontouchend = closeTouchDrag;
+                document.ontouchmove = touchDrag;
+            }
+
+            function touchDrag(e) {
+                const touch = e.touches[0];
+                pos1 = pos3 - touch.clientX;
+                pos2 = pos4 - touch.clientY;
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                el.style.top = (el.offsetTop - pos2) + "px";
+                el.style.left = (el.offsetLeft - pos1) + "px";
+            }
+
+            function closeTouchDrag() {
+                document.ontouchend = null;
+                document.ontouchmove = null;
+            }
+        }
+
+        makeDraggable('virtual-protractor');
+        makeDraggable('virtual-ruler');
+
+        // Protractor Rotate Engine
+        let protractorAngle = 0;
+        const rotator = document.getElementById('protractor-rotator');
+        if (rotator) {
+            rotator.onclick = function(e) {
+                protractorAngle = (protractorAngle + 15) % 360;
+                const svg = document.getElementById('protractor-svg');
+                if (svg) svg.style.transform = `rotate(${protractorAngle}deg)`;
+                const val = document.getElementById('rot-angle-val');
+                if (val) val.innerText = `${protractorAngle}°`;
+            };
+        }
+
+        // Toggle Generic Answer
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        // Exit Ticket Validation
+        function checkTicketAnswer() {
+            const sel = document.querySelector('input[name="opt_ticket"]:checked');
+            const fb = document.getElementById('ticket-feedback');
+            if (!fb) return;
+
+            if (!sel) {
+                fb.className = 'p-3 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 block font-bold text-center';
+                fb.innerHTML = 'يرجى اختيار أحد البدائل الأربعة أولاً على السبورة!';
+                return;
+            }
+
+            fb.classList.remove('hidden');
+            if (sel.value === 'A') {
+                fb.className = 'p-4 rounded-2xl bg-emerald-100 border-2 border-emerald-400 text-emerald-950 block space-y-1';
+                fb.innerHTML = `
+                    <div class="font-black text-emerald-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+                        <span>إجابة صحيحة ومثالية! (A) $\\overline{BC} \\cong \\overline{YZ}$</span>
+                    </div>
+                    <p class="text-xs text-slate-700 pt-1">
+                        الزاوية $\\angle C$ محصورة بدقة بين $\\overline{AC}$ و $\\overline{BC}$. وتطابق $\\overline{BC} \\cong \\overline{YZ}$ يكمل شروط مسلمة $SAS$.
+                    </p>
+                `;
+            } else {
+                fb.className = 'p-4 rounded-2xl bg-rose-100 border-2 border-rose-400 text-rose-950 block space-y-1';
+                fb.innerHTML = `
+                    <div class="font-black text-rose-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-xmark text-rose-600 text-base"></i>
+                        <span>إجابة خاطئة! فكر في موقع الزاوية المحصورة</span>
+                    </div>
+                    <p class="text-xs text-slate-700 pt-1">
+                        اختيار أي ضلع آخر ينتج حالة $SSA$ الخاطئة لأن الزاوية ستكون غير محصورة. البديل الصحيح هو <strong>(A)</strong>.
+                    </p>
+                `;
+            }
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([fb]);
+            }
+        }
+
+        // Fullscreen Toggle
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        // Board Timer
+        let bSec = 0;
+        let bInterval = null;
+        let bRunning = false;
+
+        function updateBoardTimerDisplay() {
+            const m = Math.floor(bSec / 60);
+            const s = bSec % 60;
+            const disp = document.getElementById('board-timer');
+            if (disp) disp.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function toggleBoardTimer() {
+            const btn = document.getElementById('board-timer-btn');
+            if (!bRunning) {
+                bRunning = true;
+                bInterval = setInterval(() => { bSec++; updateBoardTimerDisplay(); }, 1000);
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+            } else {
+                bRunning = false;
+                clearInterval(bInterval);
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            }
+        }
+
+        function resetBoardTimer() {
+            bRunning = false;
+            clearInterval(bInterval);
+            bSec = 0;
+            updateBoardTimerDisplay();
+            const btn = document.getElementById('board-timer-btn');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+        }
+    </script>
+</body>
+</html>

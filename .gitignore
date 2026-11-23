@@ -1,0 +1,34 @@
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+env/
+
+# Temporary scripts & PC batch tools
+*.bat
+*.vbs
+scratch/
+test_*.pdf
+test_*.docx
+test_*.html
+
+# Large raw textbook PDFs (>100MB exceeds GitHub file push limit)
+1m.pdf
+1s.pdf
+3m.pdf
+6 ب.pdf
+
+# Operating system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace

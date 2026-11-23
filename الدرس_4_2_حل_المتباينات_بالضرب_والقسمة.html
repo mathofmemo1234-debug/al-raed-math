@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملخص الطالب | الدرس 4-2: حل المتباينات بالضرب أو بالقسمة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #dbeafe;
+            --secondary: #0d9488;
+            --accent: #e11d48;
+            --warning-bg: #fff1f2;
+            --warning-border: #f43f5e;
+            --dark: #0f172a;
+            --gray-100: #f8fafc;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.7;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #0284c7);
+            color: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.05rem;
+        }
+
+        .print-btn {
+            position: absolute;
+            left: 24px;
+            top: 24px;
+            background: var(--white);
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+
+        .print-btn:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .card-header h2 {
+            font-size: 1.35rem;
+            color: var(--primary);
+        }
+
+        .rule-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 768px) {
+            .rule-box {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .rule-card {
+            padding: 16px;
+            border-radius: 10px;
+            border-right: 5px solid;
+        }
+
+        .rule-positive {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+
+        .rule-negative {
+            background: var(--warning-bg);
+            border-color: var(--warning-border);
+        }
+
+        .rule-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .rule-positive h3 { color: #166534; }
+        .rule-negative h3 { color: #9f1239; }
+
+        .important-alert {
+            background: #fef2f2;
+            border: 2px dashed #ef4444;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 14px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #991b1b;
+            font-weight: 700;
+        }
+
+        /* Frayer Model */
+        .frayer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            position: relative;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 2px solid var(--gray-200);
+        }
+
+        .frayer-cell {
+            background: var(--white);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .frayer-cell h4 {
+            color: var(--secondary);
+            margin-bottom: 6px;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 4px;
+        }
+
+        .frayer-center {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: var(--primary);
+            color: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* Solved Examples */
+        .example-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 0.95rem;
+        }
+
+        .step-num {
+            background: var(--primary-light);
+            color: var(--primary);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* STEM & Life connection */
+        .stem-badge {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* Interactive Quiz */
+        .quiz-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+
+        .quiz-btn {
+            background: var(--secondary);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .quiz-answer {
+            display: none;
+            background: #ecfdf5;
+            color: #065f46;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            border-right: 3px solid #10b981;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--gray-600);
+            font-size: 0.85rem;
+            margin-top: 24px;
+            padding: 12px;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .print-btn { display: none; }
+            .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+            .quiz-answer { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header>
+        <button class="print-btn" onclick="window.print()">🖨️ طباعة الملخص</button>
+        <span class="badge">رياضيات الصف الثالث المتوسط | الفصل الدراسي الثاني</span>
+        <h1>الدرس (4-2): حل المتباينات بالضرب أو بالقسمة</h1>
+        <p>ملخص شامل للمفاهيم الرياضية، القواعد الذهبية، ونماذج الأمثلة وتطبيقات منهجية STEM</p>
+    </header>
+
+    <!-- Golden Rules -->
+    <div class="card">
+        <div class="card-header">
+            <h2>⭐ القاعدة الذهبية لحل المتباينات بالضرب والقسمة</h2>
+        </div>
+        <p>حل المتباينة بالضرب أو القسمة يشبه تماماً حل المعادلات الجبرية، ولكن مع وجود <strong>استثناء حاسم</strong> يتعلق بالإشارة السالبة:</p>
+        
+        <div class="rule-box">
+            <div class="rule-card rule-positive">
+                <h3>1. الضرب أو القسمة في عدد موجب (+)</h3>
+                <p><strong>يبقى اتجاه إشارة المتباينة كما هو دون تغيير:</strong></p>
+                <p>• إذا كان $أ > ب$ و $جـ > 0$ فإن $أ \times جـ > ب \times جـ$</p>
+                <p>• مثال: $2س < 8 \implies \frac{2س}{2} < \frac{8}{2} \implies س < 4$</p>
+            </div>
+
+            <div class="rule-card rule-negative">
+                <h3>2. الضرب أو القسمة في عدد سالب (-)</h3>
+                <p><strong>يجب عكس اتجاه إشارة المتباينة فوراً:</strong></p>
+                <p>• إذا كان $أ > ب$ و $جـ < 0$ فإن $أ \times جـ < ب \times جـ$</p>
+                <p>• مثال: $-3ص \le 15 \implies \frac{-3ص}{-3} \ge \frac{15}{-3} \implies ص \ge -5$</p>
+            </div>
+        </div>
+
+        <div class="important-alert">
+            ⚠️ <strong>تنبيه ذكي:</strong> الإشارة تُقلب فقط إذا كان <u>العدد المضروب فيه أو المقسوم عليه سالباً</u>، وليس لأن الطرف الآخر فيه إشارة سالبة!
+        </div>
+    </div>
+
+    <!-- Frayer Model -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🧩 نموذج فراير (Frayer Model): عكس اتجاه المتباينة</h2>
+        </div>
+        <div class="frayer-grid">
+            <div class="frayer-center">المفهوم: عكس إشارة التباين (الضرب / القسمة على سالب)</div>
+            <div class="frayer-cell">
+                <h4>التعريف اللفظي</h4>
+                <p>تغيير اتجاه رمز المقارنة (من $<$ إلى $>$، أو من $\le$ إلى $\ge$ والعكس) عند ضرب أو قسمة طرفي متباينة صحيحة على عدد حقيقي سالب للحفاظ على صحتها المنطقية.</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>الخصائص والسمات</h4>
+                <p>• يطبق فقط مع الأعداد السالبة.<br>• الترتيب ينعكس على خط الأعداد لأن الأعداد الأصغر سالباً هي الأكبر قيمة.<br>• النقطة المغلقة تظل مغلقة والنقطة المفتوحة تظل مفتوحة.</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>أمثلة منتمية (صحيحة)</h4>
+                <p>• $-2س < 10 \implies س > -5$<br>• $-\frac{1}{3}ص \ge 4 \implies ص \le -12$<br>• $5 > 2 \implies -5 < -2$ (ضرب في $-1$)</p>
+            </div>
+            <div class="frayer-cell">
+                <h4>لا أمثلة (أخطاء شائعة)</h4>
+                <p>• $2س < -8 \implies س > -4$ ❌ (خطأ: قسمنا على موجب $2$ فلا تُقلب الإشارة).<br>• $س - 4 < 2 \implies س > 6$ ❌ (الجمع والطرح لا يقلب الإشارة مطلقاً).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Solved Examples -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📘 أمثلة محلولة خطوة بخطوة من كتاب الطالب</h2>
+        </div>
+
+        <div class="example-card">
+            <strong>مثال 1: الحل بالضرب في كسر موجب (ص 130)</strong>
+            <p><strong>المسألة:</strong> حل المتباينة $\frac{س}{4} \le 7$ ومثل الحل بيانياً.</p>
+            <div class="step"><span class="step-num">1</span> نضرب كلا الطرفين في المعامل العكسي $(4)$ للتخلص من المقام: $4 \times \frac{س}{4} \le 4 \times 7$</div>
+            <div class="step"><span class="step-num">2</span> بما أن $4$ عدد موجب، يبقى اتجاه الرمز كما هو: $س \le 28$</div>
+            <div class="step"><span class="step-num">3</span> <strong>مجموعة الحل:</strong> $\{ س \mid س \le 28 \}$ (دائرة مغلقة عند $28$ وسهم متجه لليسار).</div>
+        </div>
+
+        <div class="example-card">
+            <strong>مثال 2: الحل بالقسمة على عدد سالب (ص 132)</strong>
+            <p><strong>المسألة:</strong> حل المتباينة $-4د \ge 24$ وتحقق من صحة الحل.</p>
+            <div class="step"><span class="step-num">1</span> نقسم كلا الطرفين على المعامل $(-4)$: $\frac{-4د}{-4} \le \frac{24}{-4}$ (لاحظ قلب الرمز من $\ge$ إلى $\le$)</div>
+            <div class="step"><span class="step-num">2</span> التبسيط: $د \le -6$</div>
+            <div class="step"><span class="step-num">3</span> <strong>التحقق:</strong> اختر قيمة أصغر من $-6$ (مثل $-7$): $-4(-7) = 28 \ge 24$ (العبارة صحيحة تماماً ✔️).</div>
+        </div>
+    </div>
+
+    <!-- STEM and Real Life -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🚀 التكامل مع منهجية STEM والحياة الواقعية</h2>
+        </div>
+        <p><span class="stem-badge">الربط الحياتي (إدارة الميزانية)</span> في مثال الكتاب (ص 130): حصل سعود على جائزة $250$ ريال، وسعر زجاجة العطر $45$ ريال. لمعرفة أقصى عدد زجاجات $ك$ يمكن شراؤها: $45ك \le 250 \implies ك \le 5.55$، إذاً أقصى عدد هو $5$ زجاجات.</p>
+        <br>
+        <p><span class="stem-badge">التكامل الهندسي والبرمجي STEM</span> في برمجة حساسات الأمان والروبوتات، تُكتب المتباينات للتحكم في السرعة والمسافة، حيث يعكس المعالج إشارة التسارع (قوة كبح سالبة) عندما تقترب المسافة من حد الأمان: $ع \le \frac{ف}{ز}$.</p>
+    </div>
+
+    <!-- Self-Assessment Quiz -->
+    <div class="card">
+        <div class="card-header">
+            <h2>✍️ اختبر نفسك (تقويم ذاتي سريع)</h2>
+        </div>
+
+        <div class="quiz-item">
+            <p><strong>س1:</strong> ما مجموعة حل المتباينة $-\frac{1}{2} ص < 6$؟</p>
+            <button class="quiz-btn" onclick="toggleAnswer('ans1')">عرض الإجابة والتحليل</button>
+            <div id="ans1" class="quiz-answer">
+                <strong>الإجابة:</strong> $ص > -12$<br>
+                <strong>السبب:</strong> تم الضرب في $(-2)$ وهو عدد سالب، فيتغير الرمز من $<$ إلى $>$.
+            </div>
+        </div>
+
+        <div class="quiz-item">
+            <p><strong>س2:</strong> عند حل المتباينة $5س \le -35$، هل نعكس اتجاه إشارة المتباينة؟ ولماذا؟</p>
+            <button class="quiz-btn" onclick="toggleAnswer('ans2')">عرض الإجابة والتحليل</button>
+            <div id="ans2" class="quiz-answer">
+                <strong>الإجابة:</strong> لا نعكس الإشارة!<br>
+                <strong>السبب:</strong> لأننا نقسم على معامل المتغير وهو موجب ($+5$)، ووجود سالب في الطرف الآخر $(-35)$ لا يؤثر في اتجاه الإشارة. الحل هو $س \le -7$.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        تصميم خبير التعليم وفق منهجية STEM | مقرر رياضيات 3م - وزارة التعليم 2026
+    </footer>
+</div>
+
+<script>
+    function toggleAnswer(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === "block") {
+            el.style.display = "none";
+        } else {
+            el.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

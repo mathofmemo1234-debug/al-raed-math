@@ -22,51 +22,89 @@
     <div class="nav-brand" onclick="window.Platform.switchView('cockpit')">
       <img src="assets/img/logo.png" alt="شعار المدارس المتقدمة" class="nav-logo" onerror="this.style.display='none'">
       <div class="nav-titles">
-        <h1>
-          منصة الرائد التعليمية الذكية للرياضيات
-          <span class="nav-badge-pill">الإصدار الشامل ٢.٠</span>
-        </h1>
-        <p>إعداد خبير الرياضيات: أ. محمد عبدالله جمعة • المدارس المتقدمة للتعلم الذكي بجدة</p>
+        <div class="nav-title-row">
+          <span class="nav-title-text">منصة الرائد التعليمية</span>
+          <span class="nav-badge-pill">الإصدار ٢.٠</span>
+        </div>
+        <p class="nav-teacher-tag">أ. محمد عبدالله جمعة • المدارس المتقدمة الذكية</p>
       </div>
     </div>
 
     <!-- Real-time Curriculum Search -->
     <div class="nav-center-search">
-      <span class="nav-search-icon">🔍</span>
-      <input type="text" id="nav-search" class="nav-search-input" placeholder="ابحث في شجرة المناهج (اسم الدرس، الهدف، المفهوم، رقم الصفحة)...">
+      <svg class="nav-search-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="nav-search" class="nav-search-input" placeholder="ابحث في المناهج والمسائل (Ctrl + K)...">
       <span class="nav-search-kbd">Ctrl K</span>
     </div>
 
-    <!-- Quick Navigation Actions -->
+    <!-- Quick Navigation Actions (Creative SVG Chips) -->
     <div class="nav-actions">
-      <button class="nav-btn nav-action-tile" id="btn-theme-toggle" title="الوضع الليلي">
-        <span class="nav-icon-container">🌙</span>
-        <span class="nav-btn-label">الوضع الليلي</span>
+      <button class="nav-chip-btn" id="btn-theme-toggle" title="تبديل الوضع الليلي والنهاري">
+        <span class="nav-chip-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </span>
+        <span class="nav-chip-label">الوضع الليلي</span>
       </button>
-      <button class="nav-btn nav-action-tile" onclick="window.Platform.switchView('question-bank')" title="بنك الأسئلة">
-        <span class="nav-icon-container">🏦</span>
-        <span class="nav-btn-label">بنك الأسئلة</span>
+
+      <button class="nav-chip-btn" onclick="window.Platform.switchView('question-bank')" title="بنك الأسئلة الشامل">
+        <span class="nav-chip-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4"></path>
+          </svg>
+        </span>
+        <span class="nav-chip-label">بنك الأسئلة</span>
       </button>
-      <button class="nav-btn nav-action-tile primary" onclick="window.Platform.switchView('exam-builder')" title="منشئ الاختبارات">
-        <span class="nav-icon-container">
-          📝
+
+      <button class="nav-chip-btn primary" onclick="window.Platform.switchView('exam-builder')" title="منشئ الاختبارات">
+        <span class="nav-chip-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="9" y1="13" x2="15" y2="13"></line>
+            <line x1="9" y1="17" x2="13" y2="17"></line>
+          </svg>
           <span class="exam-count-badge" id="nav-exam-count-badge">٠</span>
         </span>
-        <span class="nav-btn-label">منشئ الاختبارات</span>
+        <span class="nav-chip-label">منشئ الاختبارات</span>
       </button>
-      <button class="nav-btn nav-action-tile" onclick="window.Platform.switchView('suites')" title="الأجنحة التفاعلية">
-        <span class="nav-icon-container">🌟</span>
-        <span class="nav-btn-label">الأجنحة التفاعلية</span>
+
+      <button class="nav-chip-btn" onclick="window.Platform.switchView('suites')" title="الأجنحة والمختبرات التفاعلية">
+        <span class="nav-chip-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </span>
+        <span class="nav-chip-label">الأجنحة التفاعلية</span>
       </button>
-      <button class="nav-btn nav-action-tile" onclick="window.Platform.switchView('vault')" title="مركز التحميل">
-        <span class="nav-icon-container">📥</span>
-        <span class="nav-btn-label">مركز التحميل</span>
+
+      <button class="nav-chip-btn" onclick="window.Platform.switchView('vault')" title="مركز التحميل">
+        <span class="nav-chip-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </span>
+        <span class="nav-chip-label">مركز التحميل</span>
       </button>
-      <button class="nav-btn nav-action-tile" onclick="window.Platform.switchView('builder')" title="إضافة درس">
-        <span class="nav-icon-container">➕</span>
-        <span class="nav-btn-label">إضافة درس</span>
+
+      <button class="nav-chip-btn" onclick="window.Platform.switchView('builder')" title="إضافة درس">
+        <span class="nav-chip-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+        </span>
+        <span class="nav-chip-label">إضافة درس</span>
       </button>
     </div>
+    <div id="nav-flash-bar" class="nav-flash-bar"></div>
   </header>
 
   <!-- ================= App Container ================= -->

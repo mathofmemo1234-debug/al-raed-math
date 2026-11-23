@@ -71,82 +71,109 @@ body {
 
 /* ================= Top Navigation Bar ================= */
 .platform-navbar {
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #090e1a 0%, #172554 100%);
   color: #ffffff;
-  padding: 12px 24px;
+  height: 58px;
+  max-height: 58px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   position: sticky;
   top: 0;
-  z-index: 100;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .nav-logo {
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: #ffffff;
   padding: 2px;
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
   object-fit: contain;
+  transition: transform 0.25s ease;
 }
 
-.nav-titles h1 {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.3px;
+.nav-brand:hover .nav-logo {
+  transform: scale(1.06);
+}
+
+.nav-titles {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.15;
+}
+
+.nav-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.nav-badge-pill {
-  font-size: 0.65rem;
-  background: rgba(59, 130, 246, 0.3);
-  color: #93c5fd;
-  border: 1px solid rgba(147, 197, 253, 0.3);
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-weight: 600;
+.nav-title-text {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-.nav-titles p {
-  font-size: 0.78rem;
-  color: #cbd5e1;
+.nav-badge-pill {
+  font-size: 0.62rem;
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  padding: 1px 7px;
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+.nav-teacher-tag {
+  font-size: 0.72rem;
+  color: #94a3b8;
   font-weight: 500;
+  margin-top: 2px;
+  letter-spacing: -0.1px;
 }
 
 .nav-center-search {
   flex: 1;
-  min-width: 200px;
-  max-width: 480px;
+  min-width: 170px;
+  max-width: 340px;
   margin: 0 16px;
   position: relative;
   display: flex;
   align-items: center;
+  height: 36px;
 }
 
 .nav-search-input {
   width: 100%;
+  height: 36px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 24px;
-  padding: 8px 38px 8px 65px;
+  border-radius: 18px;
+  padding: 0 34px 0 62px;
   color: #ffffff;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-family: inherit;
   outline: none;
   transition: all 0.25s ease;
@@ -155,34 +182,35 @@ body {
 .nav-search-input:focus {
   background: rgba(255, 255, 255, 0.16);
   border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+  box-shadow: 0 0 16px rgba(96, 165, 250, 0.3);
 }
 
 .nav-search-input::placeholder {
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
-.nav-search-icon {
+.nav-search-svg {
   position: absolute;
-  right: 14px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
   color: #94a3b8;
   pointer-events: none;
-  font-size: 0.9rem;
 }
 
 .nav-search-kbd {
   position: absolute;
-  left: 10px;
+  left: 9px;
   top: 50%;
   transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 6px;
-  padding: 2px 7px;
-  font-size: 0.7rem;
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 0.68rem;
   font-weight: 700;
   color: #cbd5e1;
   letter-spacing: 0.5px;
@@ -193,10 +221,165 @@ body {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   flex-shrink: 0;
 }
 
+/* ==========================================================================
+   Creative Navigation Action Chips (Sleek Horizontal Modern Pills)
+   ========================================================================== */
+.nav-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f8fafc;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-chip-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+}
+
+.nav-chip-btn:active {
+  transform: scale(0.96);
+}
+
+.nav-chip-btn.primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #60a5fa;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+}
+
+.nav-chip-btn.primary:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.6);
+}
+
+.nav-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.nav-chip-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  transition: transform 0.22s ease;
+}
+
+.nav-chip-btn:hover .nav-chip-icon svg {
+  transform: scale(1.15);
+}
+
+.nav-chip-icon .exam-count-badge {
+  position: absolute;
+  top: -6px;
+  left: -8px;
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #0f172a;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  animation: pulseAttention 2s infinite ease-in-out;
+}
+
+@keyframes pulseAttention {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); box-shadow: 0 0 12px rgba(245, 158, 11, 0.9); }
+}
+
+.nav-chip-label {
+  line-height: 1;
+  letter-spacing: -0.2px;
+}
+
+/* ==========================================================================
+   Laser Flash Top Bar & Flashy Dynamic Navigation Animations (تنقل فلاشي)
+   ========================================================================== */
+.nav-flash-bar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981, #f59e0b, #ec4899, #8b5cf6, #3b82f6);
+  background-size: 300% 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.nav-flash-bar.flash-active {
+  opacity: 1;
+  animation: laserSweep 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes laserSweep {
+  0% { background-position: 0% 50%; opacity: 0; }
+  25% { opacity: 1; filter: drop-shadow(0 0 8px #38bdf8); }
+  75% { opacity: 1; filter: drop-shadow(0 0 12px #818cf8); }
+  100% { background-position: 100% 50%; opacity: 0; }
+}
+
+.flash-enter {
+  animation: viewFlashEntrance 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes viewFlashEntrance {
+  0% {
+    opacity: 0.15;
+    transform: translateY(8px) scale(0.995);
+    filter: brightness(1.22) contrast(1.05);
+  }
+  60% {
+    filter: brightness(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+.tab-pane-content.active {
+  animation: tabPaneFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes tabPaneFadeIn {
+  0% { opacity: 0.3; transform: translateX(-6px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Backward compatibility for any remaining legacy references */
 .nav-btn {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
@@ -225,106 +408,6 @@ body {
 
 .nav-btn.primary:hover {
   background: #1d4ed8;
-}
-
-/* ==========================================================================
-   توحيد حاويات الأيقونات في شريط التنقل العلوي (القاعدة الإلزامية رقم 3)
-   حاويات موحدة متساوية الأبعاد هندسياً ومصغرة بشكل جمالي ومحاذاة منتظمة
-   ========================================================================== */
-.nav-action-tile {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 4px !important;
-  min-width: 74px !important;
-  height: 64px !important;
-  padding: 5px 8px !important;
-  border-radius: 10px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  color: #ffffff !important;
-  cursor: pointer !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  text-decoration: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
-  flex-shrink: 0 !important;
-  user-select: none !important;
-}
-
-.nav-action-tile:hover {
-  background: rgba(255, 255, 255, 0.18) !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important;
-}
-
-.nav-action-tile.primary {
-  background: #2563eb !important;
-  border-color: #60a5fa !important;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
-}
-
-.nav-action-tile.primary:hover {
-  background: #1d4ed8 !important;
-  border-color: #93c5fd !important;
-}
-
-.nav-icon-container {
-  position: relative !important;
-  width: 30px !important;
-  height: 30px !important;
-  min-width: 30px !important;
-  min-height: 30px !important;
-  border-radius: 8px !important;
-  background: rgba(255, 255, 255, 0.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 1.05rem !important;
-  line-height: 1 !important;
-  flex-shrink: 0 !important;
-  transition: all 0.2s ease !important;
-}
-
-.nav-action-tile:hover .nav-icon-container {
-  background: rgba(255, 255, 255, 0.22) !important;
-  border-color: rgba(255, 255, 255, 0.38) !important;
-}
-
-.nav-action-tile.primary .nav-icon-container {
-  background: rgba(255, 255, 255, 0.24) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-}
-
-.nav-icon-container .exam-count-badge {
-  position: absolute !important;
-  top: -5px !important;
-  left: -5px !important;
-  background: #f59e0b !important;
-  color: #ffffff !important;
-  font-size: 0.68rem !important;
-  font-weight: 800 !important;
-  min-width: 17px !important;
-  height: 17px !important;
-  padding: 0 3px !important;
-  border-radius: 9px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border: 1.5px solid #0f172a !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-}
-
-.nav-btn-label {
-  font-size: 0.73rem !important;
-  font-weight: 700 !important;
-  color: #ffffff !important;
-  text-align: center !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-  letter-spacing: -0.2px !important;
 }
 
 /* ================= Main App Layout ================= */
@@ -610,29 +693,35 @@ body {
 .view-tab-btn {
   background: transparent;
   border: 1px solid transparent;
-  padding: 8px 16px;
-  font-size: 0.88rem;
+  padding: 7px 15px;
+  font-size: 0.86rem;
   font-weight: 700;
   color: var(--text-muted);
   cursor: pointer;
-  border-radius: var(--radius-sm);
+  border-radius: 20px;
   display: flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
 .view-tab-btn:hover {
-  background: var(--border-light);
-  color: var(--text-main);
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.view-tab-btn:active {
+  transform: scale(0.96);
 }
 
 .view-tab-btn.active {
   background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
   color: #ffffff;
   border-color: #3b82f6;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
 .viewport-top-tabs .nav-btn {
@@ -859,29 +948,35 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 
 .lesson-tab-button {
   background: transparent;
-  border: none;
-  padding: 10px 18px;
-  font-size: 0.9rem;
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-muted);
-  border-radius: var(--radius-sm);
+  border-radius: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .lesson-tab-button:hover {
-  background: var(--border-light);
-  color: var(--text-main);
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.lesson-tab-button:active {
+  transform: scale(0.96);
 }
 
 .lesson-tab-button.active {
-  background: #2563eb;
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
   color: #ffffff;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
 .tab-pane-content {

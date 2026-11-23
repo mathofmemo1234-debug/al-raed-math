@@ -221,9 +221,208 @@
         }
       });
     }
+
+    // Close crumb dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.tree-crumb-item')) {
+        document.querySelectorAll('.crumb-dropdown.open').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('.tree-crumb-item.active-menu').forEach(el => el.classList.remove('active-menu'));
+      }
+    });
   }
 
-  // ================= Tree Rendering =================
+  // Find ancestor IDs for a lesson: [stage, grade, term, termKey, chapter, lesson]
+  function findLessonPath(lessonId) {
+    if (!window.CURRICULUM_DATA || !window.CURRICULUM_DATA.stages) return null;
+    for (const stage of window.CURRICULUM_DATA.stages) {
+      for (const grade of stage.grades) {
+        for (const term of grade.terms) {
+          const termKey = grade.id + '-' + term.id;
+          for (const chapter of (term.chapters || [])) {
+            for (const l of (chapter.lessons || [])) {
+              if (l.id === lessonId) {
+                return {
+                  stage,
+                  grade,
+                  term,
+                  termKey,
+                  chapter,
+                  lesson: l
+                };
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  function getAllLessonsList() {
+    const list = [];
+    if (!window.CURRICULUM_DATA || !window.CURRICULUM_DATA.stages) return list;
+    window.CURRICULUM_DATA.stages.forEach(stage => {
+      stage.grades.forEach(grade => {
+        grade.terms.forEach(term => {
+          (term.chapters || []).forEach(ch => {
+            (ch.lessons || []).forEach(l => {
+              list.push({
+                id: l.id,
+                title: l.title,
+                number: l.number,
+                chapterId: ch.id,
+                chapterTitle: ch.title,
+                chapterNumber: ch.number,
+                termId: term.id,
+                gradeId: grade.id,
+                stageId: stage.id
+              });
+            });
+          });
+        });
+      });
+    });
+    return list;
+  }
+
+  function goToPrevLesson() {
+    const list = getAllLessonsList();
+    const idx = list.findIndex(item => item.id === state.currentLessonId);
+    if (idx > 0) {
+      selectLesson(list[idx - 1].id);
+    }
+  }
+
+  function goToNextLesson() {
+    const list = getAllLessonsList();
+    const idx = list.findIndex(item => item.id === state.currentLessonId);
+    if (idx >= 0 && idx < list.length - 1) {
+      selectLesson(list[idx + 1].id);
+    }
+  }
+
+  function selectFirstLessonOfStage(stageId) {
+    const stages = (window.CURRICULUM_DATA && window.CURRICULUM_DATA.stages) || [];
+    const stage = stages.find(s => s.id === stageId);
+    if (stage) {
+      for (const grade of stage.grades) {
+        for (const term of grade.terms) {
+          for (const ch of (term.chapters || [])) {
+            if (ch.lessons && ch.lessons.length) {
+              selectLesson(ch.lessons[0].id);
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function selectFirstLessonOfGrade(gradeId) {
+    const stages = (window.CURRICULUM_DATA && window.CURRICULUM_DATA.stages) || [];
+    for (const stage of stages) {
+      const grade = stage.grades.find(g => g.id === gradeId);
+      if (grade) {
+        for (const term of grade.terms) {
+          for (const ch of (term.chapters || [])) {
+            if (ch.lessons && ch.lessons.length) {
+              selectLesson(ch.lessons[0].id);
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function selectFirstLessonOfTerm(gradeId, termId) {
+    const stages = (window.CURRICULUM_DATA && window.CURRICULUM_DATA.stages) || [];
+    for (const stage of stages) {
+      const grade = stage.grades.find(g => g.id === gradeId);
+      if (grade) {
+        const term = grade.terms.find(t => t.id === termId);
+        if (term) {
+          for (const ch of (term.chapters || [])) {
+            if (ch.lessons && ch.lessons.length) {
+              selectLesson(ch.lessons[0].id);
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function selectFirstLessonOfChapter(chapterId) {
+    const stages = (window.CURRICULUM_DATA && window.CURRICULUM_DATA.stages) || [];
+    for (const stage of stages) {
+      for (const grade of stage.grades) {
+        for (const term of grade.terms) {
+          const ch = (term.chapters || []).find(c => c.id === chapterId);
+          if (ch && ch.lessons && ch.lessons.length) {
+            selectLesson(ch.lessons[0].id);
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  function expandAll() {
+    if (!window.CURRICULUM_DATA || !window.CURRICULUM_DATA.stages) return;
+    window.CURRICULUM_DATA.stages.forEach(stage => {
+      state.expandedNodes.add(stage.id);
+      stage.grades.forEach(grade => {
+        state.expandedNodes.add(grade.id);
+        grade.terms.forEach(term => {
+          state.expandedNodes.add(grade.id + '-' + term.id);
+          (term.chapters || []).forEach(ch => {
+            state.expandedNodes.add(ch.id);
+          });
+        });
+      });
+    });
+    renderTree();
+  }
+
+  function collapseAll() {
+    state.expandedNodes.clear();
+    const p = findLessonPath(state.currentLessonId);
+    if (p) {
+      state.expandedNodes.add(p.stage.id);
+      state.expandedNodes.add(p.grade.id);
+      state.expandedNodes.add(p.termKey);
+      state.expandedNodes.add(p.chapter.id);
+    }
+    renderTree();
+  }
+
+  function toggleSidebar() {
+    const sidebar = document.getElementById('app-sidebar');
+    const openPill = document.getElementById('sidebar-open-pill');
+    if (!sidebar) return;
+    sidebar.classList.toggle('collapsed');
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    if (openPill) {
+      openPill.style.display = isCollapsed ? 'inline-flex' : 'none';
+    }
+  }
+
+  function toggleCrumbDropdown(event, menuId) {
+    if (event) event.stopPropagation();
+    const targetMenu = document.getElementById(menuId);
+    if (!targetMenu) return;
+    const isOpen = targetMenu.classList.contains('open');
+    document.querySelectorAll('.crumb-dropdown.open').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.tree-crumb-item.active-menu').forEach(el => el.classList.remove('active-menu'));
+    if (!isOpen) {
+      targetMenu.classList.add('open');
+      const parentCrumb = targetMenu.closest('.tree-crumb-item');
+      if (parentCrumb) parentCrumb.classList.add('active-menu');
+    }
+  }
+
+  // ================= Hierarchical Branching Tree Rendering =================
   function renderTree() {
     if (!sidebarTreeContainer || !window.CURRICULUM_DATA) return;
     const stages = window.CURRICULUM_DATA.stages || [];
@@ -250,7 +449,9 @@
             (chapter.lessons || []).forEach(lesson => {
               const fullLesson = window.CURRICULUM_DATA.lessons[lesson.id];
               const title = fullLesson ? fullLesson.title : lesson.title;
-              const matchesSearch = !state.searchQuery || title.toLowerCase().includes(state.searchQuery) || (fullLesson && fullLesson.objectives.some(o => o.toLowerCase().includes(state.searchQuery)));
+              const matchesSearch = !state.searchQuery || 
+                title.toLowerCase().includes(state.searchQuery) || 
+                (fullLesson && fullLesson.objectives && fullLesson.objectives.some(o => o.toLowerCase().includes(state.searchQuery)));
 
               if (matchesSearch) {
                 chapterMatches = true;
@@ -262,13 +463,14 @@
                 const isActive = state.currentLessonId === lesson.id;
 
                 lessonsHtml += `
-                  <div class="tree-lesson-item ${isActive ? 'active' : ''}" onclick="window.Platform.selectLesson('${lesson.id}')">
-                    <span style="display:flex; align-items:center; gap:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                  <div class="tree-lesson-item ${isActive ? 'active' : ''}" onclick="window.Platform.selectLesson('${lesson.id}')" title="${escHtml(title)}">
+                    <span style="display:flex; align-items:center; gap:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                       <span class="lesson-status-dot ${isCompleted ? 'completed' : 'roadmap'}"></span>
-                      ${title}
+                      <span style="font-weight:700; color:${isActive ? '#ffffff' : (isCompleted ? '#e2e8f0' : '#cbd5e1')}">${lesson.number}</span>
+                      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</span>
                     </span>
-                    <span style="font-size:0.68rem; color:${isCompleted ? '#86efac' : '#fcd34d'};">
-                      ${isCompleted ? '✓ مكتمل' : 'قيد الإدراج'}
+                    <span style="font-size:0.62rem; flex-shrink:0; color:${isActive ? '#ffffff' : (isCompleted ? '#86efac' : '#fcd34d')};">
+                      ${isCompleted ? '✓' : 'قيد الإدراج'}
                     </span>
                   </div>
                 `;
@@ -277,14 +479,21 @@
 
             if (chapterMatches || !state.searchQuery) {
               const isChapterOpen = state.expandedNodes.has(chapter.id) || !!state.searchQuery;
+              const lessonCount = (chapter.lessons || []).length;
               chaptersHtml += `
                 <div class="tree-chapter-node">
                   <div class="tree-chapter-header" onclick="window.Platform.toggleNode('${chapter.id}')">
-                    <span>📖 ${chapter.number}: ${chapter.title}</span>
-                    <span class="node-arrow ${isChapterOpen ? 'open' : ''}">◀</span>
+                    <span style="display:flex; align-items:center; gap:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                      <span>📖</span>
+                      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${chapter.number}: ${chapter.title}</span>
+                    </span>
+                    <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                      <span style="font-size:0.6rem; color:#94a3b8;">(${lessonCount})</span>
+                      <span class="node-arrow ${isChapterOpen ? 'open' : ''}">◀</span>
+                    </div>
                   </div>
-                  <div class="tree-chapter-content" style="display:${isChapterOpen ? 'block' : 'none'}; padding-right:8px;">
-                    ${lessonsHtml}
+                  <div class="tree-chapter-children" style="display:${isChapterOpen ? 'block' : 'none'};">
+                    ${lessonsHtml || '<div style="padding:4px 8px; font-size:0.7rem; color:#64748b;">قيد الإدراج</div>'}
                   </div>
                 </div>
               `;
@@ -292,14 +501,15 @@
           });
 
           if (termMatches || !state.searchQuery) {
-            const isTermOpen = state.expandedNodes.has(grade.id + '-' + term.id) || !!state.searchQuery;
+            const termKey = grade.id + '-' + term.id;
+            const isTermOpen = state.expandedNodes.has(termKey) || !!state.searchQuery;
             termsHtml += `
               <div class="tree-term-node">
-                <div class="tree-term-header" onclick="window.Platform.toggleNode('${grade.id}-${term.id}')">
+                <div class="tree-term-header" onclick="window.Platform.toggleNode('${termKey}')">
                   <span>${term.icon || '📅'} ${term.name}</span>
                   <span class="node-arrow ${isTermOpen ? 'open' : ''}">◀</span>
                 </div>
-                <div style="display:${isTermOpen ? 'block' : 'none'};">
+                <div class="tree-term-children" style="display:${isTermOpen ? 'block' : 'none'};">
                   ${chaptersHtml}
                 </div>
               </div>
@@ -313,12 +523,15 @@
             <div class="tree-grade-node">
               <div class="tree-grade-header" onclick="window.Platform.toggleNode('${grade.id}')">
                 <div class="tree-grade-title">
-                  <span>🎓 ${grade.name}</span>
-                  <span class="grade-badge">${grade.badge || ''}</span>
+                  <span>${isGradeOpen ? '📂' : '📁'}</span>
+                  <span>${grade.name}</span>
                 </div>
-                <span class="node-arrow ${isGradeOpen ? 'open' : ''}">◀</span>
+                <div style="display:flex; align-items:center; gap:5px;">
+                  <span class="grade-badge">${grade.badge ? grade.badge.split('(')[0].trim() : ''}</span>
+                  <span class="node-arrow ${isGradeOpen ? 'open' : ''}">◀</span>
+                </div>
               </div>
-              <div style="display:${isGradeOpen ? 'block' : 'none'};">
+              <div class="tree-grade-children" style="display:${isGradeOpen ? 'block' : 'none'};">
                 ${termsHtml}
               </div>
             </div>
@@ -327,12 +540,16 @@
       });
 
       if (stageMatches || !state.searchQuery) {
+        const isStageOpen = state.expandedNodes.has(stage.id) !== false; // stages open by default
         html += `
           <div class="tree-stage-group">
-            <div class="tree-stage-header">
+            <div class="tree-stage-header" onclick="window.Platform.toggleNode('${stage.id}')">
               <span>${stage.icon} ${stage.name}</span>
+              <span class="node-arrow ${isStageOpen ? 'open' : ''}">◀</span>
             </div>
-            ${gradesHtml}
+            <div class="tree-stage-children" style="display:${isStageOpen ? 'block' : 'none'};">
+              ${gradesHtml}
+            </div>
           </div>
         `;
       }
@@ -356,6 +573,15 @@
     state.currentLessonId = lessonId;
     state.activeView = 'cockpit';
     
+    // Auto-expand all parent ancestors so current lesson is visible in tree
+    const p = findLessonPath(lessonId);
+    if (p) {
+      state.expandedNodes.add(p.stage.id);
+      state.expandedNodes.add(p.grade.id);
+      state.expandedNodes.add(p.termKey);
+      state.expandedNodes.add(p.chapter.id);
+    }
+
     // update tabs
     document.querySelectorAll('.view-tab-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.view === 'cockpit');
@@ -364,6 +590,15 @@
     renderTree();
     triggerFlashTransition();
     renderCurrentView();
+
+    // Auto-scroll active item in sidebar smoothly
+    setTimeout(() => {
+      const activeEl = document.querySelector('.tree-lesson-item.active');
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }, 50);
+
     // Scroll viewport to top smoothly
     if (viewportArea) viewportArea.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -546,18 +781,137 @@
       </div>
     ` : '';
 
+    const pathInfo = findLessonPath(lesson.id);
+    let topTreeBreadcrumbsHtml = '';
+    
+    if (pathInfo) {
+      const { stage, grade, term, chapter } = pathInfo;
+      const allLessons = getAllLessonsList();
+      const currentIdx = allLessons.findIndex(item => item.id === lesson.id);
+      const hasPrev = currentIdx > 0;
+      const hasNext = currentIdx >= 0 && currentIdx < allLessons.length - 1;
+
+      const stagesDropHtml = (window.CURRICULUM_DATA.stages || []).map(s => `
+        <div class="crumb-dropdown-item ${s.id === stage.id ? 'active' : ''}" onclick="window.Platform.selectFirstLessonOfStage('${s.id}')">
+          <span>${s.icon} ${s.name}</span>
+          ${s.id === stage.id ? '<span>✓</span>' : ''}
+        </div>
+      `).join('');
+
+      const gradesDropHtml = (stage.grades || []).map(g => `
+        <div class="crumb-dropdown-item ${g.id === grade.id ? 'active' : ''}" onclick="window.Platform.selectFirstLessonOfGrade('${g.id}')">
+          <span>🎓 ${g.name}</span>
+          ${g.id === grade.id ? '<span>✓</span>' : ''}
+        </div>
+      `).join('');
+
+      const termsDropHtml = (grade.terms || []).map(t => `
+        <div class="crumb-dropdown-item ${t.id === term.id ? 'active' : ''}" onclick="window.Platform.selectFirstLessonOfTerm('${grade.id}', '${t.id}')">
+          <span>${t.icon || '📅'} ${t.name}</span>
+          ${t.id === term.id ? '<span>✓</span>' : ''}
+        </div>
+      `).join('');
+
+      const chaptersDropHtml = (term.chapters || []).map(ch => `
+        <div class="crumb-dropdown-item ${ch.id === chapter.id ? 'active' : ''}" onclick="window.Platform.selectFirstLessonOfChapter('${ch.id}')">
+          <span>📖 ${ch.number}: ${ch.title}</span>
+          ${ch.id === chapter.id ? '<span>✓</span>' : ''}
+        </div>
+      `).join('');
+
+      const lessonsDropHtml = (chapter.lessons || []).map(l => `
+        <div class="crumb-dropdown-item ${l.id === lesson.id ? 'active' : ''}" onclick="window.Platform.selectLesson('${l.id}')">
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span class="lesson-status-dot ${l.status === 'completed' ? 'completed' : 'roadmap'}"></span>
+            ${l.number} ${l.title}
+          </span>
+          ${l.id === lesson.id ? '<span>✓</span>' : ''}
+        </div>
+      `).join('');
+
+      topTreeBreadcrumbsHtml = `
+        <nav class="tree-breadcrumb-nav" aria-label="شجرة المسار الهرمية">
+          <div class="tree-crumb-root-label">
+            <span>🌳 شجرة المسار:</span>
+          </div>
+
+          <div class="tree-crumb-item" onclick="window.Platform.toggleCrumbDropdown(event, 'crumb-drop-stage')" title="المرحلة التعليمية">
+            <span>${stage.icon} ${stage.name}</span>
+            <span class="crumb-arrow">▾</span>
+            <div class="crumb-dropdown" id="crumb-drop-stage">
+              ${stagesDropHtml}
+            </div>
+          </div>
+
+          <span class="crumb-sep">/</span>
+
+          <div class="tree-crumb-item" onclick="window.Platform.toggleCrumbDropdown(event, 'crumb-drop-grade')" title="الصف الدراسي">
+            <span>🎓 ${grade.name}</span>
+            <span class="crumb-arrow">▾</span>
+            <div class="crumb-dropdown" id="crumb-drop-grade">
+              ${gradesDropHtml}
+            </div>
+          </div>
+
+          <span class="crumb-sep">/</span>
+
+          <div class="tree-crumb-item" onclick="window.Platform.toggleCrumbDropdown(event, 'crumb-drop-term')" title="الفصل الدراسي">
+            <span>${term.icon || '📅'} ${term.name}</span>
+            <span class="crumb-arrow">▾</span>
+            <div class="crumb-dropdown" id="crumb-drop-term">
+              ${termsDropHtml}
+            </div>
+          </div>
+
+          <span class="crumb-sep">/</span>
+
+          <div class="tree-crumb-item" onclick="window.Platform.toggleCrumbDropdown(event, 'crumb-drop-chapter')" title="الباب أو الفصل">
+            <span>📖 ${chapter.number}: ${chapter.title}</span>
+            <span class="crumb-arrow">▾</span>
+            <div class="crumb-dropdown" id="crumb-drop-chapter">
+              ${chaptersDropHtml}
+            </div>
+          </div>
+
+          <span class="crumb-sep">/</span>
+
+          <div class="tree-crumb-item current-lesson" onclick="window.Platform.toggleCrumbDropdown(event, 'crumb-drop-lesson')" title="الدرس الحالي">
+            <span class="lesson-status-dot completed" style="margin-left:4px;"></span>
+            <span>🎯 ${lesson.number}: ${lesson.title}</span>
+            <span class="crumb-arrow">▾</span>
+            <div class="crumb-dropdown" id="crumb-drop-lesson">
+              ${lessonsDropHtml}
+            </div>
+          </div>
+
+          <div class="tree-crumb-nav-steppers">
+            <button type="button" class="crumb-stepper-btn" onclick="window.Platform.goToPrevLesson()" ${hasPrev ? '' : 'disabled'} title="الانتقال للدرس السابق">
+              ▶ السابق
+            </button>
+            <button type="button" class="crumb-stepper-btn" onclick="window.Platform.goToNextLesson()" ${hasNext ? '' : 'disabled'} title="الانتقال للدرس التالي">
+              التالي ◀
+            </button>
+          </div>
+        </nav>
+      `;
+    } else {
+      topTreeBreadcrumbsHtml = `
+        <div class="breadcrumb-trail">
+          <span>🏫 ${lesson.stage || ''}</span>
+          <span>/</span>
+          <span>🎓 ${lesson.grade || ''}</span>
+          <span>/</span>
+          <span>📅 ${lesson.term || ''}</span>
+          <span>/</span>
+          <span>📖 ${lesson.chapter || ''}</span>
+        </div>
+      `;
+    }
+
     let html = `
       <!-- Cockpit Header Banner -->
       <div class="lesson-cockpit-header">
-        <div class="breadcrumb-trail">
-          <span>🏫 ${lesson.stage}</span>
-          <span>/</span>
-          <span>🎓 ${lesson.grade}</span>
-          <span>/</span>
-          <span>📅 ${lesson.term}</span>
-          <span>/</span>
-          <span>📖 ${lesson.chapter}</span>
-        </div>
+        ${topTreeBreadcrumbsHtml}
         <div class="lesson-header-main">
           <div class="lesson-title-area">
             <h2>الدرس ${fmtNum(lesson.number, isG6)}: ${lesson.title}</h2>
@@ -1451,6 +1805,16 @@
   window.Platform = {
     selectLesson,
     toggleNode,
+    expandAll,
+    collapseAll,
+    toggleSidebar,
+    goToPrevLesson,
+    goToNextLesson,
+    toggleCrumbDropdown,
+    selectFirstLessonOfStage,
+    selectFirstLessonOfGrade,
+    selectFirstLessonOfTerm,
+    selectFirstLessonOfChapter,
     switchLessonTab,
     switchView,
     answerMCQ,

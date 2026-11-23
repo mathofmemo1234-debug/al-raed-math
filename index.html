@@ -111,20 +111,24 @@
   <div class="app-container">
     
     <!-- Sidebar: Hierarchical Curriculum Tree -->
-    <aside class="app-sidebar">
+    <aside class="app-sidebar" id="app-sidebar">
       <div class="sidebar-header">
         <div class="sidebar-title-row">
           <div class="sidebar-title">
-            <span>🌳 شجرة المناهج الدراسية</span>
+            <span>🌳 شجرة المناهج</span>
           </div>
-          <span style="font-size:0.75rem; color:#93c5fd; background:rgba(30,58,138,0.6); padding:2px 8px; border-radius:12px;">الفصلان الدراسيان</span>
+          <div class="sidebar-quick-tools">
+            <button type="button" class="sidebar-tool-btn" onclick="window.Platform.expandAll()" title="توسيع كافة الفروع الشجرية">⤢ توسيع</button>
+            <button type="button" class="sidebar-tool-btn" onclick="window.Platform.collapseAll()" title="طي كافة الفروع الشجرية">⤡ طي</button>
+            <button type="button" class="sidebar-tool-btn toggle-sidebar-btn" onclick="window.Platform.toggleSidebar()" title="طي القائمة الجانبية">◀</button>
+          </div>
         </div>
 
         <!-- Term Filter Tabs -->
         <div class="term-filter-tabs">
           <button class="term-tab-btn active" data-term="all">الكل</button>
-          <button class="term-tab-btn" data-term="term1">🍂 الفصل ١</button>
-          <button class="term-tab-btn" data-term="term2">❄️ الفصل ٢</button>
+          <button class="term-tab-btn" data-term="term1">فصل ١</button>
+          <button class="term-tab-btn" data-term="term2">فصل ٢</button>
         </div>
       </div>
 
@@ -137,9 +141,12 @@
     <!-- Main Viewport Content Area -->
     <main class="app-viewport">
       
-      <!-- View Switcher Group -->
+      <!-- Views Navigation Bar -->
       <div class="viewport-top-tabs">
         <div class="view-switcher-group">
+          <button type="button" class="sidebar-open-pill" id="sidebar-open-pill" onclick="window.Platform.toggleSidebar()" title="إظهار شجرة المناهج" style="display:none;">
+            🌳 شجرة المناهج ◀
+          </button>
           <button class="view-tab-btn active" data-view="cockpit">
             🎯 مركز الدرس التفاعلي
           </button>

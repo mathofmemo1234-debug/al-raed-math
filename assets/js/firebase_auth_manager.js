@@ -452,7 +452,10 @@
           const result = await authService.signInWithPopup(provider);
           const u = result.user;
           const today = new Date().toLocaleDateString('ar-SA');
-          const isDirector = u.email && u.email.toLowerCase() === 'mohamed.gomaa@al-raed.edu.sa';
+          const isDirector = u.email && (
+            u.email.toLowerCase() === 'mohamed.gomaa@al-raed.edu.sa' ||
+            u.email.toLowerCase() === 'mathofmemo1234@gmail.com'
+          );
 
           const userObj = {
             uid: u.uid,

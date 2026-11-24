@@ -96,17 +96,17 @@
       ...mcqs.map((q, idx) => ({
         type: 'mcq',
         id: `mcq_${idx}`,
-        question: formatMathDisplay(q.question, isArabicNum),
+        question: formatMathDisplay(q.q || q.question || '', isArabicNum),
         options: (q.options || []).map(opt => formatMathDisplay(opt, isArabicNum)),
-        answer: q.answer,
+        answer: (q.correct !== undefined) ? q.correct : ((q.answer !== undefined) ? q.answer : 0),
         explanation: formatMathDisplay(q.explanation || '', isArabicNum)
       })),
       ...tfs.map((q, idx) => ({
         type: 'tf',
         id: `tf_${idx}`,
-        question: formatMathDisplay(q.question, isArabicNum),
+        question: formatMathDisplay(q.statement || q.q || q.question || '', isArabicNum),
         options: ['صواب', 'خطأ'],
-        answer: q.answer ? 0 : 1,
+        answer: (q.is_true === true || q.answer === true) ? 0 : 1,
         explanation: formatMathDisplay(q.explanation || '', isArabicNum)
       }))
     ];

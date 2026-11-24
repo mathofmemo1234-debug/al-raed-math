@@ -99,11 +99,89 @@
           isLiveFirebase = true;
           console.log('✓ Firebase Live Cloud Connected successfully!');
           setupLiveSessionSync();
+          setupDirectorUsersLiveSync();
+          syncUsersFromCloud();
         } catch (e) {
           console.warn('Firebase init warning:', e);
         }
       }
     }
+  }
+
+  let directorUsersUnsubscribe = null;
+
+  async function syncUsersFromCloud() {
+    if (!isLiveFirebase || !firestoreService) return;
+    try {
+      const snap = await firestoreService.collection('users').get();
+      if (!snap.empty) {
+        const cloudUsers = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (d && (d.uid || doc.id)) {
+            if (!d.uid) d.uid = doc.id;
+            cloudUsers.push(d);
+          }
+        });
+        if (cloudUsers.length) {
+          mergeCloudUsersIntoLocal(cloudUsers);
+        }
+      }
+    } catch (err) {
+      console.warn('Firestore fetch users warning:', err);
+    }
+  }
+
+  function setupDirectorUsersLiveSync() {
+    if (!isLiveFirebase || !firestoreService) return;
+    if (directorUsersUnsubscribe) {
+      directorUsersUnsubscribe();
+      directorUsersUnsubscribe = null;
+    }
+    try {
+      directorUsersUnsubscribe = firestoreService.collection('users').onSnapshot((snapshot) => {
+        if (!snapshot || snapshot.empty) return;
+        const cloudUsers = [];
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          if (d && (d.uid || doc.id)) {
+            if (!d.uid) d.uid = doc.id;
+            cloudUsers.push(d);
+          }
+        });
+        if (cloudUsers.length) {
+          mergeCloudUsersIntoLocal(cloudUsers);
+          if (document.getElementById('raed-director-modal') && global.FirebaseAuthManager) {
+            const activeTab = document.querySelector('.director-tab-btn.active');
+            let filter = 'all';
+            if (activeTab) {
+              if (activeTab.textContent.includes('بانتظار')) filter = 'pending';
+              else if (activeTab.textContent.includes('المعتمدون')) filter = 'approved';
+            }
+            global.FirebaseAuthManager.refreshDirectorModal(filter);
+          }
+        }
+      }, (err) => {
+        console.warn('Director live users snapshot warning:', err);
+      });
+    } catch (e) {
+      console.warn('Failed to start director users listener:', e);
+    }
+  }
+
+  function mergeCloudUsersIntoLocal(cloudUsers) {
+    let current = loadUsersDirectory();
+    cloudUsers.forEach(cloudU => {
+      const idx = current.findIndex(x => x.uid === cloudU.uid || (x.email && cloudU.email && x.email.toLowerCase() === cloudU.email.toLowerCase()));
+      if (idx !== -1) {
+        current[idx] = Object.assign({}, current[idx], cloudU);
+      } else {
+        current.push(cloudU);
+      }
+    });
+    usersDirectory = current;
+    saveUsersDirectory(usersDirectory);
+    notifyChange();
   }
 
   function setupLiveSessionSync() {
@@ -132,6 +210,23 @@
             const localSess = safeStorage.getItem(LOCAL_SESSION_KEY);
             if (fresh.activeSessionId && localSess && fresh.activeSessionId !== localSess) {
               forceLogoutDueToSessionKick(`تم رصد تسجيل دخول جديد لحسابك من (${fresh.lastLoginDevice || 'جهاز جديد'}).\n\nحفاظاً على أمان الحساب ومنع مشاركة الحسابات، يُسمح بجلسة نشطة واحدة فقط. تم تسجيل الخروج تلقائياً من هذا الجهاز.`);
+              return;
+            }
+
+            // Real-time detection of role change (Pending -> Approved)
+            if (fresh.role && currentUser && fresh.role !== currentUser.role) {
+              currentUser.role = fresh.role;
+              currentUser.approvedAt = fresh.approvedAt;
+              saveCurrentUser(currentUser);
+              notifyChange();
+              if (fresh.role === 'approved') {
+                if (global.FirebaseAuthManager && typeof global.FirebaseAuthManager.showToast === 'function') {
+                  global.FirebaseAuthManager.showToast('🎉 تهانينا! تم اعتماد حسابك بنجاح من قبل المدير العام (أ. محمد عبدالله جمعة). كافة الدروس متاحة لك الآن!', 'success');
+                }
+                if (global.Platform && typeof global.Platform.renderCurrentView === 'function') {
+                  global.Platform.renderCurrentView();
+                }
+              }
             }
           });
         } catch (err) {
@@ -609,14 +704,26 @@
       usersDirectory = loadUsersDirectory();
       const u = usersDirectory.find(x => x.uid === uid);
       if (u) {
+        const today = new Date().toLocaleDateString('ar-SA');
         u.role = 'approved';
-        u.approvedAt = new Date().toLocaleDateString('ar-SA');
+        u.approvedAt = today;
         saveUsersDirectory(usersDirectory);
 
         if (currentUser.uid === uid) {
           currentUser = u;
           saveCurrentUser(currentUser);
         }
+
+        // Real-Time Cloud Firestore Sync
+        if (isLiveFirebase && firestoreService) {
+          firestoreService.collection('users').doc(uid).set({
+            role: 'approved',
+            approvedAt: today
+          }, { merge: true }).catch(err => {
+            console.warn('Firestore live approve warning:', err);
+          });
+        }
+
         this.showToast(`✓ تم اعتماد المستخدم (${u.displayName}) ومنحه الوصول الكامل بنجاح!`, 'success');
         notifyChange();
         this.refreshDirectorModal();
@@ -639,6 +746,18 @@
           currentUser = u;
           saveCurrentUser(currentUser);
         }
+
+        // Real-Time Cloud Firestore Sync
+        if (isLiveFirebase && firestoreService) {
+          firestoreService.collection('users').doc(uid).set({
+            role: 'pending',
+            approvedAt: null,
+            activeSessionId: null
+          }, { merge: true }).catch(err => {
+            console.warn('Firestore live revoke warning:', err);
+          });
+        }
+
         this.showToast(`تم تعليق اعتماد المستخدم (${u.displayName}).`, 'warning');
         notifyChange();
         this.refreshDirectorModal();
@@ -655,6 +774,15 @@
       if (u) {
         u.activeSessionId = null; // Invalidates the active token
         saveUsersDirectory(usersDirectory);
+
+        // Real-Time Cloud Firestore Sync
+        if (isLiveFirebase && firestoreService) {
+          firestoreService.collection('users').doc(uid).set({
+            activeSessionId: null
+          }, { merge: true }).catch(err => {
+            console.warn('Firestore live terminate session warning:', err);
+          });
+        }
 
         this.showToast(`🔴 تم إنهاء الجلسة النشطة للمستخدم (${u.displayName}) فوراً! سيخرج جهازه تلقائياً.`, 'info');
         this.refreshDirectorModal();
@@ -675,6 +803,14 @@
 
       usersDirectory = usersDirectory.filter(x => x.uid !== uid);
       saveUsersDirectory(usersDirectory);
+
+      // Real-Time Cloud Firestore Sync
+      if (isLiveFirebase && firestoreService) {
+        firestoreService.collection('users').doc(uid).delete().catch(err => {
+          console.warn('Firestore live delete warning:', err);
+        });
+      }
+
       this.showToast('تم حذف المستخدم من الدليل بنجاح.', 'info');
       notifyChange();
       this.refreshDirectorModal();
@@ -701,6 +837,14 @@
       };
       usersDirectory.push(newUser);
       saveUsersDirectory(usersDirectory);
+
+      // Real-Time Cloud Firestore Sync
+      if (isLiveFirebase && firestoreService) {
+        firestoreService.collection('users').doc(newUser.uid).set(newUser).catch(err => {
+          console.warn('Firestore live add preapproved warning:', err);
+        });
+      }
+
       this.showToast(`✓ تم إضافة واعتماد (${name}) بنجاح!`, 'success');
       notifyChange();
       this.refreshDirectorModal();
@@ -797,6 +941,16 @@
 
       this.refreshDirectorModal();
       modal.style.display = 'flex';
+      syncUsersFromCloud().then(() => {
+        this.refreshDirectorModal();
+      });
+    },
+
+    async syncCloudUsersNow() {
+      this.showToast('جاري جلب وتحديث المستخدمين من سحابة Firebase...', 'info');
+      await syncUsersFromCloud();
+      this.refreshDirectorModal();
+      this.showToast('✓ تم تحديث قائمة المستخدمين السحابية بنجاح!', 'success');
     },
 
     refreshDirectorModal(filterRole) {
@@ -842,16 +996,21 @@
               </div>
             </div>
 
-            <!-- Filter Tabs -->
-            <div class="director-tabs-row">
-              <button type="button" class="director-tab-btn ${currentFilter === 'all' ? 'active' : ''}" onclick="window.FirebaseAuthManager.refreshDirectorModal('all')">
-                الكل (${usersDirectory.length})
-              </button>
-              <button type="button" class="director-tab-btn ${currentFilter === 'pending' ? 'active' : ''}" onclick="window.FirebaseAuthManager.refreshDirectorModal('pending')">
-                ⏳ بانتظار الاعتماد (${pendingCount})
-              </button>
-              <button type="button" class="director-tab-btn ${currentFilter === 'approved' ? 'active' : ''}" onclick="window.FirebaseAuthManager.refreshDirectorModal('approved')">
-                ✓ المعتمدون (${approvedCount})
+            <!-- Filter Tabs & Cloud Sync -->
+            <div class="director-tabs-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="director-tab-btn ${currentFilter === 'all' ? 'active' : ''}" onclick="window.FirebaseAuthManager.refreshDirectorModal('all')">
+                  الكل (${usersDirectory.length})
+                </button>
+                <button type="button" class="director-tab-btn ${currentFilter === 'pending' ? 'active' : ''}" onclick="window.FirebaseAuthManager.refreshDirectorModal('pending')">
+                  ⏳ بانتظار الاعتماد (${pendingCount})
+                </button>
+                <button type="button" class="director-tab-btn ${currentFilter === 'approved' ? 'active' : ''}" onclick="window.FirebaseAuthManager.refreshDirectorModal('approved')">
+                  ✓ المعتمدون (${approvedCount})
+                </button>
+              </div>
+              <button type="button" class="nav-btn" onclick="window.FirebaseAuthManager.syncCloudUsersNow()" title="تحديث السجلات من سحابة Firebase مباشرة" style="font-size:0.78rem; padding:4px 10px; background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8;">
+                🔄 تحديث السحابة
               </button>
             </div>
 

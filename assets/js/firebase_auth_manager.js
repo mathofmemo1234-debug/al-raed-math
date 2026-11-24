@@ -479,6 +479,10 @@
       return currentUser;
     },
 
+    getUser() {
+      return currentUser;
+    },
+
     getRole() {
       return currentUser ? currentUser.role : 'visitor';
     },

@@ -470,7 +470,7 @@
     const isApproved = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isApproved === 'function' && window.FirebaseAuthManager.isApproved();
     const isAdmin = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isAdmin === 'function' && window.FirebaseAuthManager.isAdmin();
     const isPending = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isPending === 'function' && window.FirebaseAuthManager.isPending();
-    const currentUser = window.FirebaseAuthManager && window.FirebaseAuthManager.getUser();
+    const currentUser = window.FirebaseAuthManager && (window.FirebaseAuthManager.getCurrentUser ? window.FirebaseAuthManager.getCurrentUser() : (window.FirebaseAuthManager.getUser ? window.FirebaseAuthManager.getUser() : null));
 
     let membershipCardHtml = '';
     if (isAdmin) {
@@ -697,7 +697,7 @@
     }, 50);
 
     // Scroll viewport to top smoothly
-    if (viewportArea) viewportArea.scrollTo({ top: 0, behavior: 'smooth' });
+    if (viewportArea && typeof viewportArea.scrollTo === 'function') viewportArea.scrollTo({ top: 0, behavior: 'smooth' });
     closeSidebarMobile();
   }
 
@@ -1129,6 +1129,9 @@
     const quizStats = state.quizScores[lesson.id] || { answeredCount: 0, correctCount: 0, userAnswers: {} };
     const totalAutoQ = (quiz.mcq || []).length + (quiz.tf || []).length;
     const examApi = window.ExamBuilder;
+    const isApproved = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isApproved === 'function' && window.FirebaseAuthManager.isApproved();
+    const isAdmin = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isAdmin === 'function' && window.FirebaseAuthManager.isAdmin();
+    const isPending = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isPending === 'function' && window.FirebaseAuthManager.isPending();
 
     const topTreeBreadcrumbsHtml = buildBreadcrumbsHtml(pathInfo, lesson);
 

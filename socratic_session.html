@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الجلسة السقراطية التفاعلية للطالب | منصة الرائد التعليمية الذكية للرياضيات</title>
+  <meta name="description" content="بيئة حوارية تفاعلية قائمة على المنهج السقراطي لبناء التفكير الرياضي وتفكيك المفاهيم البديلة - إعداد أ. محمد عبدالله جمعة">
+
+  <!-- Google Fonts: Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --purple: #7c3aed;
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      direction: rtl;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Banner & Header */
+    .session-navbar {
+      background: #ffffff;
+      border-bottom: 1.5px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      font-size: 1.8rem;
+      background: var(--primary-light);
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+    }
+
+    .brand-titles h1 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .brand-titles p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      border-color: var(--border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    /* Container */
+    .session-container {
+      max-width: 920px;
+      margin: 24px auto;
+      padding: 0 16px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Lesson Hero Banner */
+    .lesson-hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lesson-hero::after {
+      content: '🏛️';
+      position: absolute;
+      left: 20px;
+      bottom: -15px;
+      font-size: 6.5rem;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .hero-badge {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(4px);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .lesson-hero h2 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .lesson-hero p {
+      font-size: 0.95rem;
+      opacity: 0.92;
+      max-width: 680px;
+    }
+
+    /* Progress Tracker */
+    .step-tracker {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .step-item.active {
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .step-item.completed {
+      color: var(--success);
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .step-item.active .step-num {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .step-item.completed .step-num {
+      background: var(--success);
+      color: #ffffff;
+    }
+
+    /* Stage Cards */
+    .stage-section {
+      display: none;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .stage-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stage-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .stage-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background: #f1f5f9;
+    }
+
+    .stage-header h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .stage-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Stage 1: Inquiry Question */
+    .inquiry-display-box {
+      background: #eff6ff;
+      border-right: 5px solid var(--primary);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+
+    .inquiry-display-box .inq-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .inquiry-display-box .inq-text {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #1e3a8a;
+      line-height: 1.6;
+    }
+
+    .student-input-box {
+      margin-top: 16px;
+    }
+
+    .student-input-box label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .student-textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      direction: rtl;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .student-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    /* Stage 2: Socratic Live Dialogue */
+    .dialogue-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .dialogue-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+
+    .dialogue-card.teacher {
+      border-right: 4px solid var(--primary);
+      background: #f8fafc;
+    }
+
+    .dialogue-card.student {
+      border-right: 4px solid var(--purple);
+      background: #faf5ff;
+    }
+
+    .speaker-avatar {
+      font-size: 1.8rem;
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .dialogue-body {
+      flex: 1;
+    }
+
+    .dialogue-speaker {
+      font-weight: 800;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .dialogue-card.teacher .dialogue-speaker { color: var(--primary); }
+    .dialogue-card.student .dialogue-speaker { color: var(--purple); }
+
+    .dialogue-speech {
+      font-size: 1.05rem;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    /* Stage 3: Misconception Buster */
+    .buster-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .buster-layout { grid-template-columns: 1fr; }
+      .step-tracker { overflow-x: auto; }
+    }
+
+    .buster-col {
+      padding: 18px 20px;
+      border-radius: 12px;
+      border: 1.5px solid transparent;
+    }
+
+    .buster-col.wrong {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+
+    .buster-col.right {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+    }
+
+    .buster-col-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .buster-col.wrong .buster-col-title { color: var(--danger); }
+    .buster-col.right .buster-col-title { color: var(--success); }
+
+    .buster-col-body {
+      font-size: 0.98rem;
+      line-height: 1.7;
+    }
+
+    /* Stage 4: Probing Checklist */
+    .probing-checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .probing-check-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .probing-check-card:hover {
+      background: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .probing-check-card input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 3px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .probing-check-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    /* Stage 5: Certificate / Mastery Card */
+    .mastery-cert {
+      border: 3px double #cbd5e1;
+      border-radius: 16px;
+      padding: 28px;
+      background: linear-gradient(to bottom, #ffffff, #f8fafc);
+      text-align: center;
+      position: relative;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 20px;
+    }
+
+    .cert-crown {
+      font-size: 3rem;
+      margin-bottom: 8px;
+    }
+
+    .cert-title {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #1e3a8a;
+      margin-bottom: 6px;
+    }
+
+    .cert-student-name {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin: 12px 0;
+      padding: 4px 16px;
+      border-bottom: 2px dashed var(--border);
+      display: inline-block;
+    }
+
+    .cert-desc {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 16px;
+      line-height: 1.7;
+    }
+
+    .cert-metadata-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin: 16px 0;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      .cert-metadata-grid { grid-template-columns: 1fr; }
+    }
+
+    .cert-footer-sig {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+
+    .sig-box {
+      text-align: center;
+    }
+
+    .sig-name {
+      font-weight: 800;
+      color: #1e3a8a;
+    }
+
+    /* Actions Footer */
+    .stage-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1.5px solid var(--border);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Print styles */
+    @media print {
+      body { background: #ffffff; }
+      .session-navbar, .step-tracker, .stage-actions, .btn { display: none !important; }
+      .lesson-hero { color: #000000; background: none; border: 1px solid #000000; box-shadow: none; }
+      .stage-section { display: block !important; border: 1px solid #ccc; page-break-inside: avoid; }
+      .mastery-cert { border: 2px solid #000; box-shadow: none; page-break-before: always; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="session-navbar">
+    <div class="nav-brand-group">
+      <div class="brand-icon">🏛️</div>
+      <div class="brand-titles">
+        <h1>المنهج السقراطي التفاعلي للطالب</h1>
+        <p>منصة الرائد التعليمية الذكية للرياضيات • إعداد أ. محمد عبدالله جمعة</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button type="button" class="btn btn-outline" onclick="copySessionLink()" title="نسخ رابط هذه الجلسة لمشاركته مع الطالب">
+        📋 <span>نسخ الرابط للمشاركة</span>
+      </button>
+      <a href="index.html" class="btn btn-primary" title="الرجوع إلى المنصة التعليمية الرئيسية">
+        🏠 <span>المنصة الرئيسية</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="session-container" id="session-container">
+    
+    <!-- Hero Banner (Rendered dynamically) -->
+    <section class="lesson-hero" id="lesson-hero">
+      <div class="hero-badges" id="hero-badges">
+        <span class="hero-badge">تحميل بيانات الدرس...</span>
+      </div>
+      <h2 id="hero-title">جاري استدعاء الجلسة السقراطية...</h2>
+      <p id="hero-desc">حوار استقصائي معرفي موجه يقود المتعلم لاكتشاف البراهين الرياضية وتفكيك المفاهيم البديلة.</p>
+    </section>
+
+    <!-- Step Progress Tracker -->
+    <nav class="step-tracker" id="step-tracker" aria-label="مراحل الجلسة السقراطية">
+      <div class="step-item active" onclick="goToStage(1)" id="tracker-step-1">
+        <span class="step-num">١</span>
+        <span>السؤال التوليدي</span>
+      </div>
+      <div class="step-item" onclick="goToStage(2)" id="tracker-step-2">
+        <span class="step-num">٢</span>
+        <span>المحاورة السقراطية</span>
+      </div>
+      <div class="step-item" onclick="goToStage(3)" id="tracker-step-3">
+        <span class="step-num">٣</span>
+        <span>تفكيك المأزق</span>
+      </div>
+      <div class="step-item" onclick="goToStage(4)" id="tracker-step-4">
+        <span class="step-num">٤</span>
+        <span>السبر والتعميق</span>
+      </div>
+      <div class="step-item" onclick="goToStage(5)" id="tracker-step-5">
+        <span class="step-num">٥</span>
+        <span>بطاقة الإتقان</span>
+      </div>
+    </nav>
+
+    <!-- Stage 1: Inquiry Question -->
+    <section class="stage-section active" id="stage-1">
+      <div class="stage-header">
+        <div class="stage-icon-badge">❓</div>
+        <div>
+          <h3>المرحلة الأولى: السؤال التوليدي الاستقصائي</h3>
+          <p>تأمل السؤال المحوري الذي يفتح آفاق الدرس وفكر في إجابتك الأولية قبل بدء الحوار.</p>
+        </div>
+      </div>
+
+      <div class="inquiry-display-box">
+        <div class="inq-title">🎯 السؤال الاستقصائي المحوري للدرس:</div>
+        <div class="inq-text" id="stage1-inquiry-text">جاري التحميل...</div>
+      </div>
+
+      <div class="student-input-box">
+        <label for="student-hypothesis">💡 ما هو تخمينك أو رأيك المبدئي تجاه هذا التساؤل؟ (سجل فكرتك لتقارنها بنهاية الحوار):</label>
+        <textarea id="student-hypothesis" class="student-textarea" placeholder="اكتب تأملك الأولي هنا... (مثال: أعتقد أن السبب هو...)"></textarea>
+      </div>
+
+      <div class="stage-actions">
+        <div></div>
+        <button type="button" class="btn btn-primary" onclick="goToStage(2)">
+          <span>تسجيل الفكرة وبدء الحوار السقراطي</span> ◀
+        </button>
+      </div>
+    </section>
+
+    <!-- Stage 2: Socratic Dialogue -->
+    <section class="stage-section" id="stage-2">
+      <div class="stage-header">
+        <div class="stage-icon-badge">💬</div>
+        <div>
+          <h3>المرحلة الثانية: المحاورة السقراطية المعيارية</h3>
+          <p>تتبع خطوات الحوار المنطقي بين المعلم السقراطي والمتعلم المستكشف لفهم جوهر القاعدة الرياضية.</p>
+        </div>
+      </div>
+
+      <div class="dialogue-thread" id="stage2-dialogue-thread">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="stage-actions">
+        <button type="button" class="btn btn-outline" onclick="goToStage(1)">
+          ▶ <span>السابق: السؤال التوليدي</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="goToStage(3)">
+          <span>التالي: تفكيك المأزق المفاهيمي</span> ◀
+        </button>
+      </div>
+    </section>
+
+    <!-- Stage 3: Misconception Buster -->
+    <section class="stage-section" id="stage-3">
+      <div class="stage-header">
+        <div class="stage-icon-badge">⚡</div>
+        <div>
+          <h3>المرحلة الثالثة: تفكيك المأزق المفاهيمي</h3>
+          <p>مقارنة حاسمة تكشف الخطأ الشائع الذي يقع فيه الكثيرون والبرهان الرياضي الدقيق الذي يحميك منه.</p>
+        </div>
+      </div>
+
+      <div class="buster-layout">
+        <div class="buster-col wrong">
+          <div class="buster-col-title">❌ الفهم الخاطئ الشائع (التصور البديل):</div>
+          <div class="buster-col-body" id="stage3-misconception">جاري التحميل...</div>
+        </div>
+        <div class="buster-col right">
+          <div class="buster-col-title">✓ التصحيح والبرهان الرياضي المعتمد:</div>
+          <div class="buster-col-body" id="stage3-correction">جاري التحميل...</div>
+        </div>
+      </div>
+
+      <div class="stage-actions">
+        <button type="button" class="btn btn-outline" onclick="goToStage(2)">
+          ▶ <span>السابق: المحاورة السقراطية</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="goToStage(4)">
+          <span>التالي: أسئلة السبر والتعميق</span> ◀
+        </button>
+      </div>
+    </section>
+
+    <!-- Stage 4: Probing & Reflection -->
+    <section class="stage-section" id="stage-4">
+      <div class="stage-header">
+        <div class="stage-icon-badge">🔍</div>
+        <div>
+          <h3>المرحلة الرابعة: أسئلة السبر والتعميق المعرفي</h3>
+          <p>راجع هذه الأسئلة لتعميق استيعابك للمفهوم وتحقق من قدرتك على الإجابة عليها ذاتياً.</p>
+        </div>
+      </div>
+
+      <div class="probing-checklist" id="stage4-probing-list">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="stage-actions">
+        <button type="button" class="btn btn-outline" onclick="goToStage(3)">
+          ▶ <span>السابق: تفكيك المأزق</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="goToStage(5)">
+          <span>التالي: إصدار بطاقة الإتقان السقراطي</span> ◀
+        </button>
+      </div>
+    </section>
+
+    <!-- Stage 5: Mastery Certificate -->
+    <section class="stage-section" id="stage-5">
+      <div class="stage-header">
+        <div class="stage-icon-badge">🏆</div>
+        <div>
+          <h3>المرحلة الخامسة: بطاقة إتقان الحوار السقراطي</h3>
+          <p>أدخل اسمك الكريم لتوثيق إتمامك لجلسة التعلّم السقراطي التفاعلية وحفظ بطاقة الإتقان.</p>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-bottom:20px; align-items:center; flex-wrap:wrap;">
+        <div style="flex:1; min-width:240px;">
+          <label style="display:block; font-size:0.88rem; font-weight:700; margin-bottom:4px;">👤 اسم الطالب / الطالبة:</label>
+          <input type="text" id="cert-student-input" class="student-textarea" style="min-height:auto; height:44px;" placeholder="اكتب اسمك الثلاثي هنا..." oninput="updateCertName()">
+        </div>
+        <div style="flex:1; min-width:200px;">
+          <label style="display:block; font-size:0.88rem; font-weight:700; margin-bottom:4px;">🏫 المدرسة / الصف:</label>
+          <input type="text" id="cert-school-input" class="student-textarea" style="min-height:auto; height:44px;" value="المدارس المتقدمة للتعلم الذكي بجدة" oninput="updateCertSchool()">
+        </div>
+      </div>
+
+      <div class="mastery-cert" id="printable-cert">
+        <div class="cert-crown">🏅</div>
+        <div class="cert-title">بطاقة إتقان الحوار السقراطي الرياضي</div>
+        <div style="font-size:0.9rem; color:var(--text-muted); font-weight:700;">منصة الرائد التعليمية الذكية للرياضيات</div>
+
+        <div class="cert-student-name" id="cert-display-name">بطل الرياضيات المستكشف</div>
+
+        <div class="cert-desc" id="cert-display-desc">
+          أتم بنجاح جلسة الحوار والاستقصاء السقراطي، وأظهر كفاءة متميزة في التفكير الناقد وتفكيك المفاهيم البديلة وتطبيق الخطوات المنطقية لحل المسائل الرياضية.
+        </div>
+
+        <div class="cert-metadata-grid">
+          <div><strong>📌 الدرس:</strong> <span id="cert-meta-lesson">-</span></div>
+          <div><strong>🧭 الفصل:</strong> <span id="cert-meta-chapter">-</span></div>
+          <div><strong>📅 التاريخ:</strong> <span id="cert-meta-date">-</span></div>
+        </div>
+
+        <div class="cert-footer-sig">
+          <div class="sig-box">
+            <div style="font-size:0.8rem; color:var(--text-muted);">إشراف وإعداد خبير الرياضيات</div>
+            <div class="sig-name">أ. محمد عبدالله جمعة</div>
+          </div>
+          <div style="font-size:2.4rem;">🌟</div>
+          <div class="sig-box">
+            <div style="font-size:0.8rem; color:var(--text-muted);">الاعتماد الأكاديمي</div>
+            <div class="sig-name">المدارس المتقدمة للتعلم الذكي</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-actions">
+        <button type="button" class="btn btn-outline" onclick="goToStage(4)">
+          ▶ <span>السابق: السبر والتعميق</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="window.print()">
+          🖨️ <span>طباعة وحفظ بطاقة الإتقان PDF</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Element -->
+  <div class="toast" id="session-toast">
+    <span>✓</span> <span id="toast-msg">تم نسخ الرابط بنجاح!</span>
+  </div>
+
+  <!-- Required Scripts -->
+  <script src="assets/js/arabic_utils.js"></script>
+  <script src="assets/js/grade6_book_data.js"></script>
+  <script src="assets/js/grade1m_book_data.js"></script>
+  <script src="assets/js/curriculum_tree.js"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // 1. Merge all book data into CURRICULUM_DATA
+      if (window.CURRICULUM_DATA && window.CURRICULUM_DATA.lessons) {
+        if (window.GRADE6_BOOK_DATA && window.GRADE6_BOOK_DATA.lessons) {
+          Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE6_BOOK_DATA.lessons);
+        }
+        if (window.GRADE1M_BOOK_DATA && window.GRADE1M_BOOK_DATA.lessons) {
+          Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE1M_BOOK_DATA.lessons);
+        }
+      }
+
+      // 2. Parse URL params to get lesson ID
+      const urlParams = new URLSearchParams(window.location.search);
+      let lessonId = urlParams.get('lesson') || 'g6-t1-c1-l1';
+
+      // Fallback if not found
+      let lesson = (window.CURRICULUM_DATA && window.CURRICULUM_DATA.lessons && window.CURRICULUM_DATA.lessons[lessonId]) || null;
+      if (!lesson) {
+        // Find first available lesson
+        const keys = Object.keys(window.CURRICULUM_DATA.lessons || {});
+        if (keys.length) {
+          lessonId = keys[0];
+          lesson = window.CURRICULUM_DATA.lessons[lessonId];
+        }
+      }
+
+      const utils = window.ArabicUtils || {
+        toEasternDigits: (v) => String(v || ''),
+        renderMathHtml: (v) => String(v || '')
+      };
+
+      // 3. Find lesson path in curriculum tree for breadcrumbs
+      function findLessonPath(lid) {
+        if (!window.CURRICULUM_DATA || !window.CURRICULUM_DATA.stages) return null;
+        for (const stage of window.CURRICULUM_DATA.stages) {
+          for (const grade of stage.grades) {
+            for (const term of grade.terms) {
+              for (const ch of (term.chapters || [])) {
+                for (const ls of (ch.lessons || [])) {
+                  if (ls.id === lid) {
+                    return { stage, grade, term, chapter: ch, lesson: ls };
+                  }
+                }
+              }
+            }
+          }
+        }
+        return null;
+      }
+
+      const pathInfo = findLessonPath(lessonId);
+
+      // 4. Render Hero and Socratic Data
+      function initSession() {
+        if (!lesson) return;
+        const s = lesson.socratic || {};
+
+        // Title and Breadcrumbs
+        const gradeName = pathInfo ? pathInfo.grade.name : '';
+        const chapterName = pathInfo ? pathInfo.chapter.title : (lesson.chapter || '');
+        const pagesStr = lesson.pages ? `صفحات الكتاب: ${utils.toEasternDigits(lesson.pages)}` : '';
+
+        const badgesEl = document.getElementById('hero-badges');
+        badgesEl.innerHTML = `
+          ${gradeName ? `<span class="hero-badge">🎓 ${gradeName}</span>` : ''}
+          ${chapterName ? `<span class="hero-badge">📖 ${chapterName}</span>` : ''}
+          ${pagesStr ? `<span class="hero-badge">📄 ${pagesStr}</span>` : ''}
+          <span class="hero-badge" style="background:rgba(245, 158, 11, 0.35);">🏛️ المنهج السقراطي</span>
+        `;
+
+        document.getElementById('hero-title').innerText = `الدرس ${utils.toEasternDigits(lesson.number)}: ${lesson.title}`;
+
+        // Stage 1: Inquiry Question
+        const inqEl = document.getElementById('stage1-inquiry-text');
+        inqEl.innerHTML = utils.renderMathHtml(s.inquiry_question || 'كيف يمثل هذا الدرس مدخلاً لفهم النماذج الرياضية في واقع الحياة؟');
+
+        // Stage 2: Socratic Dialogue
+        const dialogueList = s.dialogue || [];
+        const threadEl = document.getElementById('stage2-dialogue-thread');
+        threadEl.innerHTML = dialogueList.map(turn => `
+          <div class="dialogue-card ${turn.role || 'teacher'}">
+            <div class="speaker-avatar">${turn.avatar || (turn.role === 'teacher' ? '🏛️' : '🎓')}</div>
+            <div class="dialogue-body">
+              <div class="dialogue-speaker">${turn.speaker}</div>
+              <div class="dialogue-speech">${utils.renderMathHtml(turn.text)}</div>
+            </div>
+          </div>
+        `).join('');
+
+        // Stage 3: Misconception Buster
+        const mb = s.misconception_buster || {};
+        document.getElementById('stage3-misconception').innerHTML = utils.renderMathHtml(mb.misconception || s.conceptual_dilemma || 'الاعتماد على الحفظ الآلي دون الاستيعاب المنطقي للبرهان.');
+        document.getElementById('stage3-correction').innerHTML = utils.renderMathHtml(mb.correction || 'الفهم المنهجي يبدأ بالتحليل والتخطيط المنطقي ثم الحل والتحقق التام من معقولية الناتج.');
+
+        // Stage 4: Probing Questions
+        const probingList = s.probing_questions || [];
+        const probingEl = document.getElementById('stage4-probing-list');
+        probingEl.innerHTML = probingList.map((q, idx) => `
+          <label class="probing-check-card">
+            <input type="checkbox" onchange="checkProbingProgress()">
+            <span class="probing-check-text">${utils.renderMathHtml(q)}</span>
+          </label>
+        `).join('');
+
+        // Stage 5: Certificate Metadata
+        document.getElementById('cert-meta-lesson').innerText = `${utils.toEasternDigits(lesson.number)} - ${lesson.title}`;
+        document.getElementById('cert-meta-chapter').innerText = chapterName || '-';
+
+        const today = new Date();
+        const hijriYear = 1448;
+        const dateStr = `${utils.toEasternDigits(today.getDate())} / ${utils.toEasternDigits(today.getMonth() + 1)} / ${utils.toEasternDigits(hijriYear)} هـ`;
+        document.getElementById('cert-meta-date').innerText = dateStr;
+      }
+
+      // Stage Navigation
+      window.goToStage = function (stageNum) {
+        for (let i = 1; i <= 5; i++) {
+          const sec = document.getElementById('stage-' + i);
+          const trk = document.getElementById('tracker-step-' + i);
+          if (sec) sec.classList.toggle('active', i === stageNum);
+          if (trk) {
+            trk.classList.toggle('active', i === stageNum);
+            if (i < stageNum) trk.classList.add('completed');
+          }
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // Certificate dynamic updates
+      window.updateCertName = function () {
+        const input = document.getElementById('cert-student-input');
+        const display = document.getElementById('cert-display-name');
+        display.innerText = (input && input.value.trim()) || 'بطل الرياضيات المستكشف';
+      };
+
+      window.updateCertSchool = function () {
+        const input = document.getElementById('cert-school-input');
+        // optional live update
+      };
+
+      window.checkProbingProgress = function () {
+        const checks = document.querySelectorAll('#stage4-probing-list input[type="checkbox"]');
+        const checked = document.querySelectorAll('#stage4-probing-list input[type="checkbox"]:checked');
+        if (checks.length && checked.length === checks.length) {
+          showToast('🎉 رائع! أتممت مراجعة جميع أسئلة السبر والتعميق المعرفي.');
+        }
+      };
+
+      // Copy session link to clipboard
+      window.copySessionLink = function () {
+        const url = window.location.href;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(() => {
+            showToast('✓ تم نسخ رابط الجلسة السقراطية التفاعلية بنجاح!');
+          }).catch(() => fallbackCopy(url));
+        } else {
+          fallbackCopy(url);
+        }
+      };
+
+      function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('✓ تم نسخ رابط الجلسة السقراطية التفاعلية بنجاح!');
+      }
+
+      function showToast(msg) {
+        const toast = document.getElementById('session-toast');
+        const msgEl = document.getElementById('toast-msg');
+        if (toast && msgEl) {
+          msgEl.innerText = msg;
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+      }
+
+      // Initialize on load
+      window.addEventListener('DOMContentLoaded', initSession);
+    })();
+  </script>
+</body>
+</html>

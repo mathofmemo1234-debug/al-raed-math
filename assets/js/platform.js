@@ -13,7 +13,7 @@
   const state = {
     currentLessonId: 'g6-t1-c1-l1',
     activeView: 'cockpit', // 'cockpit' | 'question-bank' | 'exam-builder' | 'visual-tree' | 'suites' | 'vault' | 'builder'
-    activeLessonTab: 'objectives', // 'objectives' | 'plan' | 'summary' | 'worksheet' | 'tools' | 'quiz' | 'downloads'
+    activeLessonTab: 'prep', // 'prep' | 'summary' | 'worksheet' | 'socratic' | 'tools' | 'quiz' | 'downloads'
     termFilter: 'all',
     searchQuery: '',
     quizScores: {}, // lessonId -> { answeredCount, correctCount, userAnswers: {} }
@@ -129,6 +129,13 @@
     mergeBookData();
     if (window.ExamBuilder && window.ExamBuilder.updateBadge) {
       window.ExamBuilder.updateBadge();
+    }
+
+    if (window.FirebaseAuthManager) {
+      window.FirebaseAuthManager.onAuthStateChanged(() => {
+        renderTree();
+        renderCurrentView();
+      });
     }
 
     setupEventListeners();
@@ -440,7 +447,7 @@
             let chapterMatches = false;
             let lessonsHtml = '';
 
-            (chapter.lessons || []).forEach(lesson => {
+            (chapter.lessons || []).forEach((lesson, lIdx) => {
               const fullLesson = window.CURRICULUM_DATA.lessons[lesson.id];
               const title = fullLesson ? fullLesson.title : lesson.title;
               const matchesSearch = !state.searchQuery || 
@@ -455,16 +462,20 @@
 
                 const isCompleted = lesson.status === 'completed' || (fullLesson && fullLesson.status === 'completed');
                 const isActive = state.currentLessonId === lesson.id;
+                const isUnlocked = window.FirebaseAuthManager ? window.FirebaseAuthManager.isLessonUnlocked(chapter, lIdx) : true;
 
                 lessonsHtml += `
-                  <div class="tree-lesson-item ${isActive ? 'active' : ''}" onclick="window.Platform.selectLesson('${lesson.id}')" title="${escHtml(title)}">
+                  <div class="tree-lesson-item ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked-lesson' : ''}" onclick="window.Platform.selectLesson('${lesson.id}')" title="${escHtml(title)}${!isUnlocked ? ' (مخصص للأعضاء المعتمدين - المعاينة لدرسين)' : ''}">
                     <span style="display:flex; align-items:center; gap:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                       <span class="lesson-status-dot ${isCompleted ? 'completed' : 'roadmap'}"></span>
                       <span style="font-weight:700; color:${isActive ? '#ffffff' : (isCompleted ? '#e2e8f0' : '#cbd5e1')}">${lesson.number}</span>
                       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</span>
                     </span>
-                    <span style="font-size:0.62rem; flex-shrink:0; color:${isActive ? '#ffffff' : (isCompleted ? '#86efac' : '#fcd34d')};">
-                      ${isCompleted ? '✓' : 'قيد الإدراج'}
+                    <span style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                      ${!isUnlocked ? '<span class="tree-lock-badge" title="هذا الدرس متاح للأعضاء المعتمدين والمدير">🔒</span>' : ''}
+                      <span style="font-size:0.62rem; color:${isActive ? '#ffffff' : (isCompleted ? '#86efac' : '#fcd34d')};">
+                        ${isCompleted ? '✓' : 'قيد الإدراج'}
+                      </span>
                     </span>
                   </div>
                 `;
@@ -717,10 +728,47 @@
   }
 
   function copyLessonQuestionToWord(lessonId, type, idx) {
+    const path = findLessonPath(lessonId);
+    if (path && window.FirebaseAuthManager) {
+      const lIdx = (path.chapter.lessons || []).findIndex(l => l.id === lessonId);
+      if (!window.FirebaseAuthManager.isLessonUnlocked(path.chapter, lIdx >= 0 ? lIdx : 0)) {
+        window.FirebaseAuthManager.showToast('🔒 ميزة نسخ الأسئلة إلى Word مخصصة للأعضاء المعتمدين والمدير العام. يرجى تسجيل الدخول للحصول على الاعتماد.', 'warning');
+        window.FirebaseAuthManager.openAuthModal();
+        return;
+      }
+    }
     const lesson = window.CURRICULUM_DATA.lessons[lessonId];
     const qObj = buildLessonQuestionPayload(lesson, type, idx);
     if (qObj && window.ArabicUtils) {
       window.ArabicUtils.copyQuestionsToWord([qObj], { includeAnswers: false, numbered: false });
+    }
+  }
+
+  function copySocraticStudentLink(lessonId) {
+    const base = window.location.href.split('?')[0].split('#')[0].replace(/index\.html$/, '');
+    const cleanBase = base.endsWith('/') ? base : (base + '/');
+    const fullUrl = cleanBase + 'socratic_session.html?lesson=' + encodeURIComponent(lessonId);
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        if (window.ArabicUtils && window.ArabicUtils.showToast) {
+          window.ArabicUtils.showToast('✓ تم نسخ رابط الجلسة السقراطية التفاعلية للطالب بنجاح!', 'success');
+        }
+      }).catch(() => fallbackCopyText(fullUrl));
+    } else {
+      fallbackCopyText(fullUrl);
+    }
+  }
+
+  function fallbackCopyText(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (window.ArabicUtils && window.ArabicUtils.showToast) {
+      window.ArabicUtils.showToast('✓ تم نسخ رابط الجلسة السقراطية التفاعلية للطالب بنجاح!', 'success');
     }
   }
 
@@ -738,6 +786,15 @@
   }
 
   function addAllLessonQuestionsToExam(lessonId) {
+    const path = findLessonPath(lessonId);
+    if (path && window.FirebaseAuthManager) {
+      const lIdx = (path.chapter.lessons || []).findIndex(l => l.id === lessonId);
+      if (!window.FirebaseAuthManager.isLessonUnlocked(path.chapter, lIdx >= 0 ? lIdx : 0)) {
+        window.FirebaseAuthManager.showToast('🔒 ميزة إضافة الأسئلة لمنشئ الاختبارات مخصصة للأعضاء المعتمدين والمدير العام.', 'warning');
+        window.FirebaseAuthManager.openAuthModal();
+        return;
+      }
+    }
     const lesson = window.CURRICULUM_DATA.lessons[lessonId];
     if (!lesson || !window.ExamBuilder) return;
     const all = [];
@@ -748,36 +805,7 @@
     renderLessonCockpit();
   }
 
-  // ================= Render Lesson Cockpit =================
-  function renderLessonCockpit() {
-    const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
-    if (!lesson) {
-      renderUnfinishedLessonPlaceholder(state.currentLessonId);
-      return;
-    }
-
-    const isG6 = isFullBookLesson(lesson);
-    const quiz = lesson.quiz || { mcq: [], tf: [], essay: [] };
-    const essays = quiz.essay || [];
-    const quizStats = state.quizScores[lesson.id] || { answeredCount: 0, correctCount: 0, userAnswers: {} };
-    const totalAutoQ = (quiz.mcq || []).length + (quiz.tf || []).length;
-    const examApi = window.ExamBuilder;
-
-    const lessonIdeaHtml = (lesson.lesson_idea || (lesson.vocabulary && lesson.vocabulary.length)) ? `
-      <div class="lesson-idea-box" style="background:var(--bg-page); border:1px solid var(--border-light); border-right:4px solid var(--primary); border-radius:8px; padding:14px 16px; margin-bottom:18px;">
-        ${lesson.lesson_idea ? `<div style="margin-bottom:8px;"><strong>💡 فكرة الدرس:</strong> ${lesson.lesson_idea}</div>` : ''}
-        ${(lesson.vocabulary && lesson.vocabulary.length) ? `
-          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
-            <strong>🏷️ المفردات:</strong>
-            ${lesson.vocabulary.map(v => `<span class="qb-pill chapter-pill">${v}</span>`).join('')}
-          </div>
-        ` : ''}
-      </div>
-    ` : '';
-
-    const pathInfo = findLessonPath(lesson.id);
-    let topTreeBreadcrumbsHtml = '';
-    
+  function buildBreadcrumbsHtml(pathInfo, lesson) {
     if (pathInfo) {
       const { stage, grade, term, chapter } = pathInfo;
       const allLessons = getAllLessonsList();
@@ -823,7 +851,7 @@
         </div>
       `).join('');
 
-      topTreeBreadcrumbsHtml = `
+      return `
         <nav class="tree-breadcrumb-nav" aria-label="المسار التعليمي الهرمي">
           <div class="tree-crumb-root-label">
             <span>🧭 المسار التعليمي:</span>
@@ -888,19 +916,128 @@
           </div>
         </nav>
       `;
-    } else {
-      topTreeBreadcrumbsHtml = `
-        <div class="breadcrumb-trail">
-          <span>🏫 ${lesson.stage || ''}</span>
-          <span>/</span>
-          <span>🎓 ${lesson.grade || ''}</span>
-          <span>/</span>
-          <span>📅 ${lesson.term || ''}</span>
-          <span>/</span>
-          <span>📖 ${lesson.chapter || ''}</span>
-        </div>
-      `;
     }
+    return `
+      <div class="breadcrumb-trail">
+        <span>🏫 ${lesson.stage || ''}</span>
+        <span>/</span>
+        <span>🎓 ${lesson.grade || ''}</span>
+        <span>/</span>
+        <span>📅 ${lesson.term || ''}</span>
+        <span>/</span>
+        <span>📖 ${lesson.chapter || ''}</span>
+      </div>
+    `;
+  }
+
+  function renderVisitorLockedLessonGate(lesson, pathInfo) {
+    if (!viewportArea) return;
+    const isG6 = isFullBookLesson(lesson);
+    const topTreeBreadcrumbsHtml = buildBreadcrumbsHtml(pathInfo, lesson);
+
+    const currentUser = window.FirebaseAuthManager ? window.FirebaseAuthManager.getCurrentUser() : null;
+    const isPending = currentUser && currentUser.role === 'pending';
+
+    viewportArea.innerHTML = `
+      <div class="lesson-cockpit-header">
+        ${topTreeBreadcrumbsHtml}
+        <div class="lesson-header-main">
+          <div class="lesson-title-area">
+            <h2>الدرس ${fmtNum(lesson.number, isG6)}: ${lesson.title}</h2>
+            <div class="lesson-subtitle">${lesson.english_title ? (lesson.english_title + ' • ') : ''}صفحات الكتاب المدرسي: ${fmtNum(lesson.pages, isG6)}</div>
+            <div class="lesson-meta-badges">
+              <span class="meta-badge red">🔒 محتوى مخصص للأعضاء المعتمدين</span>
+              <span class="meta-badge">📖 ${lesson.chapter || ''}</span>
+              <span class="meta-badge">💡 إشراف: أ. محمد عبدالله جمعة</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="locked-lesson-container">
+        <div class="locked-shield-card">
+          <div class="locked-shield-icon">🔒</div>
+          <h3 class="locked-shield-title">هذا الدرس مخصص للأعضاء المعتمدين</h3>
+          
+          <div class="locked-shield-notice">
+            <strong>📢 سياسة وصول الزوار والمعاينة النموذجية:</strong>
+            <p style="margin-top:6px; line-height:1.7;">
+              يُتاح لزوار المنصة الكرام استعراض <strong>أول درسين مجاناً من كل فصل دراسي</strong> كعينة معاينة شاملة لكافة المحتويات والأنشطة والتحضير الميداني والاختبارات.
+            </p>
+            <p style="margin-top:6px; line-height:1.7;">
+              للوصول إلى هذا الدرس (<strong>${lesson.number}: ${lesson.title}</strong>) وبقية دروس المنهج، يرجى تسجيل الدخول بحساب Google أو رقم الجوال ليتم اعتماد حسابك من قبل المدير العام (أ. محمد عبدالله جمعة).
+            </p>
+          </div>
+
+          ${isPending ? `
+            <div class="pending-approval-banner">
+              <span style="font-size:2rem;">⏳</span>
+              <div>
+                <strong style="color:#b45309; font-size:1.05rem;">حسابك قيد المراجعة والاعتماد من قبل المدير العام:</strong>
+                <p style="margin-top:4px; color:#475569; line-height:1.6;">مرحباً بك (${escHtml(currentUser.displayName)}). تم تسجيل طلب اعتمادك بنجاح وهو قيد المراجعة حالياً من قبل خبير الرياضيات والمدير العام (أ. محمد عبدالله جمعة). ستتاح لك كافة الدروس والخصائص فور الاعتماد.</p>
+              </div>
+            </div>
+          ` : `
+            <div class="locked-action-btns">
+              <button type="button" class="nav-btn primary large" onclick="window.FirebaseAuthManager.openAuthModal()">
+                🔑 <span>تسجيل الدخول / طلب اعتماد الحساب</span>
+              </button>
+              <button type="button" class="nav-btn large director" onclick="window.FirebaseAuthManager.signInAsDirector()">
+                👑 <span>دخول المدير العام (أ. محمد عبدالله جمعة)</span>
+              </button>
+            </div>
+          `}
+
+          <div class="locked-features-list">
+            <h4 style="color:#1e3a8a; font-weight:800; margin-bottom:12px;">مزايا الحساب المعتمد والوصول الإداري:</h4>
+            <div class="features-check-grid">
+              <div class="feat-item">✓ وصول غير محدود لكافة دروس كتب الرياضيات (سادس ابتدائي + أول متوسط) بالفصلين الأول والثاني.</div>
+              <div class="feat-item">✓ التحضير الميداني الشامل المعتمد بـ ٦ محطات متكاملة وتوزيع زمني واقعي (٤٥ دقيقة).</div>
+              <div class="feat-item">✓ استوديو توليد التحضير بالذكاء الاصطناعي مع تخصيص زمن الحصة والأنماط التدريسية.</div>
+              <div class="feat-item">✓ نسخ التحضير الميداني والأسئلة بضغطة زر إلى Word بصيغة جداول رسمية جاهزة للطباعة.</div>
+              <div class="feat-item">✓ بنك الأسئلة الشامل ومنشئ الاختبارات مع نماذج الإجابة وسلم الدرجات.</div>
+              <div class="feat-item">✓ حماية فائقة للحساب من المشاركة عبر تقنية الجلسة النشطة الواحدة (Single Active Session).</div>
+            </div>
+          </div>
+
+          <div style="margin-top:22px; text-align:center;">
+            <button type="button" class="nav-btn" onclick="window.Platform.goToPrevLesson()">
+              ◀ الانتقال للدرس السابق (أحد الدروس المفتوحة للمعاينة)
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ================= Render Lesson Cockpit =================
+  function renderLessonCockpit() {
+    const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
+    if (!lesson) {
+      renderUnfinishedLessonPlaceholder(state.currentLessonId);
+      return;
+    }
+
+    const pathInfo = findLessonPath(lesson.id);
+    let isLessonUnlocked = true;
+    if (pathInfo && window.FirebaseAuthManager) {
+      const lIdx = (pathInfo.chapter.lessons || []).findIndex(l => l.id === lesson.id);
+      isLessonUnlocked = window.FirebaseAuthManager.isLessonUnlocked(pathInfo.chapter, lIdx >= 0 ? lIdx : 0);
+    }
+
+    if (!isLessonUnlocked) {
+      renderVisitorLockedLessonGate(lesson, pathInfo);
+      return;
+    }
+
+    const isG6 = isFullBookLesson(lesson);
+    const quiz = lesson.quiz || { mcq: [], tf: [], essay: [] };
+    const essays = quiz.essay || [];
+    const quizStats = state.quizScores[lesson.id] || { answeredCount: 0, correctCount: 0, userAnswers: {} };
+    const totalAutoQ = (quiz.mcq || []).length + (quiz.tf || []).length;
+    const examApi = window.ExamBuilder;
+
+    const topTreeBreadcrumbsHtml = buildBreadcrumbsHtml(pathInfo, lesson);
 
     let html = `
       <!-- Cockpit Header Banner -->
@@ -912,9 +1049,9 @@
             <div class="lesson-subtitle">${lesson.english_title ? (lesson.english_title + ' • ') : ''}صفحات الكتاب المدرسي: ${fmtNum(lesson.pages, isG6)}</div>
             <div class="lesson-meta-badges">
               <span class="meta-badge green">✓ ${lesson.badge || 'مكتمل وشامل'}</span>
+              <span class="meta-badge" onclick="window.Platform.switchLessonTab('prep')" style="cursor:pointer;" title="الانتقال إلى التحضير الميداني الشامل">📋 التحضير الميداني المعتمد</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('socratic')" style="cursor:pointer;" title="الانتقال إلى منصة سقراط التوليدية">🏛️ منصة سقراط الحوارية</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('tools')" style="cursor:pointer;" title="الانتقال إلى الأدوات والمختبر التفاعلي">🛠️ ${(lesson.lesson_tools && lesson.lesson_tools.title) ? lesson.lesson_tools.title.split('(')[0].trim() : 'أدوات الدرس الذكية'}</span>
-              <span class="meta-badge">🎯 ${fmtNum(lesson.objectives.length, true)} أهداف تعليمية</span>
               <span class="meta-badge orange">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
               <span class="meta-badge">💡 إشراف: أ. محمد عبدالله جمعة</span>
             </div>
@@ -928,11 +1065,8 @@
 
       <!-- Navigation Tabs for the Lesson -->
       <div class="lesson-nav-tabs">
-        <button class="lesson-tab-button ${state.activeLessonTab === 'objectives' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('objectives')">
-          🎯 نواتج التعلم والأهداف الشاملة
-        </button>
-        <button class="lesson-tab-button ${state.activeLessonTab === 'plan' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('plan')">
-          📋 خطة التدريس STEM (الخماسية)
+        <button class="lesson-tab-button ${state.activeLessonTab === 'prep' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('prep')">
+          📋 التحضير الميداني الشامل المعتمد
         </button>
         <button class="lesson-tab-button ${state.activeLessonTab === 'summary' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('summary')">
           📚 الملخص ومطوية المفاهيم
@@ -951,66 +1085,9 @@
         </button>
       </div>
 
-      <!-- Tab 1: Objectives -->
-      <div class="tab-pane-content ${state.activeLessonTab === 'objectives' ? 'active' : ''}" id="tab-objectives">
-        <div class="objectives-card">
-          <div class="card-section-title">
-            <span>🎯 نواتج التعلم والأهداف المعيارية للدرس</span>
-          </div>
-          ${lessonIdeaHtml}
-          <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:18px;">
-            تمت صياغة هذه الأهداف لتغطي كافة المستويات المعرفية والمهارية وفق معايير وزارة التعليم وهيئة تقويم التعليم والتدريب:
-          </p>
-          <div class="objectives-grid">
-            ${lesson.objectives.map((obj, i) => `
-              <div class="objective-item">
-                <span class="obj-number">${fmtNum(i + 1, true)}</span>
-                <span>${fmtNum(obj, isG6)}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab 2: Lesson Plan STEM 5Es -->
-      <div class="tab-pane-content ${state.activeLessonTab === 'plan' ? 'active' : ''}" id="tab-plan">
-        <div class="plan-container">
-          <div class="plan-5e-card">
-            <div class="plan-5e-header">
-              <span class="plan-5e-icon engage">🔥</span>
-              <span class="plan-5e-title">١. مرحلة الانخراط والتهيئة</span>
-            </div>
-            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.engage, isG6)}</div>
-          </div>
-          <div class="plan-5e-card">
-            <div class="plan-5e-header">
-              <span class="plan-5e-icon explore">🔍</span>
-              <span class="plan-5e-title">٢. مرحلة الاستكشاف التعاوني</span>
-            </div>
-            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.explore, isG6)}</div>
-          </div>
-          <div class="plan-5e-card">
-            <div class="plan-5e-header">
-              <span class="plan-5e-icon explain">💡</span>
-              <span class="plan-5e-title">٣. مرحلة الشرح والتفسير المعرفي</span>
-            </div>
-            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.explain, isG6)}</div>
-          </div>
-          <div class="plan-5e-card">
-            <div class="plan-5e-header">
-              <span class="plan-5e-icon elaborate">🚀</span>
-              <span class="plan-5e-title">٤. مرحلة الإثراء والتوسع وتكامل العلوم والرياضيات</span>
-            </div>
-            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.elaborate, isG6)}</div>
-          </div>
-          <div class="plan-5e-card">
-            <div class="plan-5e-header">
-              <span class="plan-5e-icon evaluate">📊</span>
-              <span class="plan-5e-title">٥. مرحلة التقويم والتغذية الراجعة</span>
-            </div>
-            <div class="plan-5e-body">${fmtNum(lesson.plan_5es.evaluate, isG6)}</div>
-          </div>
-        </div>
+      <!-- Tab 1: Comprehensive Field Lesson Preparation (Master Unified Standard) -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'prep' ? 'active' : ''}" id="tab-prep">
+        ${window.LessonPrepManager ? window.LessonPrepManager.renderPane(lesson) : ''}
       </div>
 
       <!-- Tab 3: Summary & Concept Guide -->
@@ -1381,6 +1458,30 @@
             </div>
           </div>
         ` : ''}
+
+        <!-- Standalone Interactive Socratic Session Link for Students -->
+        <div class="socratic-card socratic-student-share-card">
+          <div class="socratic-card-header" style="align-items:flex-start;">
+            <span class="socratic-icon" style="background:#eff6ff; font-size:1.8rem; padding:8px; border-radius:10px; border:1px solid #bfdbfe;">🚀</span>
+            <div style="flex:1;">
+              <h4 style="font-size:1.15rem; font-weight:800; color:#1e3a8a; margin-bottom:4px;">رابط جلسة التعلّم السقراطي التفاعلية للطالب</h4>
+              <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.6;">رابط تفاعلي مستقل وخاص بهذا الدرس يمكن نسخه وإرساله للطالب (عبر واتساب / كلاس روم / تيمز / منصة مدرستي) لدراسة الدرس ذاتياً عبر الحوار السقراطي وتفكيك المفاهيم الخاطئة والحصول على بطاقة إتقان معتمدة.</p>
+            </div>
+          </div>
+          <div class="socratic-share-actions-row">
+            <div class="socratic-url-display" title="رابط جلسة الطالب التفاعلية">
+              <span>socratic_session.html?lesson=${encodeURIComponent(lesson.id)}</span>
+            </div>
+            <div class="socratic-share-btns">
+              <button type="button" class="nav-btn primary" onclick="window.Platform.copySocraticStudentLink('${lesson.id}')">
+                📋 <span>نسخ رابط الطالب للمشاركة</span>
+              </button>
+              <a href="socratic_session.html?lesson=${encodeURIComponent(lesson.id)}" target="_blank" class="nav-btn" style="background:#ffffff; border:1.5px solid #cbd5e1; color:#0f172a; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                🔗 <span>فتح الجلسة التفاعلية ↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -1818,11 +1919,14 @@
     toggleAllSolutions,
     saveNewLesson,
     copyLessonQuestionToWord,
+    copySocraticStudentLink,
     toggleLessonQuestionInExam,
     addAllLessonQuestionsToExam,
     openImageLightbox,
     closeImageLightbox,
-    runToolAction
+    runToolAction,
+    findLessonPath,
+    renderCurrentView
   };
 
 })();

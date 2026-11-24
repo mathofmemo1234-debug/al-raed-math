@@ -16,8 +16,31 @@
   };
   const CHOICE_LETTERS = ['أ', 'ب', 'ج', 'د', 'هـ', 'و'];
   const WORD_CHOICE_LETTERS = ['أ', 'ب', 'جـ', 'د', 'هـ', 'و'];
+  const SECONDARY_CHOICE_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
   const RLM = '\u200F';
+  const LRM = '\u200E';
   const _clipboardImageCache = Object.create(null);
+
+  /**
+   * فحص ما إذا كان السياق أو الكتاب أو الدرس ينتمي إلى المرحلة الثانوية
+   * حيث تعتمد المرحلة الثانوية الأرقام الإنجليزية حصراً واتجاه LTR للمعادلات
+   */
+  function isSecondaryStage(val) {
+    if (!val) return false;
+    if (typeof val === 'string') {
+      return val === 'g1s' || val === '1s' || val === 'secondary' || val === 'المرحلة الثانوية' || val.startsWith('g1s');
+    }
+    if (typeof val === 'object') {
+      if (val.isSecondary || val.secondary) return true;
+      if (val.id && (val.id === 'g1s' || val.id.startsWith('g1s'))) return true;
+      if (val.bookId && (val.bookId === 'g1s' || val.bookId === '1s')) return true;
+      if (val.gradeId && (val.gradeId === 'g1s' || val.gradeId === '1s')) return true;
+      if (val.lessonId && val.lessonId.startsWith('g1s')) return true;
+      if (val.stage && (val.stage === 'المرحلة الثانوية' || val.stage.includes('ثانوي'))) return true;
+      if (val.grade && val.grade.includes('الثانوي')) return true;
+    }
+    return false;
+  }
 
   /**
    * تحويل جميع الأرقام الإنجليزية (0-9) إلى أرقام عربية مشرقية (٠-٩)
@@ -31,6 +54,24 @@
     return str.replace(/[0-9]/g, function (d) {
       return EASTERN_DIGITS[Number(d)];
     });
+  }
+
+  /**
+   * تحويل جميع الأرقام العربية المشرقية (٠-٩) والفاصلة (٫) إلى أرقام إنجليزية (0-9)
+   * معتمد حصراً في المرحلة الثانوية
+   */
+  function toWesternDigits(input) {
+    if (input === null || input === undefined) return '';
+    return String(input).replace(/[٠-٩٫]/g, function (ch) {
+      return EASTERN_TO_WESTERN_MAP[ch] || ch;
+    });
+  }
+
+  /**
+   * تنسيق الأرقام وفق المرحلة الدراسية: إنجليزية للثانوية ومشرقية للابتدائية والمتوسطة
+   */
+  function formatStageDigits(input, isSecondary) {
+    return isSecondary ? toWesternDigits(input) : toEasternDigits(input);
   }
 
   const UNICODE_SUP_TO_EASTERN_MAP = {
@@ -74,12 +115,28 @@
     return s;
   }
 
-  function formatMathForWordHtml(input) {
+  function formatMathForWordHtml(input, opts) {
     if (input === null || input === undefined) return '';
     let s = String(input);
-    if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1)) {
+    const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
+
+    if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('sec-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1)) {
       s = s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
     }
+
+    if (sec) {
+      s = toWesternDigits(s);
+      // الأسس والصيغ الإنجليزية للثانوي في Word
+      s = s.replace(/<span\s+class=["'](?:sec-pow|ar-pow)["']\s*>\s*<span\s+class=["'](?:sec-base|ar-base)["']>([\s\S]*?)<\/span>\s*<sup\s+class=["'](?:sec-exp|ar-exp)["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+        return '<span dir="ltr" style="direction:ltr; unicode-bidi:isolate; font-weight:bold;">' + base + '<sup style="font-size:75%; vertical-align:super;">' + exp + '</sup></span>';
+      });
+      // العبارات المحددة كـ sec-math
+      s = s.replace(/<span\s+class=["'][^"']*sec-math[^"']*["'][^>]*>([\s\S]*?)<\/span>/gi, function (_, inner) {
+        return '<span dir="ltr" style="direction:ltr; unicode-bidi:isolate; font-family:\'Times New Roman\',serif; font-style:italic; font-weight:bold;">' + inner + '</span>';
+      });
+      return s;
+    }
+
     const powers = [];
     s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const ph = '___ARPOW' + numToAlpha(powers.length) + '___';
@@ -109,11 +166,19 @@
   }
 
   /**
-   * تنسيق الدرجة بصيغة عربية مشرقية دقيقة
+   * تنسيق الدرجة بصيغة دقيقة (مشرقية للابتدائي والمتوسط، وإنجليزية للثانوي)
    */
-  function formatMark(num) {
+  function formatMark(num, isSecondary) {
     const val = toWesternNumber(num, 1);
     const rounded = Math.round(val * 100) / 100;
+    if (isSecondary) {
+      if (rounded === 1) return '1 درجة';
+      if (rounded === 2) return '2 درجتان';
+      if (rounded >= 3 && rounded <= 10 && Number.isInteger(rounded)) {
+        return rounded + ' درجات';
+      }
+      return rounded + ' درجة';
+    }
     if (rounded === 1) return '١ درجة';
     if (rounded === 2) return 'درجتان';
     const numStr = toEasternDigits(String(rounded));
@@ -123,9 +188,12 @@
     return numStr + ' درجة';
   }
 
-  function formatMarkShort(num) {
+  function formatMarkShort(num, isSecondary) {
     const val = toWesternNumber(num, 0);
     const rounded = Math.round(val * 100) / 100;
+    if (isSecondary) {
+      return String(rounded);
+    }
     return toEasternDigits(String(rounded));
   }
 
@@ -161,14 +229,52 @@
 
   /**
    * صياغة وعرض نصوص الأسئلة والخيارات والحلول بصيغة HTML آمنة
-   * تضمن وضع الأس أعلى يسار الأساس وبالأرقام العربية المشرقية دون تسريب وسوم خام
+   * تضمن في المرحلة الابتدائية والمتوسطة: الأرقام العربية المشرقية والأسس RTL
+   * وفي المرحلة الثانوية: الأرقام الإنجليزية حصراً والمعادلات LTR والشرح RTL المتوازن
    */
-  function renderMathHtml(input) {
+  function renderMathHtml(input, opts) {
     if (input === null || input === undefined) return '';
     let s = String(input);
-    if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1)) {
+    const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
+
+    if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('sec-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1)) {
       s = s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
     }
+
+    if (sec) {
+      // المرحلة الثانوية: أرقام إنجليزية (0-9) حصراً + اتجاه LTR للمعادلات والرموز الجبرية
+      s = toWesternDigits(s);
+      const secTags = [];
+      s = s.replace(/<span\s+[^>]*>[\s\S]*?<\/span>/gi, function (fullTag) {
+        const ph = '___SECTAG' + numToAlpha(secTags.length) + '___';
+        secTags.push(fullTag);
+        return ph;
+      });
+
+      // صياغة الأسس الإنجليزية مثل x^2 أو (x+3)^2
+      s = s.replace(/(\(-?[0-9a-zA-Z\s\+\-\*\/=]+\)|[0-9a-zA-Z]+)\s*\^\s*([0-9a-zA-Z]+)/g, function (_, base, exp) {
+        return '<span class="sec-pow" dir="ltr"><span class="sec-base">' + escapeHtml(base) + '</span><sup class="sec-exp">' + escapeHtml(exp) + '</sup></span>';
+      });
+
+      // صياغة العبارات والمعادلات الإنجليزية المباشرة مثل y = 2x + 1 أو DE = 8x - 3 أو m∠A + m∠B = 90° إذا لم تكن مضمنة في وسم
+      s = s.replace(/(?<![\w\>])([A-Z][a-zA-Z0-9_\'\^\*\+\-\/\s\=∠≅△°~><]{2,}[A-Za-z0-9°])(?![\w\<])/g, function (match) {
+        if (match.indexOf('___SECTAG') !== -1 || match.indexOf('sec-pow') !== -1) return match;
+        // إذا كان تعبيراً رياضياً يحتوي على رمز رياضي أو مساواة
+        if (/[=\+\-∠≅△°~><^]/.test(match) && !/[أ-ي]/.test(match)) {
+          return '<span class="sec-math ltr-math" dir="ltr">' + match + '</span>';
+        }
+        return match;
+      });
+
+      secTags.forEach(function (tag, i) {
+        const ph = '___SECTAG' + numToAlpha(i) + '___';
+        s = s.split(ph).join(tag);
+      });
+
+      return s;
+    }
+
+    // المرحلة الابتدائية والمتوسطة: الأرقام العربية المشرقية والأسس على يسار الأساس
     const powers = [];
     s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const ph = '___ARPOW' + numToAlpha(powers.length) + '___';
@@ -202,9 +308,18 @@
    * تحويل وسوم الأسس إلى نص عادي آمن للحافظة النصية والمحررات العادية
    * يمنع تسريب أي وسوم HTML نهائياً
    */
-  function stripMathToPlain(input) {
+  function stripMathToPlain(input, opts) {
     if (input === null || input === undefined) return '';
     let s = String(input);
+    const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
+    if (sec) {
+      s = s.replace(/<span\s+class=["'](?:sec-pow|ar-pow)["']\s*>\s*<span\s+class=["'](?:sec-base|ar-base)["']>([\s\S]*?)<\/span>\s*<sup\s+class=["'](?:sec-exp|ar-exp)["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+        const b = toWesternDigits(String(base || '').replace(/<[^>]+>/g, '').trim());
+        const e = toWesternDigits(String(exp || '').replace(/<[^>]+>/g, '').trim());
+        return b + '^' + e;
+      });
+      return toWesternDigits(s.replace(/<[^>]+>/g, '').trim());
+    }
     s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const b = toEasternDigits(String(base || '').replace(/<[^>]+>/g, '').trim());
       const e = toEasternDigits(String(exp || '').replace(/<[^>]+>/g, '').trim());
@@ -221,11 +336,20 @@
 
   /**
    * تحويل السؤال إلى صيغة قابلة للتحرير المريح داخل حقل التعديل (textarea)
-   * بحيث يرى المعلم كلم^٢ أو ٥^٢ بدلاً من وسوم HTML المعقدة
+   * بحيث يرى المعلم كلم^٢ أو ٥^٢ بدلاً من وسوم HTML المعقدة (أو صيغ إنجليزية للثانوي)
    */
-  function stripMathToInputText(input) {
+  function stripMathToInputText(input, opts) {
     if (input === null || input === undefined) return '';
     let s = String(input);
+    const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
+    if (sec) {
+      s = s.replace(/<span\s+class=["'](?:sec-pow|ar-pow)["']\s*>\s*<span\s+class=["'](?:sec-base|ar-base)["']>([\s\S]*?)<\/span>\s*<sup\s+class=["'](?:sec-exp|ar-exp)["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+        const b = toWesternDigits(String(base || '').replace(/<[^>]+>/g, '').trim());
+        const e = toWesternDigits(String(exp || '').replace(/<[^>]+>/g, '').trim());
+        return b + '^' + e;
+      });
+      return toWesternDigits(s.replace(/<[^>]+>/g, '').trim());
+    }
     s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const b = toEasternDigits(String(base || '').replace(/<[^>]+>/g, '').trim());
       const e = toEasternDigits(String(exp || '').replace(/<[^>]+>/g, '').trim());
@@ -251,7 +375,11 @@
     const s = String(src).trim();
     if (!s || /^data:/i.test(s) || /^https?:/i.test(s)) return s;
     if (typeof window !== 'undefined' && window.location && /^https?:$/i.test(window.location.protocol)) {
-      return window.location.origin + '/' + s.replace(/^\/+/, '');
+      try {
+        return new URL(s.replace(/^\/+/, ''), window.location.href).href;
+      } catch (e) {
+        return window.location.origin + '/' + s.replace(/^\/+/, '');
+      }
     }
     return s;
   }
@@ -326,7 +454,7 @@
     return result;
   }
 
-  function buildWordFigHtml(q, imageMap) {
+  function buildWordFigHtml(q, imageMap, isSecondary) {
     if (!q || !q.image) return '';
     const mapped = imageMap && imageMap[q.image];
     const srcUrl = mapped && mapped.dataUrl ? mapped.dataUrl : toClipboardUrl(q.image);
@@ -334,39 +462,46 @@
     const dimAttrs = (mapped && mapped.width && mapped.height)
       ? (' width="' + mapped.width + '" height="' + mapped.height + '"')
       : '';
+    const isSec = !!isSecondary || isSecondaryStage(q);
+    const fmtCap = formatStageDigits(q.imageCaption || '', isSec);
     const cap = q.imageCaption
-      ? ('<div style="font-size:10pt; color:#475569; margin-top:2pt;">' + escapeHtml(toEasternDigits(q.imageCaption)) + '</div>')
+      ? ('<div style="font-size:10pt; color:#475569; margin-top:2pt;">' + escapeHtml(fmtCap) + '</div>')
       : '';
+    const altText = formatStageDigits(q.imageCaption || 'شكل السؤال', isSec);
     return (
       '<div style="text-align:center; margin:4pt 0 2pt 0;">' +
-      '<img src="' + escapeHtml(srcUrl) + '" alt="' + escapeHtml(toEasternDigits(q.imageCaption || 'شكل السؤال')) + '"' +
+      '<img src="' + escapeHtml(srcUrl) + '" alt="' + escapeHtml(altText) + '"' +
       dimAttrs + ' style="max-width:290px; max-height:175px; height:auto; border:1px solid #cbd5e1;" />' +
       cap +
       '</div>'
     );
   }
 
-  function buildWordAnswerLine(q, qType) {
+  function buildWordAnswerLine(q, qType, opts) {
+    const isSec = !!(opts && opts.isSecondary);
     if (qType === 'mcq' && typeof q.correct === 'number') {
-      const corrLetter = WORD_CHOICE_LETTERS[q.correct] || 'أ';
-      const corrText = formatMathForWordHtml((q.options && q.options[q.correct]) || '');
-      const expText = q.explanation ? (' — ' + formatMathForWordHtml(q.explanation)) : '';
+      const letters = isSec ? SECONDARY_CHOICE_LETTERS : WORD_CHOICE_LETTERS;
+      const corrLetter = letters[q.correct] || (isSec ? 'A' : 'أ');
+      const corrText = formatMathForWordHtml((q.options && q.options[q.correct]) || '', opts);
+      const expText = q.explanation ? (' — ' + formatMathForWordHtml(q.explanation, opts)) : '';
       return '<strong>الإجابة النموذجية:</strong> ' + corrLetter + ') ' + corrText + expText;
     }
     if (qType === 'tf') {
       const tfAns = q.is_true ? 'صواب (✓)' : 'خطأ (✗)';
-      const expText = q.explanation ? (' — ' + formatMathForWordHtml(q.explanation)) : '';
+      const expText = q.explanation ? (' — ' + formatMathForWordHtml(q.explanation, opts)) : '';
       return '<strong>الإجابة النموذجية:</strong> ' + tfAns + expText;
     }
     if (q.ans) {
-      return '<strong>الحل النموذجي:</strong> ' + formatMathForWordHtml(q.ans);
+      return '<strong>الحل النموذجي:</strong> ' + formatMathForWordHtml(q.ans, opts);
     }
     return '';
   }
 
-  function buildClipboardHeaderHtml(header, totalMarks, imageMap) {
+  function buildClipboardHeaderHtml(header, totalMarks, imageMap, isSecondary) {
     if (!header) return '';
     const h = header;
+    const isSec = !!isSecondary || isSecondaryStage(h);
+    const fmtD = function (v) { return formatStageDigits(v || '', isSec); };
     const includeLogo = h.includeLogo !== false;
     const rawLogo = h.customLogoDataUrl || 'assets/img/logo.png';
     const logoObj = includeLogo ? ((imageMap && imageMap[rawLogo]) || { dataUrl: toClipboardUrl(rawLogo), width: 72, height: 72 }) : null;
@@ -380,17 +515,17 @@
       '<table dir="rtl" cellspacing="0" cellpadding="4" style="width:100%; border-collapse:collapse; border-bottom:3px solid #3F9E35; margin-bottom:6pt; ' + fontStyle + '">' +
       '<tr>' +
       '<td style="width:36%; text-align:center; vertical-align:middle; border:none; font-size:11pt; font-weight:bold; line-height:1.45;">' +
-      '<div>' + escapeHtml(toEasternDigits(h.ministry || 'المملكة العربية السعودية')) + '</div>' +
-      '<div>' + escapeHtml(toEasternDigits(h.district || '')) + '</div>' +
-      (h.schoolCompany ? '<div>' + escapeHtml(toEasternDigits(h.schoolCompany)) + '</div>' : '') +
-      '<div>' + escapeHtml(toEasternDigits(h.school || '')) + '</div>' +
-      (h.stage ? '<div>' + escapeHtml(toEasternDigits(h.stage)) + '</div>' : '') +
+      '<div>' + escapeHtml(fmtD(h.ministry || 'المملكة العربية السعودية')) + '</div>' +
+      '<div>' + escapeHtml(fmtD(h.district || '')) + '</div>' +
+      (h.schoolCompany ? '<div>' + escapeHtml(fmtD(h.schoolCompany)) + '</div>' : '') +
+      '<div>' + escapeHtml(fmtD(h.school || '')) + '</div>' +
+      (h.stage ? '<div>' + escapeHtml(fmtD(h.stage)) + '</div>' : '') +
       '</td>' +
       '<td style="width:40%; text-align:center; vertical-align:middle; border:none;">' +
       (moeObj.dataUrl ? '<div style="margin-bottom:4pt;"><img src="' + escapeHtml(moeObj.dataUrl) + '" width="' + (moeObj.width || 92) + '" style="max-height:52px; width:auto;" /></div>' : '') +
-      '<div style="font-size:13pt; font-weight:bold;">' + escapeHtml(toEasternDigits(h.examTitle || '')) + '</div>' +
-      '<div style="font-size:10.5pt;">المادة: ' + escapeHtml(toEasternDigits(h.subject || 'الرياضيات')) + ' • الصف: ' + escapeHtml(toEasternDigits(h.grade || '')) + ' • الفصل: ' + escapeHtml(toEasternDigits(h.term || '')) + '</div>' +
-      '<div style="font-size:10.5pt;">العام الدراسي: ' + escapeHtml(toEasternDigits(h.year || '')) + ' • الزمن: ' + escapeHtml(toEasternDigits(h.duration || '')) + '</div>' +
+      '<div style="font-size:13pt; font-weight:bold;">' + escapeHtml(fmtD(h.examTitle || '')) + '</div>' +
+      '<div style="font-size:10.5pt;">المادة: ' + escapeHtml(fmtD(h.subject || 'الرياضيات')) + ' • الصف: ' + escapeHtml(fmtD(h.grade || '')) + ' • الفصل: ' + escapeHtml(fmtD(h.term || '')) + '</div>' +
+      '<div style="font-size:10.5pt;">العام الدراسي: ' + escapeHtml(fmtD(h.year || '')) + ' • الزمن: ' + escapeHtml(fmtD(h.duration || '')) + '</div>' +
       '</td>' +
       '<td style="width:24%; text-align:center; vertical-align:middle; border:none;">' +
       (logoObj && logoObj.dataUrl ? '<img src="' + escapeHtml(logoObj.dataUrl) + '" width="' + Math.min(82, logoObj.width || 72) + '" style="max-width:82px; max-height:76px; width:auto; height:auto;" />' : '') +
@@ -403,32 +538,34 @@
       '<td rowspan="2" style="width:18%; border:1px solid #000; padding:0; vertical-align:middle;">' +
       '<table dir="rtl" cellspacing="0" cellpadding="2" style="width:100%; border-collapse:collapse;">' +
       '<tr><td style="border-bottom:1px solid #000; background:#F2F2F2; text-align:center; font-size:10pt; font-weight:bold;">الدرجة</td></tr>' +
-      '<tr><td style="text-align:center; font-size:13pt; font-weight:bold;">&nbsp;&nbsp;&nbsp; / ' + escapeHtml(formatMarkShort(totalMarks)) + '</td></tr>' +
+      '<tr><td style="text-align:center; font-size:13pt; font-weight:bold;">&nbsp;&nbsp;&nbsp; / ' + escapeHtml(formatMarkShort(totalMarks, isSec)) + '</td></tr>' +
       '</table></td></tr>' +
       '<tr>' +
       '<td style="border:1px solid #000; background:#F2F2F2; font-weight:bold; text-align:center; font-size:11pt;">الصف</td>' +
-      '<td style="border:1px solid #000; text-align:right; font-size:11pt;">' + escapeHtml(toEasternDigits(h.grade || '')) + ' / ( &nbsp;&nbsp; )</td>' +
+      '<td style="border:1px solid #000; text-align:right; font-size:11pt;">' + escapeHtml(fmtD(h.grade || '')) + ' / ( &nbsp;&nbsp; )</td>' +
       '</tr></table>' +
       '</div>'
     );
   }
 
   function renderClipboardQuestionTableGroup(qType, items, opts, imageMap, startNum) {
+    const isSec = !!(opts && opts.isSecondary);
     const cellFont = "font-family:'Cairo','Traditional Arabic','Arial',sans-serif; font-size:12pt; color:#000000;";
+    const choiceLetters = isSec ? SECONDARY_CHOICE_LETTERS : WORD_CHOICE_LETTERS;
     if (qType === 'mcq') {
       const rows = items.map(function (q, i) {
-        const qNum = opts.numbered ? toEasternDigits(startNum + i) : '١';
-        const qText = formatMathForWordHtml(q.q || q.statement || '');
-        const figHtml = buildWordFigHtml(q, imageMap);
+        const qNum = opts.numbered ? (isSec ? String(startNum + i) : toEasternDigits(startNum + i)) : (isSec ? '1' : '١');
+        const qText = formatMathForWordHtml(q.q || q.statement || '', opts);
+        const figHtml = buildWordFigHtml(q, imageMap, isSec);
         const optArr = Array.isArray(q.options) ? q.options.slice(0, 4) : ['', '', '', ''];
         while (optArr.length < 4) optArr.push('');
         const optCells = optArr.map(function (opt, oIdx) {
           return (
             '<td style="width:4.5%; border:1px solid #000; text-align:center; vertical-align:middle; font-weight:bold; padding:4pt 2pt; ' + cellFont + '">' +
-            (WORD_CHOICE_LETTERS[oIdx] || 'أ') +
+            (choiceLetters[oIdx] || (isSec ? 'A' : 'أ')) +
             '</td>' +
             '<td style="width:19.25%; border:1px solid #000; text-align:right; vertical-align:middle; padding:4pt 6pt; ' + cellFont + '">' +
-            formatMathForWordHtml(opt) +
+            formatMathForWordHtml(opt, opts) +
             '</td>'
           );
         }).join('');
@@ -453,9 +590,9 @@
         'ضع علامة ( ✓ ) أمام العبارة الصحيحة وعلامة ( ✗ ) أمام العبارة الخاطئة:' +
         '</td></tr>';
       const rows = items.map(function (q, i) {
-        const qNum = opts.numbered ? toEasternDigits(startNum + i) : '١';
-        const qText = formatMathForWordHtml(q.statement || q.q || '');
-        const figHtml = buildWordFigHtml(q, imageMap);
+        const qNum = opts.numbered ? (isSec ? String(startNum + i) : toEasternDigits(startNum + i)) : (isSec ? '1' : '١');
+        const qText = formatMathForWordHtml(q.statement || q.q || '', opts);
+        const figHtml = buildWordFigHtml(q, imageMap, isSec);
         return (
           '<tr>' +
           '<td style="width:9%; border:1px solid #000; text-align:center; vertical-align:middle; font-weight:bold; padding:5pt; ' + cellFont + '">' + qNum + '</td>' +
@@ -472,9 +609,9 @@
     }
 
     const rows = items.map(function (q, i) {
-      const qNum = opts.numbered ? toEasternDigits(startNum + i) : '١';
-      const qText = formatMathForWordHtml(q.q || q.statement || '');
-      const figHtml = buildWordFigHtml(q, imageMap);
+      const qNum = opts.numbered ? (isSec ? String(startNum + i) : toEasternDigits(startNum + i)) : (isSec ? '1' : '١');
+      const qText = formatMathForWordHtml(q.q || q.statement || '', opts);
+      const figHtml = buildWordFigHtml(q, imageMap, isSec);
       const lineCount = Math.max(2, Math.min(6, toWesternNumber(q.lines, 3)));
       let linesHtml = '';
       for (let l = 0; l < lineCount; l++) {
@@ -498,13 +635,19 @@
   }
 
   /**
-   * بناء HTML متوافق تماماً مع Microsoft Word بنظام RTL وأرقام مشرقية
+   * بناء HTML متوافق تماماً مع Microsoft Word بنظام RTL
+   * يدعم الأرقام المشرقية للابتدائي والمتوسط، والأرقام الإنجليزية ومعادلات LTR للثانوي
    * مع تضمين الجداول الرسمية والصيغ والصور المضمنة Base64
    */
   function buildWordClipboardHTML(questions, options) {
     const opts = Object.assign({ includeAnswers: false, numbered: true, asTable: true }, options || {});
     const list = Array.isArray(questions) ? questions : [questions];
     const imageMap = opts.imageMap || null;
+
+    if (!opts.isSecondary && list.some(isSecondaryStage)) {
+      opts.isSecondary = true;
+    }
+    const isSec = !!opts.isSecondary;
 
     let totalMarks = 0;
     list.forEach(function (q) {
@@ -513,7 +656,7 @@
 
     const parts = [];
     if (opts.header) {
-      parts.push(buildClipboardHeaderHtml(opts.header, totalMarks, imageMap));
+      parts.push(buildClipboardHeaderHtml(opts.header, totalMarks, imageMap, isSec));
     }
 
     if (Array.isArray(opts.sections) && opts.sections.length) {
@@ -522,13 +665,15 @@
         if (!items.length) return;
         let secMarks = 0;
         items.forEach(function (q) { secMarks += toWesternNumber(q.marks !== undefined ? q.marks : 1, 1); });
+        const secTitle = isSec ? escapeHtml(toWesternDigits(sec.title || 'القسم')) : escapeHtml(toEasternDigits(sec.title || 'القسم'));
+        const markText = escapeHtml(formatMarkShort(secMarks, isSec));
         parts.push(
           '<table dir="rtl" cellspacing="0" cellpadding="4" style="width:100%; border-collapse:collapse; margin:6pt 0 4pt 0; border:none;">' +
           '<tr>' +
-          '<td style="width:82%; text-align:right; font-weight:bold; font-size:12.5pt; border:none;">' + escapeHtml(toEasternDigits(sec.title || 'القسم')) + '</td>' +
+          '<td style="width:82%; text-align:right; font-weight:bold; font-size:12.5pt; border:none;">' + secTitle + '</td>' +
           '<td style="width:18%; border:none; padding:0;">' +
           '<table dir="rtl" cellspacing="0" cellpadding="2" style="width:100%; border-collapse:collapse;">' +
-          '<tr><td style="border:1px solid #000; text-align:center; font-weight:bold; font-size:11pt;">&nbsp;&nbsp;&nbsp; / ' + escapeHtml(formatMarkShort(secMarks)) + '</td></tr>' +
+          '<tr><td style="border:1px solid #000; text-align:center; font-weight:bold; font-size:11pt;">&nbsp;&nbsp;&nbsp; / ' + markText + '</td></tr>' +
           '</table></td></tr></table>'
         );
         let runStart = 1;
@@ -568,9 +713,9 @@
     if (opts.includeAnswers) {
       const ansLines = list.map(function (q, i) {
         const qType = q.type || (q.options ? 'mcq' : (typeof q.is_true === 'boolean' ? 'tf' : 'essay'));
-        const line = buildWordAnswerLine(q, qType);
+        const line = buildWordAnswerLine(q, qType, opts);
         if (!line) return '';
-        const lbl = opts.numbered ? ('س ' + toEasternDigits(i + 1) + ': ') : '';
+        const lbl = opts.numbered ? ('س ' + (isSec ? String(i + 1) : toEasternDigits(i + 1)) + ': ') : '';
         return '<p dir="rtl" style="direction:rtl; text-align:right; margin:2pt 0; color:#047857; font-size:11.5pt;"><strong>' + lbl + '</strong>' + line + '</p>';
       }).filter(Boolean).join('');
       if (ansLines) {
@@ -580,12 +725,14 @@
 
     if (opts.header) {
       const botRib = (imageMap && imageMap['assets/img/exam_bottom_ribbon.png']) || { dataUrl: toClipboardUrl('assets/img/exam_bottom_ribbon.png'), width: 640 };
+      const teacherName = isSec ? escapeHtml(opts.header.teacher || '') : escapeHtml(toEasternDigits(opts.header.teacher || ''));
+      const principalName = isSec ? escapeHtml(opts.header.principal || '') : escapeHtml(toEasternDigits(opts.header.principal || ''));
       parts.push(
         '<div dir="rtl" style="text-align:center; font-weight:bold; font-size:12pt; margin-top:10pt;">انتهت الأسئلة — مع خالص الدعوات بالتوفيق والنجاح</div>' +
         '<table dir="rtl" cellspacing="0" cellpadding="4" style="width:100%; border-collapse:collapse; border:none; margin-top:6pt;">' +
         '<tr>' +
-        '<td style="width:50%; text-align:center; border:none; font-weight:bold; font-size:11.5pt;">معلم المادة<br/>' + escapeHtml(toEasternDigits(opts.header.teacher || '')) + '</td>' +
-        '<td style="width:50%; text-align:center; border:none; font-weight:bold; font-size:11.5pt;">مدير المدرسة<br/>' + escapeHtml(toEasternDigits(opts.header.principal || '')) + '</td>' +
+        '<td style="width:50%; text-align:center; border:none; font-weight:bold; font-size:11.5pt;">معلم المادة<br/>' + teacherName + '</td>' +
+        '<td style="width:50%; text-align:center; border:none; font-weight:bold; font-size:11.5pt;">مدير المدرسة<br/>' + principalName + '</td>' +
         '</tr></table>' +
         (botRib.dataUrl ? '<div style="text-align:center; margin-top:6pt;"><img src="' + escapeHtml(botRib.dataUrl) + '" width="640" style="width:100%; max-height:28px; object-fit:contain;" /></div>' : '')
       );
@@ -604,30 +751,32 @@
   function buildWordClipboardPlain(questions, options) {
     const opts = Object.assign({ includeAnswers: false, numbered: true }, options || {});
     const list = Array.isArray(questions) ? questions : [questions];
+    const isSec = !!(opts.isSecondary || list.some(isSecondaryStage));
+    const letters = isSec ? SECONDARY_CHOICE_LETTERS : CHOICE_LETTERS;
 
     return list.map(function (q, idx) {
-      const qNum = opts.numbered ? ('س ' + toEasternDigits(idx + 1) + ': ') : '';
-      const qText = stripMathToPlain(q.q || q.statement || '');
-      const markText = '(' + formatMark(q.marks !== undefined ? q.marks : 1) + ')';
+      const qNum = opts.numbered ? ('س ' + (isSec ? String(idx + 1) : toEasternDigits(idx + 1)) + ': ') : '';
+      const qText = stripMathToPlain(q.q || q.statement || '', isSec);
+      const markText = '(' + formatMark(q.marks !== undefined ? q.marks : 1, isSec) + ')';
       const qType = q.type || (q.options ? 'mcq' : (typeof q.is_true === 'boolean' ? 'tf' : 'essay'));
 
       const lines = [RLM + qNum + qText + ' ' + markText];
 
       if (qType === 'mcq' && Array.isArray(q.options)) {
         const optsLine = q.options.slice(0, 4).map(function (opt, i) {
-          return (CHOICE_LETTERS[i] || 'أ') + ') ' + stripMathToPlain(opt);
+          return (letters[i] || (isSec ? 'A' : 'أ')) + ') ' + stripMathToPlain(opt, isSec);
         }).join('    ');
         lines.push(RLM + optsLine);
         if (opts.includeAnswers && typeof q.correct === 'number') {
-          const corrLetter = CHOICE_LETTERS[q.correct] || 'أ';
-          const corrText = stripMathToPlain(q.options[q.correct] || '');
-          const exp = q.explanation ? (' — ' + stripMathToPlain(q.explanation)) : '';
+          const corrLetter = letters[q.correct] || (isSec ? 'A' : 'أ');
+          const corrText = stripMathToPlain(q.options[q.correct] || '', isSec);
+          const exp = q.explanation ? (' — ' + stripMathToPlain(q.explanation, isSec)) : '';
           lines.push(RLM + 'الإجابة النموذجية: ' + corrLetter + ') ' + corrText + exp);
         }
       } else if (qType === 'tf') {
         lines.push(RLM + '(   ) صواب        (   ) خطأ');
         if (opts.includeAnswers) {
-          const exp = q.explanation ? (' — ' + stripMathToPlain(q.explanation)) : '';
+          const exp = q.explanation ? (' — ' + stripMathToPlain(q.explanation, isSec)) : '';
           lines.push(RLM + 'الإجابة النموذجية: ' + (q.is_true ? 'صواب' : 'خطأ') + exp);
         }
       } else {
@@ -636,7 +785,7 @@
           lines.push(RLM + '...........................................................................');
         }
         if (opts.includeAnswers && q.ans) {
-          lines.push(RLM + 'الحل النموذجي: ' + stripMathToPlain(q.ans));
+          lines.push(RLM + 'الحل النموذجي: ' + stripMathToPlain(q.ans, isSec));
         }
       }
       return lines.join('\n');
@@ -646,7 +795,7 @@
   /**
    * إشعار عائم غير معطل للمستخدم
    */
-  function showToast(message, type) {
+  function showToast(message, type, isSecondary) {
     if (typeof document === 'undefined' || !document.body) return;
     const toastType = type || 'success';
     let container = document.getElementById('raed-toast-container');
@@ -660,7 +809,7 @@
     const toast = document.createElement('div');
     toast.className = 'raed-toast raed-toast-' + toastType;
     toast.setAttribute('dir', 'rtl');
-    toast.textContent = toEasternDigits(message);
+    toast.textContent = isSecondary ? toWesternDigits(message) : toEasternDigits(message);
     container.appendChild(toast);
 
     setTimeout(function () {
@@ -713,9 +862,12 @@
     }
     optsObj.imageMap = imageMap;
 
+    const isSec = !!(optsObj.isSecondary || list.some(isSecondaryStage));
+    optsObj.isSecondary = isSec;
+
     const html = buildWordClipboardHTML(list, optsObj);
     const plain = buildWordClipboardPlain(list, optsObj);
-    const countStr = toEasternDigits(list.length);
+    const countStr = isSec ? toWesternDigits(list.length) : toEasternDigits(list.length);
 
     // المحاولة الأولى: Clipboard API الحديثة مع صيغتي HTML و Plain Text
     try {
@@ -732,7 +884,8 @@
           list.length === 1
             ? '✓ تم نسخ السؤال بتنسيق Microsoft Word بنجاح!'
             : '✓ تم نسخ ' + countStr + ' أسئلة بتنسيق Microsoft Word بنجاح!',
-          'success'
+          'success',
+          isSec
         );
         return true;
       }
@@ -767,7 +920,8 @@
           list.length === 1
             ? '✓ تم نسخ السؤال بتنسيق Microsoft Word بنجاح!'
             : '✓ تم نسخ ' + countStr + ' أسئلة بتنسيق Microsoft Word بنجاح!',
-          'success'
+          'success',
+          isSec
         );
         return true;
       }
@@ -778,11 +932,11 @@
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(plain);
-        showToast('✓ تم نسخ النص بصيغة RTL.', 'success');
+        showToast('✓ تم نسخ النص بصيغة RTL.', 'success', isSec);
         return true;
       }
     } catch (err3) {
-      showToast('تعذر النسخ التلقائي؛ يرجى التأكد من أذونات الحافظة.', 'error');
+      showToast('تعذر النسخ التلقائي؛ يرجى التأكد من أذونات الحافظة.', 'error', isSec);
     }
     return false;
   }
@@ -791,8 +945,13 @@
     EASTERN_DIGITS: EASTERN_DIGITS,
     CHOICE_LETTERS: CHOICE_LETTERS,
     WORD_CHOICE_LETTERS: WORD_CHOICE_LETTERS,
+    SECONDARY_CHOICE_LETTERS: SECONDARY_CHOICE_LETTERS,
+    isSecondaryStage: isSecondaryStage,
     RLM: RLM,
+    LRM: LRM,
     toEasternDigits: toEasternDigits,
+    toWesternDigits: toWesternDigits,
+    formatStageDigits: formatStageDigits,
     toWesternNumber: toWesternNumber,
     formatMark: formatMark,
     formatMarkShort: formatMarkShort,

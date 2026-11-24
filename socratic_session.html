@@ -621,6 +621,18 @@
       .stage-section { display: block !important; border: 1px solid #ccc; page-break-inside: avoid; }
       .mastery-cert { border: 2px solid #000; box-shadow: none; page-break-before: always; }
     }
+
+    .sec-math, .ltr-math, .sec-pow {
+      direction: ltr !important;
+      unicode-bidi: isolate !important;
+      display: inline-block;
+      font-family: 'Times New Roman', serif;
+    }
+    .sec-pow .sec-exp {
+      font-size: 0.72em;
+      vertical-align: super;
+      line-height: 0;
+    }
   </style>
 </head>
 <body>
@@ -856,10 +868,12 @@
   </div>
 
   <!-- Required Scripts -->
-  <script src="assets/js/arabic_utils.js"></script>
-  <script src="assets/js/grade6_book_data.js"></script>
-  <script src="assets/js/grade1m_book_data.js"></script>
-  <script src="assets/js/curriculum_tree.js"></script>
+  <script src="assets/js/arabic_utils.js?v=20261124_v4"></script>
+  <script src="assets/js/grade6_book_data.js?v=20261124_v4"></script>
+  <script src="assets/js/grade1m_book_data.js?v=20261124_v4"></script>
+  <script src="assets/js/grade3m_book_data.js?v=20261124_v4"></script>
+  <script src="assets/js/grade1s_book_data.js?v=20261124_v4"></script>
+  <script src="assets/js/curriculum_tree.js?v=20261124_v4"></script>
 
   <script>
     (function () {
@@ -872,6 +886,12 @@
         }
         if (window.GRADE1M_BOOK_DATA && window.GRADE1M_BOOK_DATA.lessons) {
           Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE1M_BOOK_DATA.lessons);
+        }
+        if (window.GRADE3M_BOOK_DATA && window.GRADE3M_BOOK_DATA.lessons) {
+          Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE3M_BOOK_DATA.lessons);
+        }
+        if (window.GRADE1S_BOOK_DATA && window.GRADE1S_BOOK_DATA.lessons) {
+          Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE1S_BOOK_DATA.lessons);
         }
       }
 
@@ -892,6 +912,7 @@
 
       const utils = window.ArabicUtils || {
         toEasternDigits: (v) => String(v || ''),
+        toWesternDigits: (v) => String(v || ''),
         renderMathHtml: (v) => String(v || '')
       };
 
@@ -920,11 +941,20 @@
       function initSession() {
         if (!lesson) return;
         const s = lesson.socratic || {};
+        const isSec = lessonId.startsWith('g1s') || (lesson && (lesson.gradeId === 'g1s' || lesson.stageId === 'secondary' || (utils.isSecondaryStage && utils.isSecondaryStage(lesson))));
+        const fmtD = function (v) {
+          const str = v === null || v === undefined ? '' : String(v);
+          return isSec ? (utils.toWesternDigits ? utils.toWesternDigits(str) : str) : utils.toEasternDigits(str);
+        };
+
+        document.querySelectorAll('.step-num').forEach(function (el, idx) {
+          el.textContent = fmtD(idx + 1);
+        });
 
         // Title and Breadcrumbs
-        const gradeName = pathInfo ? pathInfo.grade.name : '';
-        const chapterName = pathInfo ? pathInfo.chapter.title : (lesson.chapter || '');
-        const pagesStr = lesson.pages ? `صفحات الكتاب: ${utils.toEasternDigits(lesson.pages)}` : '';
+        const gradeName = pathInfo ? fmtD(pathInfo.grade.name) : '';
+        const chapterName = pathInfo ? fmtD(pathInfo.chapter.title) : fmtD(lesson.chapter || '');
+        const pagesStr = lesson.pages ? `صفحات الكتاب: ${fmtD(lesson.pages)}` : '';
 
         const badgesEl = document.getElementById('hero-badges');
         badgesEl.innerHTML = `
@@ -934,11 +964,11 @@
           <span class="hero-badge" style="background:rgba(245, 158, 11, 0.35);">🏛️ المنهج السقراطي</span>
         `;
 
-        document.getElementById('hero-title').innerText = `الدرس ${utils.toEasternDigits(lesson.number)}: ${lesson.title}`;
+        document.getElementById('hero-title').innerText = `الدرس ${fmtD(lesson.number)}: ${fmtD(lesson.title)}`;
 
         // Stage 1: Inquiry Question
         const inqEl = document.getElementById('stage1-inquiry-text');
-        inqEl.innerHTML = utils.renderMathHtml(s.inquiry_question || 'كيف يمثل هذا الدرس مدخلاً لفهم النماذج الرياضية في واقع الحياة؟');
+        inqEl.innerHTML = utils.renderMathHtml(s.inquiry_question || 'كيف يمثل هذا الدرس مدخلاً لفهم النماذج الرياضية في واقع الحياة؟', isSec);
 
         // Stage 2: Socratic Dialogue
         const dialogueList = s.dialogue || [];
@@ -947,16 +977,16 @@
           <div class="dialogue-card ${turn.role || 'teacher'}">
             <div class="speaker-avatar">${turn.avatar || (turn.role === 'teacher' ? '🏛️' : '🎓')}</div>
             <div class="dialogue-body">
-              <div class="dialogue-speaker">${turn.speaker}</div>
-              <div class="dialogue-speech">${utils.renderMathHtml(turn.text)}</div>
+              <div class="dialogue-speaker">${fmtD(turn.speaker)}</div>
+              <div class="dialogue-speech">${utils.renderMathHtml(turn.text, isSec)}</div>
             </div>
           </div>
         `).join('');
 
         // Stage 3: Misconception Buster
         const mb = s.misconception_buster || {};
-        document.getElementById('stage3-misconception').innerHTML = utils.renderMathHtml(mb.misconception || s.conceptual_dilemma || 'الاعتماد على الحفظ الآلي دون الاستيعاب المنطقي للبرهان.');
-        document.getElementById('stage3-correction').innerHTML = utils.renderMathHtml(mb.correction || 'الفهم المنهجي يبدأ بالتحليل والتخطيط المنطقي ثم الحل والتحقق التام من معقولية الناتج.');
+        document.getElementById('stage3-misconception').innerHTML = utils.renderMathHtml(mb.misconception || s.conceptual_dilemma || 'الاعتماد على الحفظ الآلي دون الاستيعاب المنطقي للبرهان.', isSec);
+        document.getElementById('stage3-correction').innerHTML = utils.renderMathHtml(mb.correction || 'الفهم المنهجي يبدأ بالتحليل والتخطيط المنطقي ثم الحل والتحقق التام من معقولية الناتج.', isSec);
 
         // Stage 4: Probing Questions
         const probingList = s.probing_questions || [];
@@ -964,17 +994,17 @@
         probingEl.innerHTML = probingList.map((q, idx) => `
           <label class="probing-check-card">
             <input type="checkbox" onchange="checkProbingProgress()">
-            <span class="probing-check-text">${utils.renderMathHtml(q)}</span>
+            <span class="probing-check-text">${utils.renderMathHtml(q, isSec)}</span>
           </label>
         `).join('');
 
         // Stage 5: Certificate Metadata
-        document.getElementById('cert-meta-lesson').innerText = `${utils.toEasternDigits(lesson.number)} - ${lesson.title}`;
+        document.getElementById('cert-meta-lesson').innerText = `${fmtD(lesson.number)} - ${fmtD(lesson.title)}`;
         document.getElementById('cert-meta-chapter').innerText = chapterName || '-';
 
         const today = new Date();
         const hijriYear = 1448;
-        const dateStr = `${utils.toEasternDigits(today.getDate())} / ${utils.toEasternDigits(today.getMonth() + 1)} / ${utils.toEasternDigits(hijriYear)} هـ`;
+        const dateStr = `${fmtD(today.getDate())} / ${fmtD(today.getMonth() + 1)} / ${fmtD(hijriYear)} هـ`;
         document.getElementById('cert-meta-date').innerText = dateStr;
       }
 

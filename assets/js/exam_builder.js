@@ -16,6 +16,18 @@
   const PROFILE_KEYS = ['ministry', 'district', 'schoolCompany', 'school', 'teacher', 'principal', 'includeLogo'];
 
   const BOOK_PRESETS = {
+    g1s: {
+      id: 'g1s',
+      label: 'الأول الثانوي (1 ث)',
+      heroTitle: '📝 منشئ الاختبارات التفاعلي (اختبار فترة / اختبار نهائي) — الصف الأول الثانوي',
+      autogenTitle: '⚡ التوليد المتوازن التلقائي من فصول كتاب «1 ث»',
+      grade: 'الأول الثانوي',
+      stage: 'المرحلة الثانوية',
+      periodTitle: 'اختبار الفترة الأولى — رياضيات 1-1',
+      finalTitle: 'الاختبار النهائي للفصل الدراسي الأول — رياضيات 1-1',
+      periodChapters: ['g1s-t1-c1', 'g1s-t1-c2'],
+      finalChapters: ['g1s-t1-c1', 'g1s-t1-c2', 'g1s-t1-c3', 'g1s-t1-c4']
+    },
     g3m: {
       id: 'g3m',
       label: 'الثالث المتوسط (٣ م)',
@@ -137,6 +149,7 @@
   function makeDefaultHeader(bookId, examType) {
     const preset = getPreset(bookId);
     const isFinal = examType === 'final';
+    const isSec = bookId === 'g1s';
     const base = {
       ministry: 'المملكة العربية السعودية',
       district: 'الإدارة العامة للتعليم بمحافظة جدة',
@@ -147,15 +160,31 @@
       subject: 'الرياضيات',
       grade: preset.grade,
       term: 'الأول',
-      year: '١٤٤٨ هـ',
+      year: isSec ? '1448 هـ' : '١٤٤٨ هـ',
       teacher: 'أ. محمد عبدالله جمعة',
       principal: 'حسين عبد الله أزيبي',
-      duration: isFinal ? 'ساعتان' : '٤٥ دقيقة',
-      instructions: 'أجب عن جميع الأسئلة التالية مستعملاً الأرقام العربية المشرقية، وتأكد من مراجعة إجاباتك قبل التسليم.',
+      duration: isFinal ? 'ساعتان' : (isSec ? '45 دقيقة' : '٤٥ دقيقة'),
+      instructions: isSec
+        ? 'أجب عن جميع الأسئلة التالية مستعملاً الأرقام الإنجليزية المعتمدة في المرحلة الثانوية (0-9)، وتأكد من مراجعة إجاباتك قبل التسليم.'
+        : 'أجب عن جميع الأسئلة التالية مستعملاً الأرقام العربية المشرقية، وتأكد من مراجعة إجاباتك قبل التسليم.',
       includeLogo: true,
       customLogoDataUrl: ''
     };
-    return Object.assign(base, loadSavedProfile());
+    const merged = Object.assign(base, loadSavedProfile());
+    if (isSec) {
+      const utils = getUtils();
+      if (utils && utils.toWesternDigits) {
+        Object.keys(merged).forEach(function (k) {
+          if (typeof merged[k] === 'string' && k !== 'customLogoDataUrl') {
+            merged[k] = utils.toWesternDigits(merged[k]);
+          }
+        });
+      }
+      if (!merged.instructions || merged.instructions.indexOf('المشرقية') !== -1) {
+        merged.instructions = base.instructions;
+      }
+    }
+    return merged;
   }
 
   const initialBookId = (function () {
@@ -163,13 +192,14 @@
       if (typeof localStorage !== 'undefined') {
         const savedBook = localStorage.getItem(ACTIVE_BOOK_STORAGE_KEY);
         if (savedBook && BOOK_PRESETS[savedBook]) {
+          if (savedBook === 'g1s' && global.GRADE1S_BOOK_DATA) return 'g1s';
           if (savedBook === 'g3m' && global.GRADE3M_BOOK_DATA) return 'g3m';
           if (savedBook === 'g1m' && global.GRADE1M_BOOK_DATA) return 'g1m';
           if (savedBook === 'g6' && global.GRADE6_BOOK_DATA) return 'g6';
         }
       }
     } catch (e) { /* ignore */ }
-    return global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6');
+    return global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6'));
   })();
 
   const state = {
@@ -203,16 +233,22 @@
 
   function getBookData(bookId) {
     const bid = bookId || state.bookId;
+    if (bid === 'g1s' && global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (bid === 'g3m' && global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (bid === 'g1m' && global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
-    if (global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
-    if (global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
+    if (bid === 'g6' && global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
+    if (global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
+    if (global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
+    if (global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
     return { chapters: [], flatQuestionBank: [] };
   }
 
   function inferQuestionBookId(q) {
     if (!q) return state.bookId;
+    if (q.gradeId === 'g1s' || (q.lessonId && q.lessonId.indexOf('g1s') === 0) || (q.chapterId && q.chapterId.indexOf('g1s') === 0)) {
+      return 'g1s';
+    }
     if (q.gradeId === 'g3m' || (q.lessonId && q.lessonId.indexOf('g3m') === 0) || (q.chapterId && q.chapterId.indexOf('g3m') === 0)) {
       return 'g3m';
     }
@@ -279,6 +315,19 @@
         const savedProf = loadSavedProfile();
         if (parsed.header) {
           state.header = Object.assign({}, baseHeader, parsed.header, savedProf);
+          if (bid === 'g1s') {
+            const utils = getUtils();
+            if (utils && utils.toWesternDigits) {
+              Object.keys(state.header).forEach(function (k) {
+                if (typeof state.header[k] === 'string' && k !== 'customLogoDataUrl') {
+                  state.header[k] = utils.toWesternDigits(state.header[k]);
+                }
+              });
+            }
+            if (!state.header.instructions || state.header.instructions.indexOf('المشرقية') !== -1) {
+              state.header.instructions = baseHeader.instructions;
+            }
+          }
         } else {
           state.header = baseHeader;
         }
@@ -325,7 +374,10 @@
   function updateBadge() {
     if (typeof document === 'undefined') return;
     const utils = getUtils();
-    const text = utils ? utils.toEasternDigits(state.questions.length) : String(state.questions.length);
+    const isSec = state.bookId === 'g1s';
+    const text = isSec
+      ? (utils ? utils.toWesternDigits(state.questions.length) : String(state.questions.length))
+      : (utils ? utils.toEasternDigits(state.questions.length) : String(state.questions.length));
     const badge = document.getElementById('exam-count-badge');
     if (badge) badge.textContent = text;
     const navBadge = document.getElementById('nav-exam-count-badge');
@@ -355,31 +407,32 @@
     if (!q) return false;
     const utils = getUtils();
     const approved = isUserApproved();
+    const targetBook = inferQuestionBookId(q);
+    const isSec = (targetBook || state.bookId) === 'g1s';
 
-    // قيد الأعضاء غير المعتمدين: ٥ أسئلة كحد أقصى من كل نوع
+    // قيد الأعضاء غير المعتمدين: 5 أسئلة كحد أقصى من كل نوع
     if (!approved) {
       const qType = q.type || 'mcq';
       const countOfType = state.questions.filter(function (item) { return (item.type || 'mcq') === qType; }).length;
       if (countOfType >= 5) {
         if (!silent) {
-          utils.showToast('🔒 لغير الأعضاء المعتمدين: تم بلوغ الحد الأقصى (٥ أسئلة) من نوع (' + getQuestionTypeName(qType) + '). اطلب الاعتماد لإضافة غير محدودة.', 'warning');
+          utils.showToast('🔒 لغير الأعضاء المعتمدين: تم بلوغ الحد الأقصى (' + (isSec ? '5' : '٥') + ' أسئلة) من نوع (' + getQuestionTypeName(qType) + '). اطلب الاعتماد لإضافة غير محدودة.', 'warning', isSec);
         }
         return false;
       }
     }
 
-    const targetBook = inferQuestionBookId(q);
     if (targetBook && BOOK_PRESETS[targetBook] && targetBook !== state.bookId && state.questions.length === 0) {
       saveDraft();
       loadDraft(targetBook);
     }
     if (q.uid && hasQuestion(q.uid)) {
-      if (!silent) utils.showToast('هذا السؤال مضاف بالفعل في قائمة الاختبار.', 'info');
+      if (!silent) utils.showToast('هذا السؤال مضاف بالفعل في قائمة الاختبار.', 'info', isSec);
       return false;
     }
     state.questions.push(cloneQuestionForExam(q));
     saveDraft();
-    if (!silent) utils.showToast('✓ تمت إضافة السؤال إلى منشئ الاختبارات.', 'success');
+    if (!silent) utils.showToast('✓ تمت إضافة السؤال إلى منشئ الاختبارات.', 'success', isSec);
     if (state.container && isActiveInViewport()) render();
     return true;
   }
@@ -402,16 +455,20 @@
       if (addQuestion(q, true)) added++;
     });
 
+    const firstBook = qs && qs[0] ? inferQuestionBookId(qs[0]) : state.bookId;
+    const isSec = (firstBook || state.bookId) === 'g1s';
+    const d = function (v) { return isSec ? String(v) : utils.toEasternDigits(v); };
+
     if (added > 0) {
       if (hitCapCount > 0) {
-        utils.showToast('✓ تمت إضافة ' + utils.toEasternDigits(added) + ' أسئلة. تم إيقاف البقية لبلوغ الحد الأقصى (٥ أسئلة لكل نوع لغير المعتمدين).', 'warning');
+        utils.showToast('✓ تمت إضافة ' + d(added) + ' أسئلة. تم إيقاف البقية لبلوغ الحد الأقصى (' + d(5) + ' أسئلة لكل نوع لغير المعتمدين).', 'warning', isSec);
       } else {
-        utils.showToast('✓ تمت إضافة ' + utils.toEasternDigits(added) + ' أسئلة إلى منشئ الاختبارات.', 'success');
+        utils.showToast('✓ تمت إضافة ' + d(added) + ' أسئلة إلى منشئ الاختبارات.', 'success', isSec);
       }
     } else if (hitCapCount > 0) {
-      utils.showToast('🔒 تعذر إضافة الأسئلة: تم الوصول للحد الأقصى المسموح لغير المعتمدين (٥ أسئلة من كل نوع). اطلب الاعتماد للفتح الكامل.', 'warning');
+      utils.showToast('🔒 تعذر إضافة الأسئلة: تم الوصول للحد الأقصى المسموح لغير المعتمدين (' + d(5) + ' أسئلة من كل نوع). اطلب الاعتماد للفتح الكامل.', 'warning', isSec);
     } else {
-      utils.showToast('جميع الأسئلة المحددة مضافة مسبقاً في الاختبار.', 'info');
+      utils.showToast('جميع الأسئلة المحددة مضافة مسبقاً في الاختبار.', 'info', isSec);
     }
     if (state.container && isActiveInViewport()) render();
   }
@@ -435,6 +492,8 @@
     const preset = getPreset(state.bookId);
     const defaults = makeDefaultHeader(state.bookId, mode);
     const approved = isUserApproved();
+    const isSec = state.bookId === 'g1s';
+    const d = function (v) { return isSec ? String(v) : utils.toEasternDigits(v); };
     state.examType = mode;
     state.header.examTitle = defaults.examTitle;
     state.header.duration = defaults.duration;
@@ -444,13 +503,13 @@
       state.autoGen.mcqCount = approved ? 10 : 5;
       state.autoGen.tfCount = approved ? 5 : 5;
       state.autoGen.essayCount = approved ? 3 : 3;
-      utils.showToast('تم ضبط إعدادات «اختبار الفترة»' + (!approved ? ' (معاينة: ٥ أسئلة للنوع)' : ' (١٠ اختيار + ٥ صواب/خطأ + ٣ مقالي)') + '.', 'info');
+      utils.showToast('تم ضبط إعدادات «اختبار الفترة»' + (!approved ? ' (معاينة: ' + d(5) + ' أسئلة للنوع)' : ' (' + d(10) + ' اختيار + ' + d(5) + ' صواب/خطأ + ' + d(3) + ' مقالي)') + '.', 'info', isSec);
     } else {
       state.autoGen.chapters = preset.finalChapters.slice();
       state.autoGen.mcqCount = approved ? 20 : 5;
       state.autoGen.tfCount = approved ? 10 : 5;
       state.autoGen.essayCount = approved ? 5 : 5;
-      utils.showToast('تم ضبط إعدادات «الاختبار النهائي» الشامل' + (!approved ? ' (معاينة: ٥ أسئلة لكل نوع)' : ' (٤٠ درجة افتراضياً)') + '.', 'info');
+      utils.showToast('تم ضبط إعدادات «الاختبار النهائي» الشامل' + (!approved ? ' (معاينة: ' + d(5) + ' أسئلة لكل نوع)' : ' (' + d(40) + ' درجة افتراضياً)') + '.', 'info', isSec);
     }
     saveDraft();
     render();
@@ -467,10 +526,11 @@
   function setAutoCount(key, val) {
     const utils = getUtils();
     const approved = isUserApproved();
+    const isSec = state.bookId === 'g1s';
     let num = Math.max(0, Math.min(50, Math.round(utils.toWesternNumber(val, 0))));
     if (!approved && num > 5) {
       num = 5;
-      utils.showToast('🔒 لغير الأعضاء المعتمدين: الحد الأقصى هو ٥ أسئلة من كل نوع. يرجى تسجيل الدخول واعتماد الحساب للتوليد غير المحدود.', 'warning');
+      utils.showToast('🔒 لغير الأعضاء المعتمدين: الحد الأقصى هو ' + (isSec ? '5' : '٥') + ' أسئلة من كل نوع. يرجى تسجيل الدخول واعتماد الحساب للتوليد غير المحدود.', 'warning', isSec);
     }
     state.autoGen[key] = num;
     saveDraft();
@@ -538,6 +598,9 @@
     let targetTf = state.autoGen.tfCount;
     let targetEssay = state.autoGen.essayCount;
 
+    const isSec = state.bookId === 'g1s';
+    const d = function (v) { return isSec ? utils.toWesternDigits(v) : utils.toEasternDigits(v); };
+
     if (!approved) {
       let clamped = false;
       if (targetMcq > 5) { targetMcq = 5; clamped = true; }
@@ -547,7 +610,7 @@
         state.autoGen.mcqCount = targetMcq;
         state.autoGen.tfCount = targetTf;
         state.autoGen.essayCount = targetEssay;
-        utils.showToast('🔒 تم ضبط الأعداد إلى ٥ أسئلة لكل نوع (الحد الأقصى لغير الأعضاء المعتمدين).', 'warning');
+        utils.showToast('🔒 تم ضبط الأعداد إلى ' + d(5) + ' أسئلة لكل نوع (الحد الأقصى لغير الأعضاء المعتمدين).', 'warning', isSec);
       }
     }
 
@@ -560,10 +623,11 @@
     saveDraft();
     render();
     utils.showToast(
-      '⚡ تم توليد اختبار متوازن من ' + utils.toEasternDigits(state.questions.length) +
-      ' سؤالاً بمجموع ' + utils.formatMark(getTotalMarks()) + '!' +
-      (!approved ? ' (معاينة: ٥ أسئلة لكل نوع)' : ' (عضو معتمد: توليد كامل غير محدود ✓)'),
-      'success'
+      '⚡ تم توليد اختبار متوازن من ' + d(state.questions.length) +
+      ' سؤالاً بمجموع ' + utils.formatMark(getTotalMarks(), isSec) + '!' +
+      (!approved ? ' (معاينة: ' + d(5) + ' أسئلة لكل نوع)' : ' (عضو معتمد: توليد كامل غير محدود ✓)'),
+      'success',
+      isSec
     );
   }
 
@@ -573,12 +637,13 @@
 
   function updateHeaderField(key, val) {
     const utils = getUtils();
+    const isSec = state.bookId === 'g1s';
     if (key === 'includeLogo') {
       state.header.includeLogo = !!val;
     } else if (key === 'customLogoDataUrl') {
       state.header.customLogoDataUrl = val ? String(val) : '';
     } else {
-      state.header[key] = utils.toEasternDigits(val);
+      state.header[key] = isSec ? utils.toWesternDigits(val) : utils.toEasternDigits(val);
     }
     saveDraft();
     if (state.showPreview) renderPreviewOnly();
@@ -726,40 +791,42 @@
     const utils = getUtils();
     const q = state.questions[idx];
     if (!q) return;
+    const qIsSec = inferQuestionBookId(q) === 'g1s';
+    const normDigits = function (s) { return qIsSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s); };
 
     const textEl = document.getElementById('eb-edit-text-' + idx);
     const marksEl = document.getElementById('eb-edit-marks-' + idx);
     const expEl = document.getElementById('eb-edit-exp-' + idx);
     const capEl = document.getElementById('eb-edit-img-cap-' + idx);
 
-    q.q = utils.formatMathExponents(utils.toEasternDigits((textEl && textEl.value) || q.q));
+    q.q = utils.formatMathExponents(normDigits((textEl && textEl.value) || q.q));
     if (q.type === 'tf') q.statement = q.q;
     q.marks = Math.max(0.5, Math.min(20, utils.toWesternNumber(marksEl && marksEl.value, q.marks || 1)));
-    if (capEl) q.imageCaption = utils.toEasternDigits(capEl.value.trim());
+    if (capEl) q.imageCaption = normDigits(capEl.value.trim());
 
     if (q.type === 'mcq') {
       q.options = [0, 1, 2, 3].map(function (i) {
         const el = document.getElementById('eb-edit-opt-' + idx + '-' + i);
-        return utils.formatMathExponents(utils.toEasternDigits((el && el.value) || ''));
+        return utils.formatMathExponents(normDigits((el && el.value) || ''));
       });
       const radio = document.querySelector('input[name="eb-edit-correct-' + idx + '"]:checked');
       if (radio) q.correct = Number(radio.value);
-      q.explanation = utils.formatMathExponents(utils.toEasternDigits((expEl && expEl.value) || ''));
+      q.explanation = utils.formatMathExponents(normDigits((expEl && expEl.value) || ''));
     } else if (q.type === 'tf') {
       const tfRadio = document.querySelector('input[name="eb-edit-tf-' + idx + '"]:checked');
       if (tfRadio) q.is_true = (tfRadio.value === 'true');
-      q.explanation = utils.formatMathExponents(utils.toEasternDigits((expEl && expEl.value) || ''));
+      q.explanation = utils.formatMathExponents(normDigits((expEl && expEl.value) || ''));
     } else {
       const ansEl = document.getElementById('eb-edit-ans-' + idx);
       const linesEl = document.getElementById('eb-edit-lines-' + idx);
-      q.ans = utils.formatMathExponents(utils.toEasternDigits((ansEl && ansEl.value) || ''));
+      q.ans = utils.formatMathExponents(normDigits((ansEl && ansEl.value) || ''));
       q.lines = Math.max(2, Math.min(6, Math.round(utils.toWesternNumber(linesEl && linesEl.value, 3))));
     }
 
     state.editingIndex = -1;
     saveDraft();
     render();
-    utils.showToast('✓ تم حفظ تعديلات السؤال بنجاح!', 'success');
+    utils.showToast('✓ تم حفظ تعديلات السؤال بنجاح!', 'success', qIsSec);
   }
 
   function toggleCustomModal(open) {
@@ -779,15 +846,19 @@
   function saveCustomQuestion(e) {
     e.preventDefault();
     const utils = getUtils();
+    const isSec = state.bookId === 'g1s';
+    const normDigits = function (s) { return isSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s); };
+    const choiceLetters = (isSec && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : utils.CHOICE_LETTERS;
     const t = state.customType;
-    const text = utils.formatMathExponents(utils.toEasternDigits(document.getElementById('eb-cust-q').value.trim()));
+    const text = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-q').value.trim()));
     const marks = Math.max(0.5, Math.min(20, utils.toWesternNumber(document.getElementById('eb-cust-marks').value, t === 'essay' ? 2 : 1)));
     const capEl = document.getElementById('eb-cust-img-cap');
-    const customCap = capEl ? utils.toEasternDigits(capEl.value.trim()) : '';
+    const customCap = capEl ? normDigits(capEl.value.trim()) : '';
     if (!text) return;
 
     const newQ = {
       uid: 'custom-' + Date.now(),
+      gradeId: state.bookId,
       type: t,
       typeLabel: t === 'mcq' ? 'اختيار من متعدد' : (t === 'tf' ? 'صواب وخطأ' : 'مسألة مقالية'),
       chapterId: 'custom',
@@ -805,18 +876,18 @@
 
     if (t === 'mcq') {
       newQ.options = [0, 1, 2, 3].map(function (i) {
-        return utils.formatMathExponents(utils.toEasternDigits(document.getElementById('eb-cust-opt-' + i).value.trim() || ('خيار ' + utils.CHOICE_LETTERS[i])));
+        return utils.formatMathExponents(normDigits(document.getElementById('eb-cust-opt-' + i).value.trim() || ('خيار ' + choiceLetters[i])));
       });
       const r = document.querySelector('input[name="eb-cust-correct"]:checked');
       newQ.correct = r ? Number(r.value) : 0;
-      newQ.explanation = utils.formatMathExponents(utils.toEasternDigits(document.getElementById('eb-cust-exp').value.trim()));
+      newQ.explanation = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-exp').value.trim()));
     } else if (t === 'tf') {
       newQ.statement = text;
       const r = document.querySelector('input[name="eb-cust-tf"]:checked');
       newQ.is_true = r ? (r.value === 'true') : true;
-      newQ.explanation = utils.formatMathExponents(utils.toEasternDigits(document.getElementById('eb-cust-exp').value.trim()));
+      newQ.explanation = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-exp').value.trim()));
     } else {
-      newQ.ans = utils.formatMathExponents(utils.toEasternDigits(document.getElementById('eb-cust-ans').value.trim()));
+      newQ.ans = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-ans').value.trim()));
       newQ.lines = Math.max(2, Math.min(6, Math.round(utils.toWesternNumber(document.getElementById('eb-cust-lines').value, 3))));
     }
 
@@ -826,7 +897,7 @@
     state.customDraftCaption = '';
     saveDraft();
     render();
-    utils.showToast('✓ تمت إضافة السؤال المخصص إلى الاختبار!', 'success');
+    utils.showToast('✓ تمت إضافة السؤال المخصص إلى الاختبار!', 'success', isSec);
   }
 
   function clearExam() {
@@ -847,6 +918,8 @@
 
   function getExamPayload() {
     return {
+      bookId: state.bookId,
+      isSecondary: state.bookId === 'g1s',
       examType: state.examType,
       header: state.header,
       options: state.options,
@@ -863,7 +936,7 @@
 
   function copyFullExamToWord() {
     if (!state.questions.length) {
-      getUtils().showToast('يرجى إضافة أسئلة أولاً قبل النسخ إلى Word.', 'warning');
+      getUtils().showToast('يرجى إضافة أسئلة أولاً قبل النسخ إلى Word.', 'warning', state.bookId === 'g1s');
       return;
     }
     const sections = global.ExamExporter
@@ -878,7 +951,8 @@
       numbered: true,
       asTable: true,
       header: state.header,
-      sections: sections
+      sections: sections,
+      isSecondary: state.bookId === 'g1s'
     });
   }
 
@@ -888,7 +962,8 @@
     getUtils().copyQuestionsToWord([q], {
       includeAnswers: false,
       numbered: false,
-      asTable: true
+      asTable: true,
+      isSecondary: inferQuestionBookId(q) === 'g1s'
     });
   }
 
@@ -905,6 +980,11 @@
     if (!state.container) return;
 
     const utils = getUtils();
+    const isSec = state.bookId === 'g1s';
+    const dNum = function (v) {
+      const s = v === null || v === undefined ? '' : String(v);
+      return isSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s);
+    };
     const chapters = getBookData().chapters || [];
     const totalMarks = getTotalMarks();
     const mcqCount = state.questions.filter(function (q) { return q.type === 'mcq'; }).length;
@@ -923,25 +1003,27 @@
         <div class="eb-hero-banner">
           <div>
             <div class="qb-grade-switcher" role="group" aria-label="اختيار الصف الدراسي للاختبار">
-              ${['g3m', 'g1m', 'g6'].map(function (bid) {
+              ${['g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
                 const cfg = BOOK_PRESETS[bid];
-                const hasData = bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA);
+                const hasData = bid === 'g1s'
+                  ? !!global.GRADE1S_BOOK_DATA
+                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA));
                 if (!hasData) return '';
                 return '<button type="button" class="qb-grade-btn ' + (state.bookId === bid ? 'active' : '') +
                   '" onclick="window.ExamBuilder.setBook(\'' + bid + '\')">📘 ' + utils.escapeHtml(cfg.label) + '</button>';
               }).join('')}
             </div>
             <h2>${utils.escapeHtml(preset.heroTitle)}</h2>
-            <p>تحرير كامل للأسئلة والصور المرفقة والترويسة والدرجات والترتيب مع التصدير الفوري بصيغتي Word (.docx) و PDF بنظام RTL والأرقام العربية المشرقية</p>
+            <p>تحرير كامل للأسئلة والصور المرفقة والترويسة والدرجات والترتيب مع التصدير الفوري بصيغتي Word (.docx) و PDF ${isSec ? 'بنظام RTL والأرقام الإنجليزية المعتمدة للمرحلة الثانوية ومعادلات LTR' : 'بنظام RTL والأرقام العربية المشرقية'}</p>
           </div>
           <div class="eb-mode-cards">
             <button type="button" class="eb-mode-btn ${state.examType === 'period' ? 'active' : ''}" onclick="window.ExamBuilder.setExamType('period')">
               <span class="eb-mode-title">📋 اختبار فترة</span>
-              <span class="eb-mode-sub">٤٥ دقيقة • ٢٠ درجة افتراضياً</span>
+              <span class="eb-mode-sub">${dNum('45')} دقيقة • ${dNum('20')} درجة افتراضياً</span>
             </button>
             <button type="button" class="eb-mode-btn ${state.examType === 'final' ? 'active' : ''}" onclick="window.ExamBuilder.setExamType('final')">
               <span class="eb-mode-title">🎓 اختبار نهائي</span>
-              <span class="eb-mode-sub">ساعتان • ٤٠ درجة شاملة</span>
+              <span class="eb-mode-sub">ساعتان • ${dNum('40')} درجة شاملة</span>
             </button>
           </div>
         </div>
@@ -960,8 +1042,8 @@
           <div class="eb-tier-banner preview">
             <div class="eb-tier-icon">🔒</div>
             <div class="eb-tier-content">
-              <div class="eb-tier-title">نسخة المعاينة المجانية (محدد بـ ٥ أسئلة كحد أقصى لكل نوع)</div>
-              <div class="eb-tier-desc">يُسمح بتوليد وإضافة حتى ٥ أسئلة فقط من كل نوع (اختيار، صواب وخطأ، مقالي). لرفع كافة القيود والتوليد الشامل، يُرجى طلب الاعتماد من المدير العام.</div>
+              <div class="eb-tier-title">نسخة المعاينة المجانية (محدد بـ ${dNum(5)} أسئلة كحد أقصى لكل نوع)</div>
+              <div class="eb-tier-desc">يُسمح بتوليد وإضافة حتى ${dNum(5)} أسئلة فقط من كل نوع (اختيار، صواب وخطأ، مقالي). لرفع كافة القيود والتوليد الشامل، يُرجى طلب الاعتماد من المدير العام.</div>
             </div>
             <button type="button" class="eb-tier-btn" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()">
               طلب الاعتماد الكامل ↗
@@ -985,7 +1067,7 @@
                     '<label class="eb-chap-chip ' + (checked ? 'checked' : '') + '">' +
                     '<input type="checkbox" ' + (checked ? 'checked' : '') +
                     ' onchange="window.ExamBuilder.toggleAutoChapter(\'' + utils.escapeHtml(ch.id) + '\', this.checked)">' +
-                    '<span>' + utils.escapeHtml(utils.toEasternDigits(ch.number + ': ' + ch.title)) + '</span>' +
+                    '<span>' + utils.escapeHtml(dNum(ch.number + ': ' + ch.title)) + '</span>' +
                     '</label>'
                   );
                 }).join('')}
@@ -994,22 +1076,22 @@
 
             <div class="eb-autogen-counts">
               <div class="eb-count-box">
-                <label>اختيار من متعدد (١ درجة):</label>
-                <input type="text" value="${utils.toEasternDigits(state.autoGen.mcqCount)}"
-                  onchange="window.ExamBuilder.setAutoCount('mcqCount', this.value); this.value = window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))">
-                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ٥ أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
+                <label>اختيار من متعدد (${dNum(1)} درجة):</label>
+                <input type="text" value="${dNum(state.autoGen.mcqCount)}"
+                  onchange="window.ExamBuilder.setAutoCount('mcqCount', this.value); this.value = ${isSec ? "window.ArabicUtils.toWesternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))" : "window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))"}">
+                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ' + dNum(5) + ' أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
               </div>
               <div class="eb-count-box">
-                <label>صواب وخطأ (١ درجة):</label>
-                <input type="text" value="${utils.toEasternDigits(state.autoGen.tfCount)}"
-                  onchange="window.ExamBuilder.setAutoCount('tfCount', this.value); this.value = window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))">
-                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ٥ أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
+                <label>صواب وخطأ (${dNum(1)} درجة):</label>
+                <input type="text" value="${dNum(state.autoGen.tfCount)}"
+                  onchange="window.ExamBuilder.setAutoCount('tfCount', this.value); this.value = ${isSec ? "window.ArabicUtils.toWesternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))" : "window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))"}">
+                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ' + dNum(5) + ' أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
               </div>
               <div class="eb-count-box">
                 <label>مسائل مقالية (درجتان):</label>
-                <input type="text" value="${utils.toEasternDigits(state.autoGen.essayCount)}"
-                  onchange="window.ExamBuilder.setAutoCount('essayCount', this.value); this.value = window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))">
-                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ٥ أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
+                <input type="text" value="${dNum(state.autoGen.essayCount)}"
+                  onchange="window.ExamBuilder.setAutoCount('essayCount', this.value); this.value = ${isSec ? "window.ArabicUtils.toWesternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))" : "window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))"}">
+                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ' + dNum(5) + ' أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
               </div>
               <button type="button" class="nav-btn primary eb-gen-btn" onclick="window.ExamBuilder.generateBalancedExam()">
                 ⚡ توليد الاختبار تلقائياً
@@ -1022,64 +1104,64 @@
         <div class="eb-card">
           <div class="eb-card-header">
             <h3>🏛️ إعدادات الترويسة الرسمية وبيانات ورقة الاختبار</h3>
-            <span class="eb-hint">جميع الأرقام تحوّل تلقائياً إلى الأرقام العربية المشرقية (٠-٩)</span>
+            <span class="eb-hint">${isSec ? 'جميع الأرقام تحوّل تلقائياً إلى الأرقام الإنجليزية المعتمدة (0-9)' : 'جميع الأرقام تحوّل تلقائياً إلى الأرقام العربية المشرقية (٠-٩)'}</span>
           </div>
           <div class="eb-header-form">
             <div class="eb-field">
               <label>الدولة / الوزارة:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.ministry))}" onchange="window.ExamBuilder.updateHeaderField('ministry', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.ministry))}" onchange="window.ExamBuilder.updateHeaderField('ministry', this.value)">
             </div>
             <div class="eb-field">
               <label>إدارة التعليم:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.district))}" onchange="window.ExamBuilder.updateHeaderField('district', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.district))}" onchange="window.ExamBuilder.updateHeaderField('district', this.value)">
             </div>
             <div class="eb-field">
               <label>الشركة / المؤسسة التعليمية:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.schoolCompany || ''))}" onchange="window.ExamBuilder.updateHeaderField('schoolCompany', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.schoolCompany || ''))}" onchange="window.ExamBuilder.updateHeaderField('schoolCompany', this.value)">
             </div>
             <div class="eb-field">
               <label>اسم المدرسة:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.school))}" onchange="window.ExamBuilder.updateHeaderField('school', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.school))}" onchange="window.ExamBuilder.updateHeaderField('school', this.value)">
             </div>
             <div class="eb-field">
               <label>المرحلة الدراسية:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.stage || ''))}" onchange="window.ExamBuilder.updateHeaderField('stage', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.stage || ''))}" onchange="window.ExamBuilder.updateHeaderField('stage', this.value)">
             </div>
             <div class="eb-field">
               <label>عنوان الاختبار:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.examTitle))}" onchange="window.ExamBuilder.updateHeaderField('examTitle', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.examTitle))}" onchange="window.ExamBuilder.updateHeaderField('examTitle', this.value)">
             </div>
             <div class="eb-field">
               <label>المادة الدراسية:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.subject || 'الرياضيات'))}" onchange="window.ExamBuilder.updateHeaderField('subject', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.subject || 'الرياضيات'))}" onchange="window.ExamBuilder.updateHeaderField('subject', this.value)">
             </div>
             <div class="eb-field">
               <label>العام الدراسي:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.year))}" onchange="window.ExamBuilder.updateHeaderField('year', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.year))}" onchange="window.ExamBuilder.updateHeaderField('year', this.value)">
             </div>
             <div class="eb-field">
               <label>الصف الدراسي:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.grade))}" onchange="window.ExamBuilder.updateHeaderField('grade', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.grade))}" onchange="window.ExamBuilder.updateHeaderField('grade', this.value)">
             </div>
             <div class="eb-field">
               <label>الفصل الدراسي:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.term))}" onchange="window.ExamBuilder.updateHeaderField('term', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.term))}" onchange="window.ExamBuilder.updateHeaderField('term', this.value)">
             </div>
             <div class="eb-field">
               <label>زمن الاختبار:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.duration))}" onchange="window.ExamBuilder.updateHeaderField('duration', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.duration))}" onchange="window.ExamBuilder.updateHeaderField('duration', this.value)">
             </div>
             <div class="eb-field">
               <label>اسم المعلم:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.teacher))}" onchange="window.ExamBuilder.updateHeaderField('teacher', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.teacher))}" onchange="window.ExamBuilder.updateHeaderField('teacher', this.value)">
             </div>
             <div class="eb-field">
               <label>اسم مدير المدرسة:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.principal || ''))}" onchange="window.ExamBuilder.updateHeaderField('principal', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.principal || ''))}" onchange="window.ExamBuilder.updateHeaderField('principal', this.value)">
             </div>
             <div class="eb-field eb-col-span-2">
               <label>تعليمات الاختبار للطلاب:</label>
-              <input type="text" value="${utils.escapeHtml(utils.toEasternDigits(state.header.instructions))}" onchange="window.ExamBuilder.updateHeaderField('instructions', this.value)">
+              <input type="text" value="${utils.escapeHtml(dNum(state.header.instructions))}" onchange="window.ExamBuilder.updateHeaderField('instructions', this.value)">
             </div>
           </div>
 
@@ -1117,9 +1199,9 @@
         <!-- شريط التصدير والمجموع الثابت -->
         <div class="eb-export-bar">
           <div class="eb-summary-pills">
-            <span class="eb-sum-pill">إجمالي الأسئلة: <strong>${utils.toEasternDigits(state.questions.length)}</strong></span>
-            <span class="eb-sum-pill">اختيارات: <strong>${utils.toEasternDigits(mcqCount)}</strong> • صواب/خطأ: <strong>${utils.toEasternDigits(tfCount)}</strong> • مقالي: <strong>${utils.toEasternDigits(essayCount)}</strong></span>
-            <span class="eb-sum-pill total">الدرجة الكلية: <strong>${utils.escapeHtml(utils.formatMark(totalMarks))}</strong></span>
+            <span class="eb-sum-pill">إجمالي الأسئلة: <strong>${dNum(state.questions.length)}</strong></span>
+            <span class="eb-sum-pill">اختيارات: <strong>${dNum(mcqCount)}</strong> • صواب/خطأ: <strong>${dNum(tfCount)}</strong> • مقالي: <strong>${dNum(essayCount)}</strong></span>
+            <span class="eb-sum-pill total">الدرجة الكلية: <strong>${utils.escapeHtml(utils.formatMark(totalMarks, isSec))}</strong></span>
           </div>
           <div class="eb-export-actions">
             <button type="button" class="nav-btn" onclick="window.ExamBuilder.togglePreview()">
@@ -1143,7 +1225,7 @@
         <!-- قائمة تحرير وترتيب أسئلة الاختبار -->
         <div class="eb-card">
           <div class="eb-card-header">
-            <h3>🛠️ تحرير وترتيب أسئلة الاختبار المختارة (${utils.toEasternDigits(state.questions.length)})</h3>
+            <h3>🛠️ تحرير وترتيب أسئلة الاختبار المختارة (${dNum(state.questions.length)})</h3>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <button type="button" class="nav-btn primary" onclick="window.ExamBuilder.toggleCustomModal(true)">✏️ إضافة سؤال مخصص جديد</button>
               <button type="button" class="nav-btn" onclick="window.Platform && window.Platform.switchView('question-bank')">🏦 استعراض بنك الأسئلة</button>
@@ -1176,18 +1258,24 @@
     const utils = getUtils();
     const isEditing = state.editingIndex === idx;
     const typeLabel = q.type === 'mcq' ? 'اختيار من متعدد' : (q.type === 'tf' ? 'صواب وخطأ' : 'مسألة مقالية');
+    const qIsSec = inferQuestionBookId(q) === 'g1s';
+    const qDNum = function (v) {
+      const s = v === null || v === undefined ? '' : String(v);
+      return qIsSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s);
+    };
+    const choiceLetters = (qIsSec && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : utils.CHOICE_LETTERS;
 
     let previewSnippet = '';
     if (q.type === 'mcq' && Array.isArray(q.options)) {
       previewSnippet = '<div class="eb-q-opts-preview">' + q.options.slice(0, 4).map(function (opt, oIdx) {
         const isCorr = oIdx === q.correct;
-        return '<span class="' + (isCorr ? 'is-corr' : '') + '"><strong>' + utils.CHOICE_LETTERS[oIdx] + ')</strong> ' +
-          utils.renderMathHtml(opt) + (isCorr ? ' ✓' : '') + '</span>';
+        return '<span class="' + (isCorr ? 'is-corr' : '') + '"><strong>' + choiceLetters[oIdx] + ')</strong> ' +
+          utils.renderMathHtml(opt, qIsSec) + (isCorr ? ' ✓' : '') + '</span>';
       }).join('') + '</div>';
     } else if (q.type === 'tf') {
       previewSnippet = '<div class="eb-q-tf-preview">الإجابة الصحيحة: <strong>' + (q.is_true ? 'صواب (✓)' : 'خطأ (✗)') + '</strong></div>';
     } else {
-      previewSnippet = '<div class="eb-q-essay-preview"><strong>الحل النموذجي:</strong> ' + utils.renderMathHtml(q.ans || '') + '</div>';
+      previewSnippet = '<div class="eb-q-essay-preview"><strong>الحل النموذجي:</strong> ' + utils.renderMathHtml(q.ans || '', qIsSec) + '</div>';
     }
 
     let editFormHtml = '';
@@ -1200,35 +1288,35 @@
             const val = (q.options && q.options[oIdx]) || '';
             return (
               '<div class="eb-edit-opt-row">' +
-              '<label class="eb-radio-lbl"><input type="radio" name="eb-edit-correct-' + idx + '" value="' + oIdx + '" ' + (q.correct === oIdx ? 'checked' : '') + '> <span>الخيار ' + utils.CHOICE_LETTERS[oIdx] + ' (صحيح)</span></label>' +
-              '<input id="eb-edit-opt-' + idx + '-' + oIdx + '" type="text" value="' + utils.escapeHtml(utils.stripMathToInputText(val)) + '" required>' +
+              '<label class="eb-radio-lbl"><input type="radio" name="eb-edit-correct-' + idx + '" value="' + oIdx + '" ' + (q.correct === oIdx ? 'checked' : '') + '> <span>الخيار ' + choiceLetters[oIdx] + ' (صحيح)</span></label>' +
+              '<input id="eb-edit-opt-' + idx + '-' + oIdx + '" type="text" value="' + utils.escapeHtml(utils.stripMathToInputText(val, qIsSec)) + '" required>' +
               '</div>'
             );
           }).join('') +
           '</div>' +
-          '<div class="eb-field"><label>التفسير الرياضي:</label><input id="eb-edit-exp-' + idx + '" type="text" value="' + utils.escapeHtml(utils.stripMathToInputText(q.explanation || '')) + '"></div>';
+          '<div class="eb-field"><label>التفسير الرياضي:</label><input id="eb-edit-exp-' + idx + '" type="text" value="' + utils.escapeHtml(utils.stripMathToInputText(q.explanation || '', qIsSec)) + '"></div>';
       } else if (q.type === 'tf') {
         typeFields =
           '<div class="eb-tf-edit-radios">' +
           '<label class="eb-radio-lbl"><input type="radio" name="eb-edit-tf-' + idx + '" value="true" ' + (q.is_true ? 'checked' : '') + '> <span>صواب (✓)</span></label>' +
           '<label class="eb-radio-lbl"><input type="radio" name="eb-edit-tf-' + idx + '" value="false" ' + (!q.is_true ? 'checked' : '') + '> <span>خطأ (✗)</span></label>' +
           '</div>' +
-          '<div class="eb-field"><label>التفسير الرياضي:</label><input id="eb-edit-exp-' + idx + '" type="text" value="' + utils.escapeHtml(utils.stripMathToInputText(q.explanation || '')) + '"></div>';
+          '<div class="eb-field"><label>التفسير الرياضي:</label><input id="eb-edit-exp-' + idx + '" type="text" value="' + utils.escapeHtml(utils.stripMathToInputText(q.explanation || '', qIsSec)) + '"></div>';
       } else {
         typeFields =
-          '<div class="eb-field"><label>الحل النموذجي:</label><textarea id="eb-edit-ans-' + idx + '" rows="2">' + utils.escapeHtml(utils.stripMathToInputText(q.ans || '')) + '</textarea></div>' +
-          '<div class="eb-field" style="max-width:180px;"><label>عدد أسطر الإجابة:</label><input id="eb-edit-lines-' + idx + '" type="text" value="' + utils.toEasternDigits(q.lines || 3) + '"></div>';
+          '<div class="eb-field"><label>الحل النموذجي:</label><textarea id="eb-edit-ans-' + idx + '" rows="2">' + utils.escapeHtml(utils.stripMathToInputText(q.ans || '', qIsSec)) + '</textarea></div>' +
+          '<div class="eb-field" style="max-width:180px;"><label>عدد أسطر الإجابة:</label><input id="eb-edit-lines-' + idx + '" type="text" value="' + qDNum(q.lines || 3) + '"></div>';
       }
 
       editFormHtml = `
         <form class="eb-inline-edit-form" onsubmit="window.ExamBuilder.saveInlineEdit(${idx}, event)">
           <div class="eb-field">
             <label>نص السؤال:</label>
-            <textarea id="eb-edit-text-${idx}" rows="2" required>${utils.escapeHtml(utils.stripMathToInputText(q.q || q.statement || ''))}</textarea>
+            <textarea id="eb-edit-text-${idx}" rows="2" required>${utils.escapeHtml(utils.stripMathToInputText(q.q || q.statement || '', qIsSec))}</textarea>
           </div>
           <div class="eb-field" style="max-width:180px;">
             <label>الدرجة:</label>
-            <input id="eb-edit-marks-${idx}" type="text" value="${utils.escapeHtml(utils.formatMarkShort(q.marks !== undefined ? q.marks : 1))}" required>
+            <input id="eb-edit-marks-${idx}" type="text" value="${utils.escapeHtml(utils.formatMarkShort(q.marks !== undefined ? q.marks : 1, qIsSec))}" required>
           </div>
           ${typeFields}
           <div class="eb-edit-image-row">
@@ -1240,7 +1328,7 @@
                 <input type="file" accept="image/*" style="display:none;" onchange="window.ExamBuilder.uploadEditQuestionImage(${idx}, this)">
               </label>
               ${q.image ? '<button type="button" class="qb-act-btn" style="color:#dc2626;" onclick="window.ExamBuilder.removeEditQuestionImage(' + idx + ')">🗑️ إزالة الصورة</button>' : ''}
-              <input id="eb-edit-img-cap-${idx}" type="text" placeholder="وصف الصورة (اختياري)..." value="${utils.escapeHtml(utils.toEasternDigits(q.imageCaption || ''))}" style="flex:1;min-width:180px;">
+              <input id="eb-edit-img-cap-${idx}" type="text" placeholder="وصف الصورة (اختياري)..." value="${utils.escapeHtml(qDNum(q.imageCaption || ''))}" style="flex:1;min-width:180px;">
             </div>
           </div>
           <div style="display:flex; gap:8px; margin-top:10px;">
@@ -1259,14 +1347,14 @@
         <div class="eb-q-card-top">
           <div class="eb-q-card-meta">
             <span class="eb-drag-handle" title="اسحب لإعادة الترتيب">⠿</span>
-            <span class="q-badge">س ${utils.toEasternDigits(idx + 1)}</span>
-            <span class="qb-pill chapter-pill">${utils.escapeHtml(utils.toEasternDigits((q.chapterNumber || '') + ' • ' + (q.lessonTitle || '')))}</span>
+            <span class="q-badge">س ${qDNum(idx + 1)}</span>
+            <span class="qb-pill chapter-pill">${utils.escapeHtml(qDNum((q.chapterNumber || '') + ' • ' + (q.lessonTitle || '')))}</span>
             <span class="qb-pill">${utils.escapeHtml(typeLabel)}</span>
           </div>
           <div class="eb-q-card-controls">
             <label class="eb-inline-mark">
               <span>الدرجة:</span>
-              <input type="text" value="${utils.escapeHtml(utils.formatMarkShort(q.marks !== undefined ? q.marks : 1))}"
+              <input type="text" value="${utils.escapeHtml(utils.formatMarkShort(q.marks !== undefined ? q.marks : 1, qIsSec))}"
                 onchange="window.ExamBuilder.updateQuestionMark(${idx}, this.value)">
             </label>
             <button type="button" class="qb-act-btn" title="تحريك لأعلى" onclick="window.ExamBuilder.moveQuestion(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>⬆️</button>
@@ -1277,11 +1365,11 @@
             <button type="button" class="qb-act-btn" style="color:#dc2626;" title="حذف" onclick="window.ExamBuilder.deleteQuestionAt(${idx})">🗑️</button>
           </div>
         </div>
-        <div class="eb-q-card-prompt">${utils.renderMathHtml(q.q || q.statement || '')}</div>
+        <div class="eb-q-card-prompt">${utils.renderMathHtml(q.q || q.statement || '', qIsSec)}</div>
         ${q.image ? (
           '<div class="eb-q-fig">' +
-          '<img src="' + utils.escapeHtml(q.image) + '" alt="' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption || 'شكل السؤال')) + '" loading="lazy" data-caption="' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption || '')) + '" onclick="if(window.Platform&&window.Platform.openImageLightbox){window.Platform.openImageLightbox(this.getAttribute(\'src\'),this.getAttribute(\'data-caption\'));}" />' +
-          (q.imageCaption ? '<div class="eb-q-fig-cap">' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption)) + '</div>' : '') +
+          '<img src="' + utils.escapeHtml(q.image) + '" alt="' + utils.escapeHtml(qDNum(q.imageCaption || 'شكل السؤال')) + '" loading="lazy" data-caption="' + utils.escapeHtml(qDNum(q.imageCaption || '')) + '" onclick="if(window.Platform&&window.Platform.openImageLightbox){window.Platform.openImageLightbox(this.getAttribute(\'src\'),this.getAttribute(\'data-caption\'));}" />' +
+          (q.imageCaption ? '<div class="eb-q-fig-cap">' + utils.escapeHtml(qDNum(q.imageCaption)) + '</div>' : '') +
           '</div>'
         ) : ''}
         ${previewSnippet}
@@ -1292,6 +1380,8 @@
 
   function renderCustomQuestionForm() {
     const utils = getUtils();
+    const isSec = state.bookId === 'g1s';
+    const choiceLetters = (isSec && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : utils.CHOICE_LETTERS;
     const t = state.customType;
     return `
       <form class="eb-custom-form" onsubmit="window.ExamBuilder.saveCustomQuestion(event)">
@@ -1310,15 +1400,15 @@
         </div>
         <div class="eb-field" style="max-width:180px;">
           <label>الدرجة:</label>
-          <input id="eb-cust-marks" type="text" value="${t === 'essay' ? '٢' : '١'}" required>
+          <input id="eb-cust-marks" type="text" value="${t === 'essay' ? (isSec ? '2' : '٢') : (isSec ? '1' : '١')}" required>
         </div>
         ${t === 'mcq' ? (
           '<div class="eb-edit-opts-grid">' +
           [0, 1, 2, 3].map(function (i) {
             return (
               '<div class="eb-edit-opt-row">' +
-              '<label class="eb-radio-lbl"><input type="radio" name="eb-cust-correct" value="' + i + '" ' + (i === 0 ? 'checked' : '') + '> <span>الخيار ' + utils.CHOICE_LETTERS[i] + ' (صحيح)</span></label>' +
-              '<input id="eb-cust-opt-' + i + '" type="text" placeholder="الخيار ' + utils.CHOICE_LETTERS[i] + '..." required>' +
+              '<label class="eb-radio-lbl"><input type="radio" name="eb-cust-correct" value="' + i + '" ' + (i === 0 ? 'checked' : '') + '> <span>الخيار ' + choiceLetters[i] + ' (صحيح)</span></label>' +
+              '<input id="eb-cust-opt-' + i + '" type="text" placeholder="الخيار ' + choiceLetters[i] + '..." required>' +
               '</div>'
             );
           }).join('') +
@@ -1332,7 +1422,7 @@
           '<div class="eb-field"><label>التفسير الرياضي (اختياري):</label><input id="eb-cust-exp" type="text" placeholder="التعليل..."></div>'
         ) : (
           '<div class="eb-field"><label>الحل النموذجي:</label><textarea id="eb-cust-ans" rows="2" placeholder="خطوات الحل النموذجية..."></textarea></div>' +
-          '<div class="eb-field" style="max-width:180px;"><label>عدد أسطر الكتابة:</label><input id="eb-cust-lines" type="text" value="٣"></div>'
+          '<div class="eb-field" style="max-width:180px;"><label>عدد أسطر الكتابة:</label><input id="eb-cust-lines" type="text" value="' + (isSec ? '3' : '٣') + '"></div>'
         )}
         <div class="eb-edit-image-row" style="margin-top:10px;">
           <label style="font-weight:700;font-size:0.86rem;">🖼️ إرفاق صورة بالسؤال المخصص (اختياري):</label>

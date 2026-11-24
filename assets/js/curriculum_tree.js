@@ -702,232 +702,232 @@ window.CURRICULUM_DATA = {
               "id": "term1",
               "name": "الفصل الدراسي الأول",
               "chapters": [
-                  {
-                                    "id": "g3m-t1-c1",
-                                    "number": "الفصل ١",
-                                    "title": "المعادلات الخطية",
-                                    "pages": "ص ١٢ – ٤٣",
-                                    "status": "completed",
-                                    "badge": "مكتمل بالكامل (ص ١٢ – ٤٣)",
-                                    "lessons": [
-                                                      {
-                                                                        "id": "g3m-t1-c1-l1",
-                                                                        "number": "١-١",
-                                                                        "title": "الدرس ١-١: المعادلات",
-                                                                        "pages": "ص ١٢-١٧",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c1-l2",
-                                                                        "number": "١-٢",
-                                                                        "title": "الدرس ١-٢: حل المعادلات ذات الخطوة الواحدة",
-                                                                        "pages": "ص ٢٠-٢٥",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c1-l3",
-                                                                        "number": "١-٣",
-                                                                        "title": "الدرس ١-٣: حل المعادلات المتعددة الخطوات",
-                                                                        "pages": "ص ٢٧-٣١",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c1-l4",
-                                                                        "number": "١-٤",
-                                                                        "title": "الدرس ١-٤: حل المعادلات التي تحتوي متغيراً في طرفيها",
-                                                                        "pages": "ص ٣٣-٣٧",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c1-l5",
-                                                                        "number": "١-٥",
-                                                                        "title": "الدرس ١-٥: حل المعادلات التي تتضمن القيمة المطلقة",
-                                                                        "pages": "ص ٣٨-٤٣",
-                                                                        "status": "completed"
-                                                      }
-                                    ]
-                  },
-                  {
-                                    "id": "g3m-t1-c2",
-                                    "number": "الفصل ٢",
-                                    "title": "العلاقات والدوال الخطية",
-                                    "pages": "ص ٥٠ – ٨٨",
-                                    "status": "completed",
-                                    "badge": "مكتمل بالكامل (ص ٥٠ – ٨٨)",
-                                    "lessons": [
-                                                      {
-                                                                        "id": "g3m-t1-c2-l1",
-                                                                        "number": "٢-١",
-                                                                        "title": "الدرس ٢-١: العلاقات",
-                                                                        "pages": "ص ٥٠-٥٥",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c2-l2",
-                                                                        "number": "٢-٢",
-                                                                        "title": "الدرس ٢-٢: الدوال",
-                                                                        "pages": "ص ٥٦-٦٢",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c2-l3",
-                                                                        "number": "٢-٣",
-                                                                        "title": "الدرس ٢-٣: تمثيل المعادلات الخطية بيانياً",
-                                                                        "pages": "ص ٦٣-٦٩",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c2-l4",
-                                                                        "number": "٢-٤",
-                                                                        "title": "الدرس ٢-٤: حل المعادلات الخطية بيانياً",
-                                                                        "pages": "ص ٧١-٧٥",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c2-l5",
-                                                                        "number": "٢-٥",
-                                                                        "title": "الدرس ٢-٥: معدل التغير والميل",
-                                                                        "pages": "ص ٧٦-٨٢",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c2-l6",
-                                                                        "number": "٢-٦",
-                                                                        "title": "الدرس ٢-٦: المتتابعات الحسابية كدوال خطية",
-                                                                        "pages": "ص ٨٣-٨٨",
-                                                                        "status": "completed"
-                                                      }
-                                    ]
-                  },
-                  {
-                                    "id": "g3m-t1-c3",
-                                    "number": "الفصل ٣",
-                                    "title": "الدوال الخطية",
-                                    "pages": "ص ٩٤ – ١١٨",
-                                    "status": "completed",
-                                    "badge": "مكتمل بالكامل (ص ٩٤ – ١١٨)",
-                                    "lessons": [
-                                                      {
-                                                                        "id": "g3m-t1-c3-l1",
-                                                                        "number": "٣-١",
-                                                                        "title": "الدرس ٣-١: تمثيل المعادلات المكتوبة بصيغة الميل والمقطع بيانياً",
-                                                                        "pages": "ص ٩٤-٩٩",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c3-l2",
-                                                                        "number": "٣-٢",
-                                                                        "title": "الدرس ٣-٢: كتابة المعادلات بصيغة الميل والمقطع",
-                                                                        "pages": "ص ١٠٠-١٠٦",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c3-l3",
-                                                                        "number": "٣-٣",
-                                                                        "title": "الدرس ٣-٣: كتابة المعادلات بصيغة الميل ونقطة",
-                                                                        "pages": "ص ١٠٨-١١٢",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c3-l4",
-                                                                        "number": "٣-٤",
-                                                                        "title": "الدرس ٣-٤: المستقيمات المتوازية والمستقيمات المتعامدة",
-                                                                        "pages": "ص ١١٣-١١٨",
-                                                                        "status": "completed"
-                                                      }
-                                    ]
-                  },
-                  {
-                                    "id": "g3m-t1-c4",
-                                    "number": "الفصل ٤",
-                                    "title": "المتباينات الخطية",
-                                    "pages": "ص ١٢٤ – ١٥٢",
-                                    "status": "completed",
-                                    "badge": "مكتمل بالكامل (ص ١٢٤ – ١٥٢)",
-                                    "lessons": [
-                                                      {
-                                                                        "id": "g3m-t1-c4-l1",
-                                                                        "number": "٤-١",
-                                                                        "title": "الدرس ٤-١: حل المتباينات بالجمع أو بالطرح",
-                                                                        "pages": "ص ١٢٤-١٢٨",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c4-l2",
-                                                                        "number": "٤-٢",
-                                                                        "title": "الدرس ٤-٢: حل المتباينات بالضرب أو بالقسمة",
-                                                                        "pages": "ص ١٣٠-١٣٤",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c4-l3",
-                                                                        "number": "٤-٣",
-                                                                        "title": "الدرس ٤-٣: حل المتباينات المتعددة الخطوات",
-                                                                        "pages": "ص ١٣٥-١٤٠",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c4-l4",
-                                                                        "number": "٤-٤",
-                                                                        "title": "الدرس ٤-٤: حل المتباينات المركبة",
-                                                                        "pages": "ص ١٤٣-١٤٧",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c4-l5",
-                                                                        "number": "٤-٥",
-                                                                        "title": "الدرس ٤-٥: حل المتباينات التي تتضمن القيمة المطلقة",
-                                                                        "pages": "ص ١٤٨-١٥٢",
-                                                                        "status": "completed"
-                                                      }
-                                    ]
-                  },
-                  {
-                                    "id": "g3m-t1-c5",
-                                    "number": "الفصل ٥",
-                                    "title": "أنظمة المعادلات الخطية",
-                                    "pages": "ص ١٥٨ – ١٨٩",
-                                    "status": "completed",
-                                    "badge": "مكتمل بالكامل (ص ١٥٨ – ١٨٩)",
-                                    "lessons": [
-                                                      {
-                                                                        "id": "g3m-t1-c5-l1",
-                                                                        "number": "٥-١",
-                                                                        "title": "الدرس ٥-١: حل نظام من معادلتين خطيتين بيانياً",
-                                                                        "pages": "ص ١٥٨-١٦٣",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c5-l2",
-                                                                        "number": "٥-٢",
-                                                                        "title": "الدرس ٥-٢: حل نظام من معادلتين خطيتين بالتعويض",
-                                                                        "pages": "ص ١٦٦-١٧٠",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c5-l3",
-                                                                        "number": "٥-٣",
-                                                                        "title": "الدرس ٥-٣: حل نظام من معادلتين خطيتين بالحذف باستعمال الجمع أو الطرح",
-                                                                        "pages": "ص ١٧١-١٧٧",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c5-l4",
-                                                                        "number": "٥-٤",
-                                                                        "title": "الدرس ٥-٤: حل نظام من معادلتين خطيتين بالحذف باستعمال الضرب",
-                                                                        "pages": "ص ١٧٩-١٨٤",
-                                                                        "status": "completed"
-                                                      },
-                                                      {
-                                                                        "id": "g3m-t1-c5-l5",
-                                                                        "number": "٥-٥",
-                                                                        "title": "الدرس ٥-٥: تطبيقات على النظام المكون من معادلتين خطيتين",
-                                                                        "pages": "ص ١٨٥-١٨٩",
-                                                                        "status": "completed"
-                                                      }
-                                    ]
-                  }
-]
+                {
+                  "id": "g3m-t1-c1",
+                  "number": "الفصل ١",
+                  "title": "المعادلات الخطية",
+                  "pages": "ص ١٢ – ٤٣",
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (ص ١٢ – ٤٣)",
+                  "lessons": [
+                    {
+                      "id": "g3m-t1-c1-l1",
+                      "number": "١-١",
+                      "title": "الدرس ١-١: المعادلات",
+                      "pages": "ص ١٢-١٧",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c1-l2",
+                      "number": "١-٢",
+                      "title": "الدرس ١-٢: حل المعادلات ذات الخطوة الواحدة",
+                      "pages": "ص ٢٠-٢٥",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c1-l3",
+                      "number": "١-٣",
+                      "title": "الدرس ١-٣: حل المعادلات المتعددة الخطوات",
+                      "pages": "ص ٢٧-٣١",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c1-l4",
+                      "number": "١-٤",
+                      "title": "الدرس ١-٤: حل المعادلات التي تحتوي متغيراً في طرفيها",
+                      "pages": "ص ٣٣-٣٧",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c1-l5",
+                      "number": "١-٥",
+                      "title": "الدرس ١-٥: حل المعادلات التي تتضمن القيمة المطلقة",
+                      "pages": "ص ٣٨-٤٣",
+                      "status": "completed"
+                    }
+                  ]
+                },
+                {
+                  "id": "g3m-t1-c2",
+                  "number": "الفصل ٢",
+                  "title": "العلاقات والدوال الخطية",
+                  "pages": "ص ٥٠ – ٨٨",
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (ص ٥٠ – ٨٨)",
+                  "lessons": [
+                    {
+                      "id": "g3m-t1-c2-l1",
+                      "number": "٢-١",
+                      "title": "الدرس ٢-١: العلاقات",
+                      "pages": "ص ٥٠-٥٥",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c2-l2",
+                      "number": "٢-٢",
+                      "title": "الدرس ٢-٢: الدوال",
+                      "pages": "ص ٥٦-٦٢",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c2-l3",
+                      "number": "٢-٣",
+                      "title": "الدرس ٢-٣: تمثيل المعادلات الخطية بيانياً",
+                      "pages": "ص ٦٣-٦٩",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c2-l4",
+                      "number": "٢-٤",
+                      "title": "الدرس ٢-٤: حل المعادلات الخطية بيانياً",
+                      "pages": "ص ٧١-٧٥",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c2-l5",
+                      "number": "٢-٥",
+                      "title": "الدرس ٢-٥: معدل التغير والميل",
+                      "pages": "ص ٧٦-٨٢",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c2-l6",
+                      "number": "٢-٦",
+                      "title": "الدرس ٢-٦: المتتابعات الحسابية كدوال خطية",
+                      "pages": "ص ٨٣-٨٨",
+                      "status": "completed"
+                    }
+                  ]
+                },
+                {
+                  "id": "g3m-t1-c3",
+                  "number": "الفصل ٣",
+                  "title": "الدوال الخطية",
+                  "pages": "ص ٩٤ – ١١٨",
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (ص ٩٤ – ١١٨)",
+                  "lessons": [
+                    {
+                      "id": "g3m-t1-c3-l1",
+                      "number": "٣-١",
+                      "title": "الدرس ٣-١: تمثيل المعادلات المكتوبة بصيغة الميل والمقطع بيانياً",
+                      "pages": "ص ٩٤-٩٩",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c3-l2",
+                      "number": "٣-٢",
+                      "title": "الدرس ٣-٢: كتابة المعادلات بصيغة الميل والمقطع",
+                      "pages": "ص ١٠٠-١٠٦",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c3-l3",
+                      "number": "٣-٣",
+                      "title": "الدرس ٣-٣: كتابة المعادلات بصيغة الميل ونقطة",
+                      "pages": "ص ١٠٨-١١٢",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c3-l4",
+                      "number": "٣-٤",
+                      "title": "الدرس ٣-٤: المستقيمات المتوازية والمستقيمات المتعامدة",
+                      "pages": "ص ١١٣-١١٨",
+                      "status": "completed"
+                    }
+                  ]
+                },
+                {
+                  "id": "g3m-t1-c4",
+                  "number": "الفصل ٤",
+                  "title": "المتباينات الخطية",
+                  "pages": "ص ١٢٤ – ١٥٢",
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (ص ١٢٤ – ١٥٢)",
+                  "lessons": [
+                    {
+                      "id": "g3m-t1-c4-l1",
+                      "number": "٤-١",
+                      "title": "الدرس ٤-١: حل المتباينات بالجمع أو بالطرح",
+                      "pages": "ص ١٢٤-١٢٨",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c4-l2",
+                      "number": "٤-٢",
+                      "title": "الدرس ٤-٢: حل المتباينات بالضرب أو بالقسمة",
+                      "pages": "ص ١٣٠-١٣٤",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c4-l3",
+                      "number": "٤-٣",
+                      "title": "الدرس ٤-٣: حل المتباينات المتعددة الخطوات",
+                      "pages": "ص ١٣٥-١٤٠",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c4-l4",
+                      "number": "٤-٤",
+                      "title": "الدرس ٤-٤: حل المتباينات المركبة",
+                      "pages": "ص ١٤٣-١٤٧",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c4-l5",
+                      "number": "٤-٥",
+                      "title": "الدرس ٤-٥: حل المتباينات التي تتضمن القيمة المطلقة",
+                      "pages": "ص ١٤٨-١٥٢",
+                      "status": "completed"
+                    }
+                  ]
+                },
+                {
+                  "id": "g3m-t1-c5",
+                  "number": "الفصل ٥",
+                  "title": "أنظمة المعادلات الخطية",
+                  "pages": "ص ١٥٨ – ١٨٩",
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (ص ١٥٨ – ١٨٩)",
+                  "lessons": [
+                    {
+                      "id": "g3m-t1-c5-l1",
+                      "number": "٥-١",
+                      "title": "الدرس ٥-١: حل نظام من معادلتين خطيتين بيانياً",
+                      "pages": "ص ١٥٨-١٦٣",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c5-l2",
+                      "number": "٥-٢",
+                      "title": "الدرس ٥-٢: حل نظام من معادلتين خطيتين بالتعويض",
+                      "pages": "ص ١٦٦-١٧٠",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c5-l3",
+                      "number": "٥-٣",
+                      "title": "الدرس ٥-٣: حل نظام من معادلتين خطيتين بالحذف باستعمال الجمع أو الطرح",
+                      "pages": "ص ١٧١-١٧٧",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c5-l4",
+                      "number": "٥-٤",
+                      "title": "الدرس ٥-٤: حل نظام من معادلتين خطيتين بالحذف باستعمال الضرب",
+                      "pages": "ص ١٧٩-١٨٤",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g3m-t1-c5-l5",
+                      "number": "٥-٥",
+                      "title": "الدرس ٥-٥: تطبيقات على النظام المكون من معادلتين خطيتين",
+                      "pages": "ص ١٨٥-١٨٩",
+                      "status": "completed"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "id": "term2",
@@ -987,7 +987,7 @@ window.CURRICULUM_DATA = {
         {
           "id": "g1s",
           "name": "الصف الأول الثانوي (رياضيات 1)",
-          "badge": "مسارات مشتركة",
+          "badge": "مكتمل 100% (4 فصول • 27 درساً)",
           "terms": [
             {
               "id": "term1",
@@ -995,139 +995,234 @@ window.CURRICULUM_DATA = {
               "chapters": [
                 {
                   "id": "g1s-t1-c1",
-                  "number": "الفصل ١",
+                  "number": "الفصل 1",
                   "title": "التبرير والبرهان",
-                  "status": "roadmap",
+                  "pages": "10 - 83",
+                  "lessons_count": 8,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (10 - 83)",
                   "lessons": [
                     {
                       "id": "g1s-t1-c1-l1",
+                      "number": "1-1",
                       "title": "التبرير الاستقرائي والتخمين",
-                      "status": "roadmap"
+                      "pages": "ص 12 – 18",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c1-l2",
-                      "title": "المنطق والعبارات الشرطية",
-                      "status": "roadmap"
+                      "number": "1-2",
+                      "title": "المنطق",
+                      "pages": "ص 19 – 25",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c1-l3",
-                      "title": "التبرير الاستنتاجي",
-                      "status": "roadmap"
+                      "number": "1-3",
+                      "title": "العبارات الشرطية",
+                      "pages": "ص 26 – 35",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c1-l4",
-                      "title": "المسلمات والبراهين الحرة",
-                      "status": "roadmap"
+                      "number": "1-4",
+                      "title": "التبرير الاستنتاجي",
+                      "pages": "ص 37 – 44",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c1-l5",
-                      "title": "البرهان الجبري وإثبات علاقات القطع والزوايا",
-                      "status": "roadmap"
+                      "number": "1-5",
+                      "title": "المسلمات والبراهين الحرة",
+                      "pages": "ص 45 – 51",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g1s-t1-c1-l6",
+                      "number": "1-6",
+                      "title": "البرهان الجبري",
+                      "pages": "ص 53 – 59",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g1s-t1-c1-l7",
+                      "number": "1-7",
+                      "title": "إثبات علاقات بين القطع المستقيمة",
+                      "pages": "ص 60 – 65",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g1s-t1-c1-l8",
+                      "number": "1-8",
+                      "title": "إثبات علاقات بين الزوايا",
+                      "pages": "ص 66 – 73",
+                      "status": "completed"
                     }
                   ]
                 },
                 {
                   "id": "g1s-t1-c2",
-                  "number": "الفصل ٢",
+                  "number": "الفصل 2",
                   "title": "التوازي والتعامد",
-                  "status": "roadmap",
+                  "pages": "84 - 143",
+                  "lessons_count": 6,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (84 - 143)",
                   "lessons": [
                     {
                       "id": "g1s-t1-c2-l1",
-                      "title": "المستقيمان والقاطع والزوايا المتبادلة",
-                      "status": "roadmap"
+                      "number": "2-1",
+                      "title": "المستقيمان والقاطع",
+                      "pages": "86-91",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c2-l2",
+                      "number": "2-2",
                       "title": "الزوايا والمستقيمات المتوازية",
-                      "status": "roadmap"
+                      "pages": "94-101",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c2-l3",
-                      "title": "ميل المستقيم ومعادلات المستقيم",
-                      "status": "roadmap"
+                      "number": "2-3",
+                      "title": "إثبات توازي مستقيمين",
+                      "pages": "102-107",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c2-l4",
-                      "title": "إثبات توازي المستقيمات والأعمدة والمسافة",
-                      "status": "roadmap"
+                      "number": "2-4",
+                      "title": "ميل المستقيم",
+                      "pages": "109-116",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g1s-t1-c2-l5",
+                      "number": "2-5",
+                      "title": "صيغ معادلة المستقيم",
+                      "pages": "117-124",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g1s-t1-c2-l6",
+                      "number": "2-6",
+                      "title": "الأعمدة والمسافة",
+                      "pages": "126-134",
+                      "status": "completed"
                     }
                   ]
                 },
                 {
                   "id": "g1s-t1-c3",
-                  "number": "الفصل ٣",
+                  "number": "الفصل 3",
                   "title": "المثلثات المتطابقة",
-                  "status": "active",
-                  "badge": "مكتمل بالكامل (ص ١٤٦ - ٢٠٠)",
+                  "pages": "144 - 211",
+                  "lessons_count": 7,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (144 - 211)",
                   "lessons": [
                     {
                       "id": "g1s-t1-c3-l1",
-                      "title": "الدرس ٣-١: تصنيف المثلثات (Classifying Triangles)",
+                      "number": "3-1",
+                      "title": "تصنيف المثلثات",
+                      "pages": "146-152",
                       "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c3-l2",
-                      "title": "الدرس ٣-٢: زوايا المثلثات (Angles of Triangles)",
+                      "number": "3-2",
+                      "title": "زوايا المثلثات",
+                      "pages": "154-161",
                       "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c3-l3",
-                      "title": "الدرس ٣-٣: المثلثات المتطابقة (Congruent Triangles)",
+                      "number": "3-3",
+                      "title": "المثلثات المتطابقة",
+                      "pages": "162-169",
                       "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c3-l4",
-                      "title": "الدرس ٣-٤: إثبات تطابق المثلثات (SSS, SAS)",
-                      "status": "completed"
-                    },
-                    {
-                      "id": "g1s-t1-c3-mid",
-                      "title": "خطة وتقويم: اختبار منتصف الفصل الثالث",
+                      "number": "3-4",
+                      "title": "إثبات تطابق المثلثات SSS, SAS",
+                      "pages": "170-177",
                       "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c3-l5",
-                      "title": "الدرس ٣-٥: إثبات تطابق المثلثات (ASA, AAS)",
+                      "number": "3-5",
+                      "title": "إثبات تطابق المثلثات ASA, AAS",
+                      "pages": "179-185",
                       "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c3-l6",
-                      "title": "الدرس ٣-٦: المثلثات المتطابقة الضلعين والمتطابقة الأضلاع",
+                      "number": "3-6",
+                      "title": "المثلثات المتطابقة الضلعين والمثلثات المتطابقة الأضلاع",
+                      "pages": "188-195",
                       "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c3-l7",
-                      "title": "الدرس ٣-٧: المثلثات والبرهان الإحداثي (Coordinate Proof)",
+                      "number": "3-7",
+                      "title": "المثلثات والبرهان الإحداثي",
+                      "pages": "196-201",
                       "status": "completed"
                     }
                   ]
                 },
                 {
                   "id": "g1s-t1-c4",
-                  "number": "الفصل ٤",
+                  "number": "الفصل 4",
                   "title": "العلاقات في المثلث",
-                  "status": "roadmap",
+                  "pages": "212 - 271",
+                  "lessons_count": 6,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (212 - 271)",
                   "lessons": [
                     {
                       "id": "g1s-t1-c4-l1",
+                      "number": "4-1",
                       "title": "المنصفات في المثلث",
-                      "status": "roadmap"
+                      "pages": "215-223",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c4-l2",
-                      "title": "القطع المتوسطة والارتفاعات",
-                      "status": "roadmap"
+                      "number": "4-2",
+                      "title": "القطع المتوسطة والارتفاعات في المثلث",
+                      "pages": "225-232",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c4-l3",
-                      "title": "متباينات في المثلث والبرهان غير المباشر",
-                      "status": "roadmap"
+                      "number": "4-3",
+                      "title": "المتباينات في المثلث",
+                      "pages": "233-239",
+                      "status": "completed"
                     },
                     {
                       "id": "g1s-t1-c4-l4",
-                      "title": "متباينة المثلث والمتباينات في مثلثين",
-                      "status": "roadmap"
+                      "number": "4-4",
+                      "title": "البرهان غير المباشر",
+                      "pages": "241-247",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g1s-t1-c4-l5",
+                      "number": "4-5",
+                      "title": "متباينة المثلث",
+                      "pages": "249-254",
+                      "status": "completed"
+                    },
+                    {
+                      "id": "g1s-t1-c4-l6",
+                      "number": "4-6",
+                      "title": "المتباينات في مثلثين",
+                      "pages": "255-262",
+                      "status": "completed"
                     }
                   ]
                 }
@@ -1139,25 +1234,25 @@ window.CURRICULUM_DATA = {
               "chapters": [
                 {
                   "id": "g1s-t2-c5",
-                  "number": "الفصل ٥",
+                  "number": "الفصل 5",
                   "title": "الأشكال الرباعية",
                   "status": "roadmap"
                 },
                 {
                   "id": "g1s-t2-c6",
-                  "number": "الفصل ٦",
+                  "number": "الفصل 6",
                   "title": "التشابه",
                   "status": "roadmap"
                 },
                 {
                   "id": "g1s-t2-c7",
-                  "number": "الفصل ٧",
+                  "number": "الفصل 7",
                   "title": "التحويلات الهندسية والتماثل",
                   "status": "roadmap"
                 },
                 {
                   "id": "g1s-t2-c8",
-                  "number": "الفصل ٨",
+                  "number": "الفصل 8",
                   "title": "الدائرة",
                   "status": "roadmap"
                 }
@@ -25710,1929 +25805,6 @@ window.CURRICULUM_DATA = {
         "widget_badge": "أداة نشطة ومخصصة للدرس",
         "interactive_embed_url": "منصة_سقراط_للرياضيات_سادس_ابتدائي.html"
       }
-    },
-    "g1s-t1-c3-l1": {
-      "id": "g1s-t1-c3-l1",
-      "number": "٣-١",
-      "title": "تصنيف المثلثات",
-      "english_title": "Classifying Triangles",
-      "grade": "الصف الأول الثانوي",
-      "stage": "المرحلة الثانوية",
-      "term": "الفصل الدراسي الأول",
-      "term_id": "term1",
-      "chapter": "الفصل الثالث: المثلثات المتطابقة",
-      "chapter_id": "g1s-t1-c3",
-      "pages": "ص ١٤٦ - ١٥٢",
-      "status": "completed",
-      "badge": "مكتمل بالكامل",
-      "objectives": [
-        "تصنيف المثلثات وفق زواياها (حاد الزوايا، منفرج الزاوية، قائم الزاوية، متطابق الزوايا).",
-        "تصنيف المثلثات وفق أضلاعها (مختلف الأضلاع، متطابق الضلعين، متطابق الأضلاع).",
-        "استخدام الجبر لحساب أطوال الأضلاع وقياسات الزوايا المجهولة في المثلثات المصنفة.",
-        "تطبيق خصائص المثلثات في حل مشكلات هندسية واقعية ومعمارية (مثل جمالونات الجسور والرافعات).",
-        "صياغة مبررات هندسية واضحة لتصنيف المثلثات في الأشكال المركبة."
-      ],
-      "plan_5es": {
-        "engage": "عرض صور للهياكل الفولاذية لبرج المملكة أو برج إيفل والجسور المعلقة: لماذا يعتمد المهندسون على الهيكل المثلثي دون غيره من الأشكال؟ مناقشة صلابة المثلث وتصنيفاته المختلفة.",
-        "explore": "يقوم الطلاب باستخدام برمجية الهندسة التفاعلية بسحب رؤوس مثلث وملاحظة تغير قياسات الزوايا وأطوال الأضلاع وتصنيف المثلث في كل وضعية.",
-        "explain": "تثبيت معايير التصنيف المزدوج: زوايا (حاد، قائم، منفرج، متطابق الزوايا) وأضلاع (متطابق الأضلاع، متطابق الضلعين، مختلف الأضلاع). وتطبيق الجبر لإيجاد المجاهيل.",
-        "elaborate": "تحدي STEM هندسي: تصميم شراع قارب يحقق شروط المثلث متطابق الضلعين وتوزيع مركز الثقل.",
-        "evaluate": "حل تدريبات تفاعلية لتصنيف مثلثات مركبة، ثم إنجاز ورقة العمل والاختبار المقنن (10 اختيار من متعدد + 5 صواب وخطأ)."
-      },
-      "summary": {
-        "concept": "المثلث شكل هندسي مغلق يتكون من ثلاث قطع مستقيمة تتلاقى في ثلاث نقاط تسمى الرؤوس. يصنف بمعيارين مستقلين: الزوايا والأضلاع.",
-        "methods": [
-          "وفق الزوايا: حاد الزوايا (٣ زوايا حادة) | قائم الزاوية (زاوية قائمة واحدة) | منفرج الزاوية (زاوية منفرجة واحدة) | متطابق الزوايا (قياس كل منها ٦٠°).",
-          "وفق الأضلاع: متطابق الأضلاع (٣ أضلاع متطابقة) | متطابق الضلعين (ضلعان متطابقان على الأقل) | مختلف الأضلاع (لا توجد أضلاع متطابقة)."
-        ],
-        "golden_rule": "المثلث متطابق الأضلاع هو دائماً مثلث متطابق الزوايا (كل زاوية ٦٠°) ومتطابق الضلعين أيضاً، ولكن العكس ليس صحيحاً دائماً.",
-        "solved_example": "مثلث أطوال أضلاعه: ٢س + ٣ ، س + ٧ ، ٥س - ٩ وهو متطابق الأضلاع. س = ٤، وطول الضلع = ١١ سم."
-      },
-      "worksheet": {
-        "title": "ورقة العمل الاستقصائية: تصنيف المثلثات",
-        "questions": [
-          {
-            "q": "١) صنف المثلث الذي قياسات زواياه (٤٥° ، ٤٥° ، ٩٠°) وفق زواياه وأضلاعه.",
-            "ans": "قائم الزاوية ومتطابق الضلعين."
-          },
-          {
-            "q": "٢) صنف المثلث ذو الأطوال (٧ سم ، ٩ سم ، ١٢ سم).",
-            "ans": "مختلف الأضلاع."
-          },
-          {
-            "q": "٣) مثلث متطابق الأضلاع طول ضلعه (٣س - ٥) ومحيطه ٤٢ سم. أوجد س.",
-            "ans": "طول الضلع = ١٤ سم -> ٣س = ١٩ -> س = ١٩/٣ سم."
-          },
-          {
-            "q": "٤) هل يمكن لمثلث أن يكون منفرج الزاوية ومتطابق الأضلاع؟",
-            "ans": "لا، مستحيل هندسياً لأن متطابق الأضلاع زواياه كلها ٦٠° حادة دائماً."
-          }
-        ]
-      },
-      "quiz": {
-        "mcq": [
-          {
-            "q": "مثلث قياسات زواياه ٣٠° ، ٦٠° ، ٩٠° يُصنف بأنه مثلث:",
-            "options": [
-              "حاد الزوايا",
-              "قائم الزاوية",
-              "منفرج الزاوية",
-              "متطابق الزوايا"
-            ],
-            "correct": 1,
-            "explanation": "لوجود زاوية قائمة ٩٠°."
-          },
-          {
-            "q": "المثلث متطابق الزوايا قياس كل زاوية فيه يساوي:",
-            "options": [
-              "٤٥°",
-              "٥٠°",
-              "٦٠°",
-              "٩٠°"
-            ],
-            "correct": 2,
-            "explanation": "١٨٠ ÷ ٣ = ٦٠°."
-          },
-          {
-            "q": "مثلث أطوال أضلاعه ٥ سم ، ٥ سم ، ٨ سم يُصنف بأنه:",
-            "options": [
-              "مختلف الأضلاع",
-              "متطابق الضلعين",
-              "متطابق الأضلاع",
-              "قائم الزاوية"
-            ],
-            "correct": 1,
-            "explanation": "لوجود ضلعين متطابقين طاقم كل منهما ٥ سم."
-          },
-          {
-            "q": "مثلث قياسات زواياه ٢٥° ، ٤٠° ، ١١٥° يُصنف بأنه:",
-            "options": [
-              "منفرج الزاوية",
-              "حاد الزوايا",
-              "قائم الزاوية",
-              "مستقيم"
-            ],
-            "correct": 0,
-            "explanation": "الزاوية ١١٥° زاوية منفرجة أكبر من ٩٠°."
-          },
-          {
-            "q": "مثلث متطابق الأضلاع محيطه ٣٦ سم، فإن طول ضلعه يساوي:",
-            "options": [
-              "٩ سم",
-              "١٢ سم",
-              "١٨ سم",
-              "٢٤ سم"
-            ],
-            "correct": 1,
-            "explanation": "٣٦ ÷ ٣ = ١٢ سم."
-          },
-          {
-            "q": "مثلث متطابق الضلعين طولا ضلعين فيه ٦ سم و ١٠ سم، طول الضلع الثالث يمكن أن يكون:",
-            "options": [
-              "٤ سم",
-              "٦ سم أو ١٠ سم",
-              "١٦ سم",
-              "٢ سم"
-            ],
-            "correct": 1,
-            "explanation": "يطابق أحد الضلعين ليحافظ على تطابق الضلعين."
-          },
-          {
-            "q": "إذا كان (٢س + ٤) = (س + ١٠) في مثلث متطابق الأضلاع، فإن س تساوي:",
-            "options": [
-              "س = ٤",
-              "س = ٦",
-              "س = ٨",
-              "س = ١٠"
-            ],
-            "correct": 1,
-            "explanation": "٢س - س = ١٠ - ٤ -> س = ٦."
-          },
-          {
-            "q": "المثلث مختلف الأضلاع هو مثلث:",
-            "options": [
-              "له ضلعان متطابقان",
-              "جميع أضلاعه متطابقة",
-              "لا توجد فيه أي أضلاع متطابقة",
-              "جميع زواياه متطابقة"
-            ],
-            "correct": 2,
-            "explanation": "أطوال أضلاعه الثلاثة متمايزة تماماً."
-          },
-          {
-            "q": "هل يمكن لمثلث أن يحتوي على أكثر من زاوية قائمة واحدة؟",
-            "options": [
-              "نعم، يمكن زاويتين",
-              "نعم، في متطابق الأضلاع",
-              "لا، مستحيل هندسياً",
-              "نعم، في الأشكال المنحنية"
-            ],
-            "correct": 2,
-            "explanation": "لأن مجموع قياسات الزوايا ١٨٠° وزاويتان قائمتان = ١٨٠° دون الثالثة."
-          },
-          {
-            "q": "كل مثلث متطابق الأضلاع هو بالضرورة مثلث:",
-            "options": [
-              "قائم الزاوية",
-              "منفرج الزاوية",
-              "متطابق الضلعين وحاد الزوايا",
-              "مختلف الأضلاع"
-            ],
-            "correct": 2,
-            "explanation": "تطابق الأضلاع الثلاثة يستلزم تطابق ضلعين على الأقل وزواياه ٦٠° حادة."
-          }
-        ],
-        "tf": [
-          {
-            "statement": "يمكن أن يحتوي المثلث القائم الزاوية على زاوية منفرجة.",
-            "is_true": false,
-            "explanation": "خطأ، مجموع زوايا المثلث ١٨٠° والقائم يحوي زاويتين حادتين أخريين متتامتين."
-          },
-          {
-            "statement": "المثلث متطابق الأضلاع هو دائماً مثلث حاد الزوايا وقياس كل زاوية فيه ٦٠°.",
-            "is_true": true,
-            "explanation": "صواب، ١٨٠ ÷ ٣ = ٦٠° حادة."
-          },
-          {
-            "statement": "إذا تطابقت زاويتان في مثلث، فإن المثلث يكون متطابق الضلعين على الأقل.",
-            "is_true": true,
-            "explanation": "صواب، وفق عكس نظرية المثلث متطابق الضلعين."
-          },
-          {
-            "statement": "يوجد مثلث قياسات زواياه: ٩٥° ، ٨٥° ، ١٠°.",
-            "is_true": false,
-            "explanation": "خطأ، لأن المجموع = ١٩٠° وهو أكبر من ١٨٠°."
-          },
-          {
-            "statement": "المثلث منفرج الزاوية يحتوي على زاويتين حادتين وزاوية واحدة منفرجة.",
-            "is_true": true,
-            "explanation": "صواب، الزاويتان الأخريان حادتان دائماً."
-          }
-        ]
-      },
-      "socratic": {
-        "lesson_title": "تصنيف المثلثات",
-        "lesson_number": "٣-١",
-        "inquiry_question": "هل يكفي تطابق زوايا مثلثين لإثبات تطابقهما التام؟ أم أن التشابه لا يضمن بالضرورة التكافؤ المقاسي؟",
-        "conceptual_dilemma": "الاعتقاد بأن تطابق ثلاث زوايا (AAA) يثبت تطابق المثلثات، بينما هو يثبت التشابه فقط ولا يضمن تساوي الأضلاع.",
-        "dialogue": [
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "إذا تطابقت الزوايا الثلاث لمثلث صغير مع زوايا مثلث ضخم مرسوم على شاشة السينما، هل هما متطابقان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "🎓",
-            "text": "نعم، زواياهما متساوية تماماً!"
-          },
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "لو وضعت المثلث الصغير فوق مثلث الشاشة، هل سينطبقان تماماً بحيث يغطي أحدهما الآخر دون زيادة أو نقصان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "💡",
-            "text": "مستحيل! أحدهما أكبر بكثير من الآخر! إذن الزوايا تحدد الشكل فقط، بينما الأضلاع هي التي تحدد المقاس الفعلي!"
-          }
-        ],
-        "probing_questions": [
-          "لماذا تشترط حالة SAS أن تكون الزاوية محصورة تحديداً بين الضلعين المتطابقين؟",
-          "كم عنصراً مستقلاً على الأقل نحتاج لإثبات تطابق مثلثين، وما هي التوليفات الكافية؟",
-          "كيف يُستخدم البرهان الإحداثي وقانون المسافة بين نقطتين في إثبات خواص المثلثات؟"
-        ],
-        "misconception_buster": {
-          "misconception": "اعتماد حالة تطابق غير صحيحة مثل (SSA) أو (AAA) دون وجود ضلع محصور أو قيود التطابق القطعية.",
-          "correction": "حالات التطابق المعتمدة للمثلثات هي: SSS, SAS, ASA, AAS وتطابق وتر وساق في القائم (HL)."
-        }
-      },
-      "lesson_tools": {
-        "tool_type": "geometry_congruence_lab",
-        "title": "مختبر الهندسة الديناميكية وتطابق المثلثات (٣-١)",
-        "description": "لوحة رسم هندسي تفاعلية تسمح بسحب وتدوير المثلثات ومطابقة الأضلاع والزوايا في الوقت الحقيقي.",
-        "features": [
-          "محاكاة بصرية تفاعلية تفكك المفاهيم المعقدة إلى عناصر ملموسة.",
-          "مولد أمثلة ومسائل تدريبية لا نهائية مع التحقق الفوري من صحة الحل.",
-          "سبورة بيضاء ذكية تدعم الرسم التوضيحي وتدوين الملاحظات التفاعلية.",
-          "تصدير نتائج الاستقصاء والمحاكاة إلى سجل التعلم بضغطة زر."
-        ],
-        "quick_actions": [
-          {
-            "id": "simulate",
-            "label": "تشغيل المحاكاة التفاعلية",
-            "icon": "🚀",
-            "action": "run_simulation"
-          },
-          {
-            "id": "generate",
-            "label": "توليد مسألة استقصائية جديدة",
-            "icon": "🔄",
-            "action": "new_challenge"
-          },
-          {
-            "id": "whiteboard",
-            "label": "فتح السبورة الذكية للشرح",
-            "icon": "🖍️",
-            "action": "open_whiteboard"
-          }
-        ],
-        "widget_badge": "أداة نشطة ومخصصة للدرس",
-        "interactive_embed_url": "منصة_سقراط_للرياضيات_سادس_ابتدائي.html"
-      }
-    },
-    "g1s-t1-c3-l2": {
-      "id": "g1s-t1-c3-l2",
-      "number": "٣-٢",
-      "title": "زوايا المثلثات",
-      "english_title": "Angles of Triangles",
-      "grade": "الصف الأول الثانوي",
-      "stage": "المرحلة الثانوية",
-      "term": "الفصل الدراسي الأول",
-      "term_id": "term1",
-      "chapter": "الفصل الثالث: المثلثات المتطابقة",
-      "chapter_id": "g1s-t1-c3",
-      "pages": "ص ١٥٣ - ١٦٠",
-      "status": "completed",
-      "badge": "مكتمل بالكامل",
-      "objectives": [
-        "تطبيق نظرية مجموع قياسات زوايا المثلث (١٨٠°) لحساب زوايا مجهولة.",
-        "استنتاج وتطبيق نتائج نظرية زوايا المثلث (تتام الزاويتين الحادتين في المثلث القائم، ووجود زاوية قائمة أو منفرجة واحدة على الأكثر).",
-        "تعريف الزاوية الخارجية للمثلث والزاويتين الداخلتين البعيدتين عنها.",
-        "إثبات وتطبيق نظرية الزاوية الخارجية (قياس الزاوية الخارجية يساوي مجموع قياسي الزاويتين الداخلتين البعيدتين).",
-        "حل مسائل هندسية مركبة توظف العلاقات بين الزوايا المتجاورة والمتقابلة بالرأس وزوايا المثلث."
-      ],
-      "plan_5es": {
-        "engage": "قص زوايا مثلث ورقي وتجميع رؤوسها الثلاثة بجوار بعضها على خط مستقيم لاكتشاف أنها تشكل زاوية مستقيمة قياسها ١٨٠° بالضبط.",
-        "explore": "استخدام برمجية تفاعلية لتمديد ضلع من أضلاع مثلث وقياس الزاوية الخارجية ومقارنتها بالزاويتين الداخلتين البعيدتين عند تحريك الرؤوس.",
-        "explain": "صياغة النظريات: نظرية مجموع زوايا المثلث (ق∠١ + ق∠٢ + ق∠٣ = ١٨٠°). نظرية الزاوية الخارجية: ق∠٤ = ق∠١ + ق∠٢. وتطبيق الجبر لحل معادلات الزوايا.",
-        "elaborate": "تطبيق مساحي وفلكي: حساب زوايا الرصد المجهولة في شبكة التثليث الأرضي وحساب ارتفاعات الأبراج.",
-        "evaluate": "اختبار فوري لحساب قياسات زوايا خارجية وداخلية، ثم التقييم المقنن (10 اختيار من متعدد + 5 صواب وخطأ)."
-      },
-      "summary": {
-        "concept": "مجموع قياسات زوايا أي مثلث يساوي ١٨٠° دائماً. الزاوية الخارجية للمثلث هي الزاوية المحصورة بين ضلع في المثلث وامتداد ضلع مجاور له.",
-        "methods": [
-          "حساب زاوية داخلية مجهولة: ١٨٠° - (مجموع الزاويتين المعروفتين).",
-          "نظرية الزاوية الخارجية: قياس الزاوية الخارجية = مجموع قياسي الزاويتين الداخلتين البعيدتين عنها.",
-          "في المثلث القائم: الزاويتان الحادتان متتامتان ومجموع قياسهما = ٩٠°."
-        ],
-        "golden_rule": "قياس الزاوية الخارجية لمثلث أكبر من قياس أي من الزاويتين الداخلتين البعيدتين عنها.",
-        "solved_example": "مثلث زواياه: ٥٠° و ٧٠° والزاوية الثالثة س. س = ١٨٠ - (٥٠ + ٧٠) = ١٨٠ - ١٢٠ = ٦٠°. الزاوية الخارجية عند الرأس الثالث = ٥٠ + ٧٠ = ١٢٠°."
-      },
-      "worksheet": {
-        "title": "ورقة العمل الاستقصائية: زوايا المثلثات",
-        "questions": [
-          {
-            "q": "١) في المثلث أ ب جـ، إذا كان ق∠أ = ٥٥° ، ق∠ب = ٦٥°، فما قياس ∠جـ؟",
-            "ans": "ق∠جـ = ١٨٠ - (٥٥ + ٦٥) = ١٨٠ - ١٢٠ = ٦٠°."
-          },
-          {
-            "q": "٢) مثلث قائم الزاوية، قياس إحدى زواياه الحادة ٣٨°. أوجد قياس الزاوية الحادة الأخرى.",
-            "ans": "الزاويتان الحادتان متتامتان: ٩٠ - ٣٨ = ٥٢°."
-          },
-          {
-            "q": "٣) في مثلث، قياس الزاوية الخارجية ١١٠°، وقياس إحدى الزاويتين الداخلتين البعيدتين ٤٥°. ما قياس الزاوية الداخلة البعيدة الأخرى؟",
-            "ans": "الزاوية الأخرى = ١١٠ - ٤٥ = ٦٥°."
-          },
-          {
-            "q": "٤) زوايا مثلث معبر عنها جبرياً بـ: س ، ٢س ، ٣س. أوجد قيمة س وقياس كل زاوية.",
-            "ans": "س + ٢س + ٣س = ١٨٠ -> ٦س = ١٨٠ -> س = ٣٠°. الزوايا هي: ٣٠° ، ٦٠° ، ٩٠° (مثلث ثلاثيني ستيني قائم)."
-          }
-        ]
-      },
-      "quiz": {
-        "mcq": [
-          {
-            "q": "مجموع قياسات الزوايا الداخلية لأي مثلث يساوي دائماً:",
-            "options": [
-              "٩٠°",
-              "١٨٠°",
-              "٢٧٠°",
-              "٣٦٠°"
-            ],
-            "correct": 1,
-            "explanation": "نظرية مجموع زوايا المثلث: المجموع دائماً ١٨٠°."
-          },
-          {
-            "q": "في مثلث قائم الزاوية، الزاويتان الحادتان تكونان دائماً:",
-            "options": [
-              "متكاملتين (مجموعهما ١٨٠°)",
-              "متتامتين (مجموعهما ٩٠°)",
-              "متطابقتين دائماً",
-              "منفرجتين"
-            ],
-            "correct": 1,
-            "explanation": "لأن ٩٠° (القائمة) + ٩٠° (الحادتان) = ١٨٠°."
-          },
-          {
-            "q": "مثلث قياسا زاويتين فيه ٤٠° و ٨٠°، فإن قياس الزاوية الثالثة يساوي:",
-            "options": [
-              "٤٠°",
-              "٦٠°",
-              "٨٠°",
-              "١٠٠°"
-            ],
-            "correct": 1,
-            "explanation": "١٨٠ - (٤٠ + ٨٠) = ١٨٠ - ١٢٠ = ٦٠°."
-          },
-          {
-            "q": "قياس الزاوية الخارجية للمثلث يساوي:",
-            "options": [
-              "مجموع الزوايا الداخلية الثلاث",
-              "مجموع الزاويتين الداخلتين البعيدتين",
-              "الزاوية المجاورة لها فقط",
-              "١٨٠° دائماً"
-            ],
-            "correct": 1,
-            "explanation": "هذا هو نص نظرية الزاوية الخارجية."
-          },
-          {
-            "q": "إذا كان قياس الزاوية الخارجية لمثلث يساوي ١٣٠°، وإحدى الزاويتين الداخلتين البعيدتين ٧٠°، فإن قياس الزاوية الأخرى يساوي:",
-            "options": [
-              "٥٠°",
-              "٦٠°",
-              "٧٠°",
-              "١١٠°"
-            ],
-            "correct": 1,
-            "explanation": "١٣٠ - ٧٠ = ٦٠°."
-          },
-          {
-            "q": "قياس الزاوية الخارجية لمثلث متطابق الأضلاع يساوي دائماً:",
-            "options": [
-              "٦٠°",
-              "٩٠°",
-              "١٢٠°",
-              "١٨٠°"
-            ],
-            "correct": 2,
-            "explanation": "كل زاوية داخلية ٦٠°، فالخارجية = ٦٠ + ٦٠ = ١٢٠° (أو ١٨٠ - ٦٠ = ١٢٠°)."
-          },
-          {
-            "q": "في مثلث متطابق الضلعين، إذا كان قياس زاوية الرأس ٤٠°، فإن قياس كل زاوية من زاويتي القاعدة يساوي:",
-            "options": [
-              "٤٠°",
-              "٧٠°",
-              "٨٠°",
-              "١٤٠°"
-            ],
-            "correct": 1,
-            "explanation": "(١٨٠ - ٤٠) ÷ ٢ = ١٤٠ ÷ ٢ = ٧٠°."
-          },
-          {
-            "q": "مثلث زواياه الداخلية: س ، س + ١٠ ، س + ٢٠. قيمة س تساوي:",
-            "options": [
-              "٤٠°",
-              "٥٠°",
-              "٦٠°",
-              "٧٠°"
-            ],
-            "correct": 1,
-            "explanation": "٣س + ٣٠ = ١٨٠ -> ٣س = ١٥٠ -> س = ٥٠°."
-          },
-          {
-            "q": "الزاوية الخارجية لمثلث تكون دائماً أكبر من:",
-            "options": [
-              "١٨٠°",
-              "أي من الزاويتين الداخلتين البعيدتين عنها",
-              "مجموع الزاويتين الداخلتين",
-              "الزاوية المستقيمة"
-            ],
-            "correct": 1,
-            "explanation": "وفق متباينة الزاوية الخارجية."
-          },
-          {
-            "q": "أقصى عدد من الزوايا المنفرجة يمكن أن يتضمنه أي مثلث هو:",
-            "options": [
-              "زاوية واحدة فقط",
-              "زاويتان",
-              "ثلاث زوايا",
-              "لا يمكن وجود زاوية منفرجة"
-            ],
-            "correct": 0,
-            "explanation": "زاوية واحدة فقط لأن قياس المنفرجة > ٩٠° وزاويتان ستتجاوزان ١٨٠°."
-          }
-        ],
-        "tf": [
-          {
-            "statement": "مجموع قياسات زوايا المثلث يختلف باختلاف نوع المثلث ومساحته.",
-            "is_true": false,
-            "explanation": "خطأ، مجموع قياسات زوايا أي مثلث في الهندسة الإقليدية المستوية ثابت دائماً ويساوي ١٨٠°."
-          },
-          {
-            "statement": "الزاويتان الحادتان في أي مثلث قائم الزاوية متتامتان.",
-            "is_true": true,
-            "explanation": "صواب، مجموعهما ٩٠°."
-          },
-          {
-            "statement": "قياس الزاوية الخارجية للمثلث يمكن أن يكون أقل من قياس إحدى الزاويتين الداخلتين البعيدتين.",
-            "is_true": false,
-            "explanation": "خطأ، قياسها يساوي مجموع الداخلتين البعيدتين الموجبتين، فهي أكبر من كل منهما حتماً."
-          },
-          {
-            "statement": "إذا تساوت زوايا مثلث مع زوايا مثلث آخر، فإن المثلثين يكونان متطابقين بالضرورة.",
-            "is_true": false,
-            "explanation": "خطأ، يكونان متشابهين وتطابق الزوايا لا يضمن تطابق الأضلاع (قد يكون تكبيراً أو تصغيراً)."
-          },
-          {
-            "statement": "الزاوية المجاورة للزاوية الخارجية للمثلث تشكل معها زوجاً خطياً متكاملاً مجموعهما ١٨٠°.",
-            "is_true": true,
-            "explanation": "صواب، لأنهما تقعان على خط مستقيم واحد."
-          }
-        ]
-      },
-      "socratic": {
-        "lesson_title": "زوايا المثلثات",
-        "lesson_number": "٣-٢",
-        "inquiry_question": "هل يكفي تطابق زوايا مثلثين لإثبات تطابقهما التام؟ أم أن التشابه لا يضمن بالضرورة التكافؤ المقاسي؟",
-        "conceptual_dilemma": "الاعتقاد بأن تطابق ثلاث زوايا (AAA) يثبت تطابق المثلثات، بينما هو يثبت التشابه فقط ولا يضمن تساوي الأضلاع.",
-        "dialogue": [
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "إذا تطابقت الزوايا الثلاث لمثلث صغير مع زوايا مثلث ضخم مرسوم على شاشة السينما، هل هما متطابقان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "🎓",
-            "text": "نعم، زواياهما متساوية تماماً!"
-          },
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "لو وضعت المثلث الصغير فوق مثلث الشاشة، هل سينطبقان تماماً بحيث يغطي أحدهما الآخر دون زيادة أو نقصان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "💡",
-            "text": "مستحيل! أحدهما أكبر بكثير من الآخر! إذن الزوايا تحدد الشكل فقط، بينما الأضلاع هي التي تحدد المقاس الفعلي!"
-          }
-        ],
-        "probing_questions": [
-          "لماذا تشترط حالة SAS أن تكون الزاوية محصورة تحديداً بين الضلعين المتطابقين؟",
-          "كم عنصراً مستقلاً على الأقل نحتاج لإثبات تطابق مثلثين، وما هي التوليفات الكافية؟",
-          "كيف يُستخدم البرهان الإحداثي وقانون المسافة بين نقطتين في إثبات خواص المثلثات؟"
-        ],
-        "misconception_buster": {
-          "misconception": "اعتماد حالة تطابق غير صحيحة مثل (SSA) أو (AAA) دون وجود ضلع محصور أو قيود التطابق القطعية.",
-          "correction": "حالات التطابق المعتمدة للمثلثات هي: SSS, SAS, ASA, AAS وتطابق وتر وساق في القائم (HL)."
-        }
-      },
-      "lesson_tools": {
-        "tool_type": "geometry_congruence_lab",
-        "title": "مختبر الهندسة الديناميكية وتطابق المثلثات (٣-٢)",
-        "description": "لوحة رسم هندسي تفاعلية تسمح بسحب وتدوير المثلثات ومطابقة الأضلاع والزوايا في الوقت الحقيقي.",
-        "features": [
-          "محاكاة بصرية تفاعلية تفكك المفاهيم المعقدة إلى عناصر ملموسة.",
-          "مولد أمثلة ومسائل تدريبية لا نهائية مع التحقق الفوري من صحة الحل.",
-          "سبورة بيضاء ذكية تدعم الرسم التوضيحي وتدوين الملاحظات التفاعلية.",
-          "تصدير نتائج الاستقصاء والمحاكاة إلى سجل التعلم بضغطة زر."
-        ],
-        "quick_actions": [
-          {
-            "id": "simulate",
-            "label": "تشغيل المحاكاة التفاعلية",
-            "icon": "🚀",
-            "action": "run_simulation"
-          },
-          {
-            "id": "generate",
-            "label": "توليد مسألة استقصائية جديدة",
-            "icon": "🔄",
-            "action": "new_challenge"
-          },
-          {
-            "id": "whiteboard",
-            "label": "فتح السبورة الذكية للشرح",
-            "icon": "🖍️",
-            "action": "open_whiteboard"
-          }
-        ],
-        "widget_badge": "أداة نشطة ومخصصة للدرس",
-        "interactive_embed_url": "منصة_سقراط_للرياضيات_سادس_ابتدائي.html"
-      }
-    },
-    "g1s-t1-c3-l3": {
-      "id": "g1s-t1-c3-l3",
-      "number": "٣-٣",
-      "title": "المثلثات المتطابقة",
-      "english_title": "Congruent Triangles",
-      "grade": "الصف الأول الثانوي",
-      "stage": "المرحلة الثانوية",
-      "term": "الفصل الدراسي الأول",
-      "term_id": "term1",
-      "chapter": "الفصل الثالث: المثلثات المتطابقة",
-      "chapter_id": "g1s-t1-c3",
-      "pages": "ص ١٦١ - ١٦٧",
-      "status": "completed",
-      "badge": "مكتمل بالكامل",
-      "objectives": [
-        "تحديد العناصر المتناظرة (أضلاع وزوايا) في المضلعات والمثلثات المتطابقة.",
-        "كتابة عبارات التطابق بدقة مع مراعاة الترتيب الصحيح للرؤوس المتناظرة.",
-        "استخدام تعريف تطابق المضلعات (تطابق جميع الأضلاع المتناظرة والزوايا المتناظرة).",
-        "إثبات وتطبيق نظرية الزاوية الثالثة في المثلثات المتطابقة.",
-        "تطبيق خصائص تطابق المثلثات (الانعكاس، التماثل، التعدي) في حل مسائل هندسية."
-      ],
-      "plan_5es": {
-        "engage": "عرض صورتين لقطع غيار سيارات أو قوالب هندسية: متى نقول إن قطعتين متطابقتان تماماً؟ فكرة التطابق التام والانطباق.",
-        "explore": "تدوير وسحب مثلثين متطابقين على المستوى الشفاف لمطابقة الرؤوس والأضلاع واكتشاف أهمية ترتيب الأحرف في جملة التطابق.",
-        "explain": "صياغة المفهوم: يتطابق مثلثان إذا وفقط إذا كانت أجزاؤهما المتناظرة متطابقة (CPCTC). شرح نظرية الزاوية الثالثة: إذا تطابقت زاويتان في مثلث مع زاويتين في مثلث آخر، فإن الزاوية الثالثة في الأول تطابق الزاوية الثالثة في الثاني.",
-        "elaborate": "تطبيق على التماثل الإنشائي في المباني ثنائية الأجنحة وبرهنة تطابق الجناحين.",
-        "evaluate": "كتابة عبارات التطابق وتحديد القيم المجهولة، ثم التقييم المقنن (10 اختيار من متعدد + 5 صواب وخطأ)."
-      },
-      "summary": {
-        "concept": "المثلثان المتطابقان لهما نفس الشكل ونفس القياس تماماً، وتنطبق جميع عناصرهما المتناظرة الستة (٣ أضلاع و ٣ زوايا).",
-        "methods": [
-          "عبارة التطابق: إذا كان المثلث أ ب جـ ≅ المثلث د هـ و، فإن: أ ب ≅ د هـ ، ب جـ ≅ هـ و ، أ جـ ≅ د و ، و ∠أ ≅ ∠د ، ∠ب ≅ ∠هـ ، ∠جـ ≅ ∠و.",
-          "نظرية الزاوية الثالثة: إذا تطابقت زاويتان في مثلث مع زاويتين في مثلث آخر، فإن الزاوية الثالثة تطابق الثالثة حتماً."
-        ],
-        "golden_rule": "ترتيب الحروف في عبارة التطابق إلزامي، فالحرف الأول يناظر الأول، والثاني يناظر الثاني، والثالث يناظر الثالث.",
-        "solved_example": "إذا كان المثلث س ص ع ≅ المثلث ل م ن، وكان ق∠س = ٥٠° ، ق∠ص = ٧٠° ، ل م = ٩ سم. فإن: س ص = ٩ سم، وق∠ع = ق∠ن = ١٨٠ - (٥٠+٧٠) = ٦٠°."
-      },
-      "worksheet": {
-        "title": "ورقة العمل الاستقصائية: المثلثات المتطابقة",
-        "questions": [
-          {
-            "q": "١) إذا كان المثلث أ ب جـ ≅ المثلث د هـ و، فاكتب جميع أزواج الأضلاع المتناظرة المتطابقة.",
-            "ans": "أ ب ≅ د هـ ، ب جـ ≅ هـ و ، أ جـ ≅ د و."
-          },
-          {
-            "q": "٢) إذا تطابقت زاويتان في مثلث قياسهما ٤٠° و ٧٥° مع زاويتين في مثلث آخر، فما قياس الزاوية الثالثة في كلا المثلثين؟",
-            "ans": "الزاوية الثالثة = ١٨٠ - (٤٠ + ٧٥) = ٦٥° في كلا المثلثين وفق نظرية الزاوية الثالثة."
-          },
-          {
-            "q": "٣) في المثلثين المتطابقين السابقين، إذا كان ق∠أ = (٢س + ١٠)° و ق∠د = ٦٠°، فأوجد قيمة س.",
-            "ans": "٢س + ١٠ = ٦٠ -> ٢س = ٥٠ -> س = ٢٥."
-          },
-          {
-            "q": "٤) بين لماذا لا تعني العبارة (المثلث أ ب جـ ≅ المثلث د هـ و) نفس الشيء مثل (المثلث أ ب جـ ≅ المثلث هـ د و).",
-            "ans": "لأن ترتيب الرؤوس اختلف، فالأولى تعني أ يناظر د، بينما الثانية تعني أ يناظر هـ وهذا يغير العلاقات التناظرية تماماً."
-          }
-        ]
-      },
-      "quiz": {
-        "mcq": [
-          {
-            "q": "إذا كان المثلث ك ل م ≅ المثلث س ص ع، فإن الضلع المناظر للضلع ل م هو:",
-            "options": [
-              "س ص",
-              "ص ع",
-              "س ع",
-              "ك م"
-            ],
-            "correct": 1,
-            "explanation": "الحرفان الثاني والثالث هما ل م ويناظرهما في الثاني ص ع."
-          },
-          {
-            "q": "إذا كان المثلث أ ب جـ ≅ المثلث د هـ و، فإن الزاوية المناظرة للزاوية جـ هي:",
-            "options": [
-              "∠د",
-              "∠هـ",
-              "∠و",
-              "∠أ"
-            ],
-            "correct": 2,
-            "explanation": "الحرف الثالث هو جـ ويناظره الحرف الثالث و."
-          },
-          {
-            "q": "تنص نظرية الزاوية الثالثة على أنه إذا تطابقت زاويتان في مثلث مع زاويتين في مثلث آخر فإن:",
-            "options": [
-              "الأضلاع تتطابق",
-              "المثلثين يتطابقان",
-              "الزاوية الثالثة في الأول تطابق الزاوية الثالثة في الثاني",
-              "مجموع الزوايا يصبح ٣٦٠°"
-            ],
-            "correct": 2,
-            "explanation": "هذا هو نص نظرية الزاوية الثالثة."
-          },
-          {
-            "q": "المثلث أ ب جـ ≅ المثلث أ ب جـ يمثل خاصية:",
-            "options": [
-              "الانعكاس للتطابق",
-              "التماثل للتطابق",
-              "التعدي للتطابق",
-              "التعويض"
-            ],
-            "correct": 0,
-            "explanation": "أي مضلع يطابق نفسه وفق خاصية الانعكاس."
-          },
-          {
-            "q": "إذا كان المثلث ١ ≅ المثلث ٢ ، والمثلث ٢ ≅ المثلث ٣، فإن المثلث ١ ≅ المثلث ٣ وفق خاصية:",
-            "options": [
-              "الانعكاس",
-              "التماثل",
-              "التعدي للتطابق",
-              "التوزيع"
-            ],
-            "correct": 2,
-            "explanation": "هذه هي خاصية التعدي."
-          },
-          {
-            "q": "إذا كان المثلث أ ب جـ ≅ المثلث س ص ع، وكان أ ب = ٥ سم، ب جـ = ٧ سم، أ جـ = ٩ سم، فإن محيط المثلث س ص ع يساوي:",
-            "options": [
-              "١٢ سم",
-              "١٦ سم",
-              "٢١ سم",
-              "٣٥ سم"
-            ],
-            "correct": 2,
-            "explanation": "المحيط = مجموع أطوال الأضلاع المتطابقة = ٥ + ٧ + ٩ = ٢١ سم."
-          },
-          {
-            "q": "إذا كان المثلث أ ب جـ ≅ المثلث د هـ و، وكان ق∠أ = ٥٠° وق∠هـ = ٦٠°، فإن ق∠جـ يساوي:",
-            "options": [
-              "٥٠°",
-              "٦٠°",
-              "٧٠°",
-              "٨٠°"
-            ],
-            "correct": 2,
-            "explanation": "ق∠ب = ق∠هـ = ٦٠°، إذن ق∠جـ = ١٨٠ - (٥٠ + ٦٠) = ٧٠°."
-          },
-          {
-            "q": "في مثلثين متطابقين، إذا كان طول ضلع في الأول (٣س - ٤) والمناظر له في الثاني ١١ سم، فإن س تساوي:",
-            "options": [
-              "س = ٣",
-              "س = ٤",
-              "س = ٥",
-              "س = ٦"
-            ],
-            "correct": 2,
-            "explanation": "٣س - ٤ = ١١ -> ٣س = ١٥ -> س = ٥."
-          },
-          {
-            "q": "أي العبارات الآتية تصف تطابق مضلعين بدقة؟",
-            "options": [
-              "تطابق الأضلاع المتناظرة وتطابق الزوايا المتناظرة معاً",
-              "تطابق الزوايا فقط",
-              "تساوي المساحة فقط",
-              "تساوي المحيط فقط"
-            ],
-            "correct": 0,
-            "explanation": "التطابق يتطلب تطابق جميع الأضلاع المتناظرة وجميع الزوايا المتناظرة."
-          },
-          {
-            "q": "تطابق مضلعان عدد أضلاع كل منهما ٥، فإن عدد أزواج العناصر المتناظرة المتطابقة فيهما هو:",
-            "options": [
-              "٥ أزواج",
-              "٨ أزواج",
-              "١٠ أزواج",
-              "١٥ زوجاً"
-            ],
-            "correct": 2,
-            "explanation": "٥ أزواج من الأضلاع المتناظرة + ٥ أزواج من الزوايا المتناظرة = ١٠ عناصر متناظرة."
-          }
-        ],
-        "tf": [
-          {
-            "statement": "ترتيب الرؤوس في عبارة التطابق غير مهم ويمكن كتابة الأحرف بأي ترتيب.",
-            "is_true": false,
-            "explanation": "خطأ، ترتيب الرؤوس جوهري لأنه يحدد أي العناصر تناظر الأخرى بدقة."
-          },
-          {
-            "statement": "إذا تطابقت زاويتان في مثلث مع زاويتين في مثلث آخر، فإن الزاويتين المتبقيتين متطابقتان حتماً.",
-            "is_true": true,
-            "explanation": "صواب، وفق نظرية الزاوية الثالثة."
-          },
-          {
-            "statement": "إذا تساوت مساحتا مثلثين، فإنهما يكونان متطابقين دائماً.",
-            "is_true": false,
-            "explanation": "خطأ، قد تتساوى المساحات مع اختلاف أطوال الأضلاع وأشكال المثلثات تماماً."
-          },
-          {
-            "statement": "خاصية التماثل للتطابق تعني أنه إذا كان المثلث أ ≅ المثلث ب، فإن المثلث ب ≅ المثلث أ.",
-            "is_true": true,
-            "explanation": "صواب، هذه خاصية التماثل."
-          },
-          {
-            "statement": "المثلثان المتطابقان يتساويان دائماً في المحيط والمساحة.",
-            "is_true": true,
-            "explanation": "صواب، لأن التطابق هو تطابق كلي تام في جميع الأبعاد الهندسية."
-          }
-        ]
-      },
-      "socratic": {
-        "lesson_title": "المثلثات المتطابقة",
-        "lesson_number": "٣-٣",
-        "inquiry_question": "هل يكفي تطابق زوايا مثلثين لإثبات تطابقهما التام؟ أم أن التشابه لا يضمن بالضرورة التكافؤ المقاسي؟",
-        "conceptual_dilemma": "الاعتقاد بأن تطابق ثلاث زوايا (AAA) يثبت تطابق المثلثات، بينما هو يثبت التشابه فقط ولا يضمن تساوي الأضلاع.",
-        "dialogue": [
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "إذا تطابقت الزوايا الثلاث لمثلث صغير مع زوايا مثلث ضخم مرسوم على شاشة السينما، هل هما متطابقان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "🎓",
-            "text": "نعم، زواياهما متساوية تماماً!"
-          },
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "لو وضعت المثلث الصغير فوق مثلث الشاشة، هل سينطبقان تماماً بحيث يغطي أحدهما الآخر دون زيادة أو نقصان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "💡",
-            "text": "مستحيل! أحدهما أكبر بكثير من الآخر! إذن الزوايا تحدد الشكل فقط، بينما الأضلاع هي التي تحدد المقاس الفعلي!"
-          }
-        ],
-        "probing_questions": [
-          "لماذا تشترط حالة SAS أن تكون الزاوية محصورة تحديداً بين الضلعين المتطابقين؟",
-          "كم عنصراً مستقلاً على الأقل نحتاج لإثبات تطابق مثلثين، وما هي التوليفات الكافية؟",
-          "كيف يُستخدم البرهان الإحداثي وقانون المسافة بين نقطتين في إثبات خواص المثلثات؟"
-        ],
-        "misconception_buster": {
-          "misconception": "اعتماد حالة تطابق غير صحيحة مثل (SSA) أو (AAA) دون وجود ضلع محصور أو قيود التطابق القطعية.",
-          "correction": "حالات التطابق المعتمدة للمثلثات هي: SSS, SAS, ASA, AAS وتطابق وتر وساق في القائم (HL)."
-        }
-      },
-      "lesson_tools": {
-        "tool_type": "geometry_congruence_lab",
-        "title": "مختبر الهندسة الديناميكية وتطابق المثلثات (٣-٣)",
-        "description": "لوحة رسم هندسي تفاعلية تسمح بسحب وتدوير المثلثات ومطابقة الأضلاع والزوايا في الوقت الحقيقي.",
-        "features": [
-          "محاكاة بصرية تفاعلية تفكك المفاهيم المعقدة إلى عناصر ملموسة.",
-          "مولد أمثلة ومسائل تدريبية لا نهائية مع التحقق الفوري من صحة الحل.",
-          "سبورة بيضاء ذكية تدعم الرسم التوضيحي وتدوين الملاحظات التفاعلية.",
-          "تصدير نتائج الاستقصاء والمحاكاة إلى سجل التعلم بضغطة زر."
-        ],
-        "quick_actions": [
-          {
-            "id": "simulate",
-            "label": "تشغيل المحاكاة التفاعلية",
-            "icon": "🚀",
-            "action": "run_simulation"
-          },
-          {
-            "id": "generate",
-            "label": "توليد مسألة استقصائية جديدة",
-            "icon": "🔄",
-            "action": "new_challenge"
-          },
-          {
-            "id": "whiteboard",
-            "label": "فتح السبورة الذكية للشرح",
-            "icon": "🖍️",
-            "action": "open_whiteboard"
-          }
-        ],
-        "widget_badge": "أداة نشطة ومخصصة للدرس",
-        "interactive_embed_url": "منصة_سقراط_للرياضيات_سادس_ابتدائي.html"
-      }
-    },
-    "g1s-t1-c3-l4": {
-      "id": "g1s-t1-c3-l4",
-      "number": "٣-٤",
-      "title": "إثبات تطابق المثلثات (SSS, SAS)",
-      "english_title": "Proving Triangle Congruence: SSS & SAS",
-      "grade": "الصف الأول الثانوي",
-      "stage": "المرحلة الثانوية",
-      "term": "الفصل الدراسي الأول",
-      "term_id": "term1",
-      "chapter": "الفصل الثالث: المثلثات المتطابقة",
-      "chapter_id": "g1s-t1-c3",
-      "pages": "ص ١٦٨ - ١٧٧",
-      "status": "completed",
-      "badge": "مكتمل بالكامل",
-      "objectives": [
-        "تحديد شروط مسلمة التطابق بثلاثة أضلاع (SSS).",
-        "تحديد مفهوم الزاوية المحصورة وشروط مسلمة التطابق بضلعين وزاوية محصورة (SAS).",
-        "كتابة براهين هندسية ذات عمودين وبراهين تسلسلية لإثبات تطابق المثلثات.",
-        "استخدام خاصية الانعكاس للتطابق (الضلع المشترك) والزوايا المتقابلة بالرأس في خطوات البرهان.",
-        "استنتاج تطابق الأجزاء المتناظرة في المثلثات المتطابقة بعد إثبات التطابق (CPCTC)."
-      ],
-      "plan_5es": {
-        "engage": "عرض لغز الجسور والرافعات وصلابة المثلث المثلثي مقابل اهتزاز المستطيل، واستنتاج أن تثبيت الأضلاع الثلاثة يثبت الزوايا حتماً.",
-        "explore": "بناء مثلثات بأطوال أضلاع ثابتة وملاحظة تطابقها التام تحت كل التحويلات الهندسية.",
-        "explain": "تدريس مسلمتي SSS و SAS مع التركيز على شرط الزاوية المحصورة وكتابة براهين ذات عمودين متكاملة.",
-        "elaborate": "تطبيق مساحي لقياس مسافات حقيقية عبر إنشاء مثلثين متطابقين بـ SAS.",
-        "evaluate": "حل براهين واختبار مقنن (10 اختيار من متعدد + 5 صواب وخطأ)."
-      },
-      "summary": {
-        "concept": "مسلمتا SSS و SAS تثبتان تطابق مثلثين بمعرفة ثلاثة عناصر فقط دون الحاجة لاختبار العناصر الستة.",
-        "methods": [
-          "مسلمة SSS: تطابق الأضلاع الثلاثة المتناظرة.",
-          "مسلمة SAS: تطابق ضلعين والزاوية المحصورة بينهما في كلا المثلثين."
-        ],
-        "golden_rule": "في SAS يجب أن تكون الزاوية محصورة بين الضلعين؛ أما SSA فليست مسلمة تطابق عامة.",
-        "solved_example": "أثبت تطابق مثلثين يشتركان في ضلع متطابق مع ضلعين متطابقين معطيين -> مسلمة SSS بخاصية الانعكاس."
-      },
-      "worksheet": {
-        "title": "ورقة العمل الاستقصائية: تطابق المثلثات (SSS, SAS)",
-        "questions": [
-          {
-            "q": "١) ما الزاوية المحصورة بين س ص و ص ع؟",
-            "ans": "الزاوية ص."
-          },
-          {
-            "q": "٢) ما المبرر الرياضي لتطابق ضلع مشترك مع نفسه؟",
-            "ans": "خاصية الانعكاس للتطابق."
-          },
-          {
-            "q": "٣) بين لماذا لا تثبت SSA التطابق دائماً.",
-            "ans": "لوجود حالة الغموض وإمكانية رسم مثلثين غير متطابقين."
-          },
-          {
-            "q": "٤) ماذا نستنتج بعد إثبات تطابق مثلثين بـ SSS؟",
-            "ans": "تطابق جميع الزوايا المتناظرة (CPCTC)."
-          }
-        ]
-      },
-      "quiz": {
-        "mcq": [
-          {
-            "q": "تختصر SSS لمسلمة التطابق عبارة:",
-            "options": [
-              "ضلع - زاوية - ضلع",
-              "ثلاثة أضلاع (Side-Side-Side)",
-              "زاوية - ضلع - زاوية",
-              "ثلاث زوايا"
-            ],
-            "correct": 1,
-            "explanation": "تطابق الأضلاع الثلاثة المتناظرة."
-          },
-          {
-            "q": "الزاوية المحصورة بين أ ب و ب جـ هي:",
-            "options": [
-              "∠أ",
-              "∠ب",
-              "∠جـ",
-              "∠د"
-            ],
-            "correct": 1,
-            "explanation": "الرأس المشترك بين الضلعين هو ب."
-          },
-          {
-            "q": "في مسلمة SAS الحرف A يرمز لـ:",
-            "options": [
-              "زاوية محصورة بين الضلعين",
-              "زاوية خارجية",
-              "زاوية قائمة فقط",
-              "المساحة"
-            ],
-            "correct": 0,
-            "explanation": "Included Angle زاوية محصورة."
-          },
-          {
-            "q": "المبرر لتطابق الضلع المشترك بين مثلثين متجاورين هو:",
-            "options": [
-              "خاصية التماثل",
-              "خاصية التعدي",
-              "خاصية الانعكاس للتطابق",
-              "مسلمة الجمع"
-            ],
-            "correct": 2,
-            "explanation": "خاصية الانعكاس: القطعة تطابق نفسها."
-          },
-          {
-            "q": "إذا تطابقت أضلاع مثلث مع أضلاع مثلث آخر، فإنهما يتطابقان وفق:",
-            "options": [
-              "AAA",
-              "SSS",
-              "SAS",
-              "SSA"
-            ],
-            "correct": 1,
-            "explanation": "مسلمة SSS."
-          },
-          {
-            "q": "إذا كان المثلث أ ب جـ ≅ المثلث د هـ و وفق SAS، وكان أ ب = ٦ سم، فإن د هـ يساوي:",
-            "options": [
-              "٣ سم",
-              "٦ سم",
-              "١٢ سم",
-              "٩ سم"
-            ],
-            "correct": 1,
-            "explanation": "د هـ يناظر أ ب ويطابقه."
-          },
-          {
-            "q": "أي الحالات الآتية لا تعد مسلمة صالحة لإثبات التطابق عموماً؟",
-            "options": [
-              "SSS",
-              "SAS",
-              "SSA",
-              "ASA"
-            ],
-            "correct": 2,
-            "explanation": "حالة SSA غير محصورة ولا تثبت التطابق."
-          },
-          {
-            "q": "المبرر الرياضي لكون أ م ≅ م ب إذا كانت م منتصف أ ب هو:",
-            "options": [
-              "تعريف نقطة المنتصف",
-              "خاصية الانعكاس",
-              "مسلمة الجمع",
-              "التعويض"
-            ],
-            "correct": 0,
-            "explanation": "تعريف نقطة المنتصف."
-          },
-          {
-            "q": "الزاويتان المتقابلتان بالرأس تكونان دائماً:",
-            "options": [
-              "متكاملتين",
-              "متتامتين",
-              "متطابقتين",
-              "منفرجتين"
-            ],
-            "correct": 2,
-            "explanation": "نظرية الزوايا المتقابلة بالرأس: متطابقة دائماً."
-          },
-          {
-            "q": "نبرر تطابق العناصر المتبقية بعد إثبات تطابق المثلثين بـ:",
-            "options": [
-              "CPCTC (العناصر المتناظرة في مثلثين متطابقين متطابقة)",
-              "خاصية الانعكاس",
-              "مسلمة SSS",
-              "مسلمة SAS"
-            ],
-            "correct": 0,
-            "explanation": "قاعدة CPCTC."
-          }
-        ],
-        "tf": [
-          {
-            "statement": "في مسلمة SAS يشترط أن تكون الزاوية محصورة بين الضلعين المتطابقين.",
-            "is_true": true,
-            "explanation": "صواب، شرط أساسي لضمان التطابق."
-          },
-          {
-            "statement": "تطابق الزوايا الثلاث (AAA) كافٍ لإثبات تطابق أي مثلثين.",
-            "is_true": false,
-            "explanation": "خطأ، يثبت التشابه فقط ولا يضمن تساوي الأضلاع."
-          },
-          {
-            "statement": "الضلع المشترك بين مثلثين يطابق نفسه بخاصية الانعكاس.",
-            "is_true": true,
-            "explanation": "صواب، وتعتبر خطوة برهان معتمدة."
-          },
-          {
-            "statement": "مسلمة SSS تعني تطابق زاويتين وضلع.",
-            "is_true": false,
-            "explanation": "خطأ، SSS تعني ثلاثة أضلاع."
-          },
-          {
-            "statement": "المثلثان المتطابقان يتساويان في المساحة والمحيط.",
-            "is_true": true,
-            "explanation": "صواب، التطابق يقتضي التساوي التام."
-          }
-        ]
-      },
-      "socratic": {
-        "lesson_title": "إثبات تطابق المثلثات (SSS, SAS)",
-        "lesson_number": "٣-٤",
-        "inquiry_question": "هل يكفي تطابق زوايا مثلثين لإثبات تطابقهما التام؟ أم أن التشابه لا يضمن بالضرورة التكافؤ المقاسي؟",
-        "conceptual_dilemma": "الاعتقاد بأن تطابق ثلاث زوايا (AAA) يثبت تطابق المثلثات، بينما هو يثبت التشابه فقط ولا يضمن تساوي الأضلاع.",
-        "dialogue": [
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "إذا تطابقت الزوايا الثلاث لمثلث صغير مع زوايا مثلث ضخم مرسوم على شاشة السينما، هل هما متطابقان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "🎓",
-            "text": "نعم، زواياهما متساوية تماماً!"
-          },
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "لو وضعت المثلث الصغير فوق مثلث الشاشة، هل سينطبقان تماماً بحيث يغطي أحدهما الآخر دون زيادة أو نقصان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "💡",
-            "text": "مستحيل! أحدهما أكبر بكثير من الآخر! إذن الزوايا تحدد الشكل فقط، بينما الأضلاع هي التي تحدد المقاس الفعلي!"
-          }
-        ],
-        "probing_questions": [
-          "لماذا تشترط حالة SAS أن تكون الزاوية محصورة تحديداً بين الضلعين المتطابقين؟",
-          "كم عنصراً مستقلاً على الأقل نحتاج لإثبات تطابق مثلثين، وما هي التوليفات الكافية؟",
-          "كيف يُستخدم البرهان الإحداثي وقانون المسافة بين نقطتين في إثبات خواص المثلثات؟"
-        ],
-        "misconception_buster": {
-          "misconception": "اعتماد حالة تطابق غير صحيحة مثل (SSA) أو (AAA) دون وجود ضلع محصور أو قيود التطابق القطعية.",
-          "correction": "حالات التطابق المعتمدة للمثلثات هي: SSS, SAS, ASA, AAS وتطابق وتر وساق في القائم (HL)."
-        }
-      },
-      "lesson_tools": {
-        "tool_type": "geometry_congruence_lab",
-        "title": "مختبر الهندسة الديناميكية وتطابق المثلثات (٣-٤)",
-        "description": "لوحة رسم هندسي تفاعلية تسمح بسحب وتدوير المثلثات ومطابقة الأضلاع والزوايا في الوقت الحقيقي.",
-        "features": [
-          "محاكاة بصرية تفاعلية تفكك المفاهيم المعقدة إلى عناصر ملموسة.",
-          "مولد أمثلة ومسائل تدريبية لا نهائية مع التحقق الفوري من صحة الحل.",
-          "سبورة بيضاء ذكية تدعم الرسم التوضيحي وتدوين الملاحظات التفاعلية.",
-          "تصدير نتائج الاستقصاء والمحاكاة إلى سجل التعلم بضغطة زر."
-        ],
-        "quick_actions": [
-          {
-            "id": "simulate",
-            "label": "تشغيل المحاكاة التفاعلية",
-            "icon": "🚀",
-            "action": "run_simulation"
-          },
-          {
-            "id": "generate",
-            "label": "توليد مسألة استقصائية جديدة",
-            "icon": "🔄",
-            "action": "new_challenge"
-          },
-          {
-            "id": "whiteboard",
-            "label": "فتح السبورة الذكية للشرح",
-            "icon": "🖍️",
-            "action": "open_whiteboard"
-          }
-        ],
-        "widget_badge": "أداة نشطة ومخصصة للدرس",
-        "interactive_embed_url": "منصة_سقراط_للرياضيات_سادس_ابتدائي.html"
-      }
-    },
-    "g1s-t1-c3-l5": {
-      "id": "g1s-t1-c3-l5",
-      "number": "٣-٥",
-      "title": "إثبات تطابق المثلثات (ASA, AAS)",
-      "english_title": "Proving Triangle Congruence: ASA & AAS",
-      "grade": "الصف الأول الثانوي",
-      "stage": "المرحلة الثانوية",
-      "term": "الفصل الدراسي الأول",
-      "term_id": "term1",
-      "chapter": "الفصل الثالث: المثلثات المتطابقة",
-      "chapter_id": "g1s-t1-c3",
-      "pages": "ص ١٧٩ - ١٨٧",
-      "status": "completed",
-      "badge": "مكتمل بالكامل",
-      "objectives": [
-        "تحديد شروط مسلمة التطابق بزاويتين وضلع محصور بينهما (ASA).",
-        "تحديد شروط نظرية التطابق بزاويتين وضلع غير محصور (AAS).",
-        "التمييز بين الضلع المحصور (Included Side) والضلع غير المحصور في المثلث.",
-        "كتابة براهين هندسية ذات عمودين وبراهين تسلسلية توظف ASA و AAS.",
-        "تطبيق حالات تطابق المثلثات القائمة الخاصة (وتر وساق HL، ساق وساق LL، وتر وزاوية حادة HA، ساق وزاوية حادة LA)."
-      ],
-      "plan_5es": {
-        "engage": "عرض مسألة تحديد موقع سفينة في البحر انطلاقاً من محطتي رادار على الشاطئ بزاويتي رصد والمسافة بين المحطتين: هل يحدد هذا موقع السفينة بدقة تامة؟ نعم وفق ASA.",
-        "explore": "رسم قطعة مستقيمة ثابتة وبناء زاويتين عند طرفيها وملاحظة نقطة التقاء ضلعي الزاويتين وتكوين مثلث فريد لا يتغير.",
-        "explain": "مسلمة ASA: تطابق زاويتين والضلع المحصور بينهما. نظرية AAS: تطابق زاويتين وضلع غير محصور (وتعتمد على نظرية الزاوية الثالثة). حالات المثلث القائم: نظرية الوتر والساق (HL) المشتقة من فيثاغورس.",
-        "elaborate": "تطبيق STEM ملاحي: قياس المسافة بين منارتين بحريتين وجزيرة صخرية دون الإبحار المباشر إليها.",
-        "evaluate": "براهين هندسية متنوعة واختبار مقنن (10 اختيار من متعدد + 5 صواب وخطأ)."
-      },
-      "summary": {
-        "concept": "حالات التطابق بالزوايا: ASA (ضلع محصور بين الزاويتين) و AAS (ضلع غير محصور). وحالة HL الخاصة بالمثلثات القائمة.",
-        "methods": [
-          "مسلمة ASA: زاوية - ضلع محصور - زاوية.",
-          "نظرية AAS: زاوية - زاوية - ضلع غير محصور.",
-          "حالة HL للمثلث القائم: تطابق الوتر وساق واحدة كافٍ لتطابق المثلثين القائمين."
-        ],
-        "golden_rule": "الضلع المحصور في ASA يقع بين رأسي الزاويتين المتطابقتين، بينما في AAS يقع خارج المسافة بين الرأسين.",
-        "solved_example": "إذا كان ق∠أ = ق∠د ، ق∠ب = ق∠هـ ، أ ب ≅ د هـ -> المثلثان متطابقان بمسلمة ASA."
-      },
-      "worksheet": {
-        "title": "ورقة العمل الاستقصائية: إثبات تطابق المثلثات (ASA, AAS)",
-        "questions": [
-          {
-            "q": "١) ما الضلع المحصور بين ∠أ و ∠ب في المثلث أ ب جـ؟",
-            "ans": "الضلع أ ب."
-          },
-          {
-            "q": "٢) ما الفرق بين مسلمة ASA ونظرية AAS؟",
-            "ans": "في ASA الضلع محصور بين الزاويتين، بينما في AAS الضلع غير محصور."
-          },
-          {
-            "q": "٣) ما الشرط الإضافي لتطبيق حالة HL؟",
-            "ans": "أن يكون المثلثان قائمي الزاوية مع تطابق الوتر وساق."
-          },
-          {
-            "q": "٤) إذا تطابقت زاويتان وضلع غير محصور في مثلثين، فما الحالة المعتمدة؟",
-            "ans": "نظرية AAS."
-          }
-        ]
-      },
-      "quiz": {
-        "mcq": [
-          {
-            "q": "الضلع المحصور بين الزاويتين ∠س و ∠ص في المثلث س ص ع هو:",
-            "options": [
-              "س ص",
-              "ص ع",
-              "س ع",
-              "لا يوجد"
-            ],
-            "correct": 0,
-            "explanation": "القطعة الواصلة بين الرأسين س و ص هي س ص."
-          },
-          {
-            "q": "تطابق زاويتين والضلع المحصور بينهما في مثلث مع نظائرها في آخر يمثل مسلمة:",
-            "options": [
-              "SSS",
-              "SAS",
-              "ASA",
-              "AAS"
-            ],
-            "correct": 2,
-            "explanation": "مسلمة ASA: Angle-Side-Angle."
-          },
-          {
-            "q": "تطابق زاويتين وضلع غير محصور يمثل نظرية:",
-            "options": [
-              "AAS",
-              "ASA",
-              "SAS",
-              "HL"
-            ],
-            "correct": 0,
-            "explanation": "نظرية AAS: Angle-Angle-Side."
-          },
-          {
-            "q": "حالة التطابق HL تطبق حصرياً على:",
-            "options": [
-              "المثلثات متطابقة الأضلاع",
-              "المثلثات القائمة الزاوية",
-              "المثلثات المنفرجة الزاوية",
-              "جميع المثلثات"
-            ],
-            "correct": 1,
-            "explanation": "HL تعني Hypotenuse-Leg في المثلث القائم."
-          },
-          {
-            "q": "في نظرية HL، الحرف H يرمز إلى:",
-            "options": [
-              "الارتفاع",
-              "الوتر (Hypotenuse)",
-              "نصف القطر",
-              "الأفق"
-            ],
-            "correct": 1,
-            "explanation": "Hypotenuse وتر المثلث القائم."
-          },
-          {
-            "q": "إذا كان ∠أ ≅ ∠د ، ∠جـ ≅ ∠و ، أ ب ≅ د هـ، فإن حالة التطابق هي:",
-            "options": [
-              "ASA",
-              "AAS",
-              "SAS",
-              "SSS"
-            ],
-            "correct": 1,
-            "explanation": "الضلع أ ب غير محصور بين ∠أ و ∠جـ، فهي AAS."
-          },
-          {
-            "q": "الزاويتان المتتامتان في مثلث قائم، إذا تطابقت إحداهما والوتر مع نظائرها في مثلث قائم آخر، فإن المثلثين يتطابقان وفق:",
-            "options": [
-              "HA (وتر وزاوية حادة)",
-              "SSS",
-              "AAA",
-              "SAS"
-            ],
-            "correct": 0,
-            "explanation": "حالة HA للمثلث القائم (أو AAS)."
-          },
-          {
-            "q": "أي الحالات التالية تكفي لإثبات تطابق مثلثين؟",
-            "options": [
-              "AAA",
-              "SSA",
-              "AAS",
-              "محيط متساوٍ فقط"
-            ],
-            "correct": 2,
-            "explanation": "AAS نظرية تطابق صحيحة."
-          },
-          {
-            "q": "في المثلثين القائمين، إذا تطابق الساقان مع الساقين، فإنهما يتطابقان بحالة:",
-            "options": [
-              "LL (ساق وساق / SAS)",
-              "HL",
-              "AAS",
-              "ASA"
-            ],
-            "correct": 0,
-            "explanation": "حالة LL وهي مكافئة لـ SAS لأن الزاوية بينهما قائمة ٩٠°."
-          },
-          {
-            "q": "المبرر المستخدم لإثبات صحة نظرية AAS بالاعتماد على ASA هو:",
-            "options": [
-              "نظرية الزاوية الثالثة",
-              "مسلمة المنصف",
-              "نظرية فيثاغورس",
-              "خاصية التعدي"
-            ],
-            "correct": 0,
-            "explanation": "نظرية الزاوية الثالثة تضمن تطابق الزاوية المحصورة الثالثة."
-          }
-        ],
-        "tf": [
-          {
-            "statement": "في مسلمة ASA يجب أن يكون الضلع واصلاً بين رأسي الزاويتين المتطابقتين.",
-            "is_true": true,
-            "explanation": "صواب، هذا هو الضلع المحصور."
-          },
-          {
-            "statement": "حالة التطابق HL تتطلب تطابق زاويتين حادتين فقط.",
-            "is_true": false,
-            "explanation": "خطأ، تتطلب تطابق الوتر وساق واحدة في مثلث قائم."
-          },
-          {
-            "statement": "يمكن إثبات تطابق المثلثين إذا علمنا قياسات الزوايا الثلاث فقط (AAA).",
-            "is_true": false,
-            "explanation": "خطأ، الزوايا الثلاث تثبت التشابه فقط."
-          },
-          {
-            "statement": "نظرية AAS تعتمد في برهانها على نظرية الزاوية الثالثة لتحويلها إلى ASA.",
-            "is_true": true,
-            "explanation": "صواب، وهذا هو البرهان الهندسي القياسي لها."
-          },
-          {
-            "statement": "في أي مثلث، الضلع الأكبر يقابل الزاوية الكبرى دائماً.",
-            "is_true": true,
-            "explanation": "صواب، وفق نظريات التباين في المثلث."
-          }
-        ]
-      },
-      "socratic": {
-        "lesson_title": "إثبات تطابق المثلثات (ASA, AAS)",
-        "lesson_number": "٣-٥",
-        "inquiry_question": "هل يكفي تطابق زوايا مثلثين لإثبات تطابقهما التام؟ أم أن التشابه لا يضمن بالضرورة التكافؤ المقاسي؟",
-        "conceptual_dilemma": "الاعتقاد بأن تطابق ثلاث زوايا (AAA) يثبت تطابق المثلثات، بينما هو يثبت التشابه فقط ولا يضمن تساوي الأضلاع.",
-        "dialogue": [
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "إذا تطابقت الزوايا الثلاث لمثلث صغير مع زوايا مثلث ضخم مرسوم على شاشة السينما، هل هما متطابقان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "🎓",
-            "text": "نعم، زواياهما متساوية تماماً!"
-          },
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "لو وضعت المثلث الصغير فوق مثلث الشاشة، هل سينطبقان تماماً بحيث يغطي أحدهما الآخر دون زيادة أو نقصان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "💡",
-            "text": "مستحيل! أحدهما أكبر بكثير من الآخر! إذن الزوايا تحدد الشكل فقط، بينما الأضلاع هي التي تحدد المقاس الفعلي!"
-          }
-        ],
-        "probing_questions": [
-          "لماذا تشترط حالة SAS أن تكون الزاوية محصورة تحديداً بين الضلعين المتطابقين؟",
-          "كم عنصراً مستقلاً على الأقل نحتاج لإثبات تطابق مثلثين، وما هي التوليفات الكافية؟",
-          "كيف يُستخدم البرهان الإحداثي وقانون المسافة بين نقطتين في إثبات خواص المثلثات؟"
-        ],
-        "misconception_buster": {
-          "misconception": "اعتماد حالة تطابق غير صحيحة مثل (SSA) أو (AAA) دون وجود ضلع محصور أو قيود التطابق القطعية.",
-          "correction": "حالات التطابق المعتمدة للمثلثات هي: SSS, SAS, ASA, AAS وتطابق وتر وساق في القائم (HL)."
-        }
-      },
-      "lesson_tools": {
-        "tool_type": "geometry_congruence_lab",
-        "title": "مختبر الهندسة الديناميكية وتطابق المثلثات (٣-٥)",
-        "description": "لوحة رسم هندسي تفاعلية تسمح بسحب وتدوير المثلثات ومطابقة الأضلاع والزوايا في الوقت الحقيقي.",
-        "features": [
-          "محاكاة بصرية تفاعلية تفكك المفاهيم المعقدة إلى عناصر ملموسة.",
-          "مولد أمثلة ومسائل تدريبية لا نهائية مع التحقق الفوري من صحة الحل.",
-          "سبورة بيضاء ذكية تدعم الرسم التوضيحي وتدوين الملاحظات التفاعلية.",
-          "تصدير نتائج الاستقصاء والمحاكاة إلى سجل التعلم بضغطة زر."
-        ],
-        "quick_actions": [
-          {
-            "id": "simulate",
-            "label": "تشغيل المحاكاة التفاعلية",
-            "icon": "🚀",
-            "action": "run_simulation"
-          },
-          {
-            "id": "generate",
-            "label": "توليد مسألة استقصائية جديدة",
-            "icon": "🔄",
-            "action": "new_challenge"
-          },
-          {
-            "id": "whiteboard",
-            "label": "فتح السبورة الذكية للشرح",
-            "icon": "🖍️",
-            "action": "open_whiteboard"
-          }
-        ],
-        "widget_badge": "أداة نشطة ومخصصة للدرس",
-        "interactive_embed_url": "منصة_سقراط_للرياضيات_سادس_ابتدائي.html"
-      }
-    },
-    "g1s-t1-c3-l6": {
-      "id": "g1s-t1-c3-l6",
-      "number": "٣-٦",
-      "title": "المثلثات المتطابقة الضلعين والمتطابقة الأضلاع",
-      "english_title": "Isosceles & Equilateral Triangles",
-      "grade": "الصف الأول الثانوي",
-      "stage": "المرحلة الثانوية",
-      "term": "الفصل الدراسي الأول",
-      "term_id": "term1",
-      "chapter": "الفصل الثالث: المثلثات المتطابقة",
-      "chapter_id": "g1s-t1-c3",
-      "pages": "ص ١٨٨ - ١٩٤",
-      "status": "completed",
-      "badge": "مكتمل بالكامل",
-      "objectives": [
-        "تسمية أجزاء المثلث متطابق الضلعين (الساقان، القاعدة، زاوية الرأس، زاويتا القاعدة).",
-        "إثبات وتطبيق نظرية المثلث متطابق الضلعين (زاويتا القاعدة متطابقتان).",
-        "إثبات وتطبيق عكس نظرية المثلث متطابق الضلعين (إذا تطابقت زاويتان فإن الضلعين المقابلين لهما متطابقان).",
-        "استنتاج نتائج المثلث متطابق الأضلاع (المثلث متطابق الأضلاع متطابق الزوايا وقياس كل زاوية ٦٠°).",
-        "استخدام المعادلات الجبرية لإيجاد قيم المتغيرات في المثلثات متطابقة الضلعين والأضلاع."
-      ],
-      "plan_5es": {
-        "engage": "طي ورقة مثلثية متطابقة الضلعين على خط تماثلها: ماذا نلاحظ على زاويتي القاعدة والضلعين؟ انطباق تام يثبت التطابق.",
-        "explore": "استخدام برمجية ديناميكية لتغيير زاوية رأس مثلث متطابق الضلعين ومراقبة قياس زاويتي القاعدة واستنتاج علاقتهما المستمرة.",
-        "explain": "تأصيل النظريات: نظرية المثلث متطابق الضلعين: إذا تطابق ضلعان في مثلث فإن الزاويتين المقابلتين لهما متطابقتان. العكس: تطابق الزوايا يقابله تطابق أضلاع. نتائج المثلث متطابق الأضلاع: يكون متطابق الزوايا، وقياس كل منها ٦٠°.",
-        "elaborate": "تطبيق هندسي معماري: حساب زوايا سقف قرميدي جمالوني متطابق الضلعين لتصريف مياه الأمطار بكفاءة.",
-        "evaluate": "تمارين جبرية على إيجاد المجاهيل س وص، ثم الاختبار المقنن (10 اختيار من متعدد + 5 صواب وخطأ)."
-      },
-      "summary": {
-        "concept": "المثلث متطابق الضلعين له ساقان متطابقان وزاويتا قاعدة متطابقتان. المثلث متطابق الأضلاع أضلاعه الثلاثة متطابقة وزواياه الثلاث متطابقة (٦٠°).",
-        "methods": [
-          "نظرية متطابق الضلعين: أ ب ≅ أ جـ -> ∠ب ≅ ∠جـ.",
-          "عكس النظرية: ∠ب ≅ ∠جـ -> أ ب ≅ أ جـ.",
-          "حساب زاوية القاعدة: (١٨٠° - زاوية الرأس) ÷ ٢.",
-          "حساب زاوية الرأس: ١٨٠° - ٢(زاوية القاعدة)."
-        ],
-        "golden_rule": "زاويتا القاعدة في المثلث متطابق الضلعين متطابقتان دائماً وحادتان دائماً.",
-        "solved_example": "مثلث متطابق الضلعين زاوية رأسه ٥٠°، فإن كل زاوية من زاويتي قاعدته = (١٨٠ - ٥٠) ÷ ٢ = ١٣٠ ÷ ٢ = ٦٥°."
-      },
-      "worksheet": {
-        "title": "ورقة العمل الاستقصائية: المثلثات متطابقة الضلعين والأضلاع",
-        "questions": [
-          {
-            "q": "١) في المثلث أ ب جـ، إذا كان أ ب ≅ أ جـ و ق∠أ = ٨٠°، فما قياس ∠ب و ∠جـ؟",
-            "ans": "ق∠ب = ق∠جـ = (١٨٠ - ٨٠) ÷ ٢ = ٥٠°."
-          },
-          {
-            "q": "٢) إذا كان قياس إحدى زاويتي قاعدة مثلث متطابق الضلعين ٥٥°، فما قياس زاوية الرأس؟",
-            "ans": "زاوية الرأس = ١٨٠ - ٢(٥٥) = ١٨٠ - ١١٠ = ٧٠°."
-          },
-          {
-            "q": "٣) مثلث متطابق الأضلاع طول ضلعه (٤س - ٧) وطول ضلع آخر (٢س + ٥). أوجد س وطول الضلع.",
-            "ans": "٤س - ٧ = ٢س + ٥ -> ٢س = ١٢ -> س = ٦. طول الضلع = ٤(٦) - ٧ = ١٧ سم."
-          },
-          {
-            "q": "٤) هل يمكن أن تكون زاوية القاعدة في مثلث متطابق الضلعين قائمة أو منفرجة؟ فسر ذلك.",
-            "ans": "مستحيل، لأن الزاويتين متطابقتان، فلو كانت إحداهما قائمة (٩٠°) لكان مجموعهما ١٨٠° دون زاوية الرأس وهذا يناقض نظرية مجموع الزوايا."
-          }
-        ]
-      },
-      "quiz": {
-        "mcq": [
-          {
-            "q": "زاويتا القاعدة في المثلث متطابق الضلعين تكونان دائماً:",
-            "options": [
-              "متكاملتين",
-              "متطابقتين",
-              "قائمتين",
-              "منفرجتين"
-            ],
-            "correct": 1,
-            "explanation": "نظرية المثلث متطابق الضلعين: زاويتا القاعدة متطابقتان."
-          },
-          {
-            "q": "إذا كان قياس زاوية الرأس في مثلث متطابق الضلعين يساوي ١٠٠°، فإن قياس كل زاوية من زاويتي القاعدة يساوي:",
-            "options": [
-              "٤٠°",
-              "٥٠°",
-              "٨٠°",
-              "١٠٠°"
-            ],
-            "correct": 0,
-            "explanation": "(١٨٠ - ١٠٠) ÷ ٢ = ٨٠ ÷ ٢ = ٤٠°."
-          },
-          {
-            "q": "قياس كل زاوية داخلية في أي مثلث متطابق الأضلاع يساوي دائماً:",
-            "options": [
-              "٤٥°",
-              "٦٠°",
-              "٩٠°",
-              "١٢٠°"
-            ],
-            "correct": 1,
-            "explanation": "١٨٠ ÷ ٣ = ٦٠°."
-          },
-          {
-            "q": "إذا كان قياس إحدى زاويتي القاعدة في مثلث متطابق الضلعين ٦٥°، فإن قياس زاوية الرأس يساوي:",
-            "options": [
-              "٥٠°",
-              "٦٠°",
-              "٦٥°",
-              "٧٠°"
-            ],
-            "correct": 0,
-            "explanation": "١٨٠ - (٦٥ + ٦٥) = ١٨٠ - ١٣٠ = ٥٠°."
-          },
-          {
-            "q": "عكس نظرية المثلث متطابق الضلعين ينص على أنه إذا تطابقت زاويتان في مثلث فإن:",
-            "options": [
-              "المثلث متطابق الأضلاع",
-              "الضلعين المقابلين لهما متطابقان",
-              "الزاوية الثالثة ٦٠°",
-              "المثلث قائم"
-            ],
-            "correct": 1,
-            "explanation": "تطابق الزاويتين يقتضي تطابق الضلعين المقابلين لهما."
-          },
-          {
-            "q": "في مثلث متطابق الضلعين، طول أحد الساقين (٣س + ٢) وطول الساق الآخر (س + ١٢). قيمة س تساوي:",
-            "options": [
-              "س = ٣",
-              "س = ٥",
-              "س = ٧",
-              "س = ١٠"
-            ],
-            "correct": 1,
-            "explanation": "٣س + ٢ = س + ١٢ -> ٢س = ١٠ -> س = ٥."
-          },
-          {
-            "q": "مثلث متطابق الضلعين محيطه ٢٨ سم وطول قاعدته ٨ سم. طول كل من ساقيه يساوي:",
-            "options": [
-              "٨ سم",
-              "١٠ سم",
-              "١٢ سم",
-              "١٤ سم"
-            ],
-            "correct": 1,
-            "explanation": "(٢٨ - ٨) ÷ ٢ = ٢٠ ÷ ٢ = ١٠ سم."
-          },
-          {
-            "q": "إذا تطابقت زوايا مثلث الثلاث، فإن المثلث يكون بالضرورة:",
-            "options": [
-              "متطابق الأضلاع",
-              "قائم الزاوية",
-              "مختلف الأضلاع",
-              "منفرج الزاوية"
-            ],
-            "correct": 0,
-            "explanation": "تطابق الزوايا الثلاث يستلزم تطابق الأضلاع الثلاثة."
-          },
-          {
-            "q": "نوع زاويتي القاعدة في أي مثلث متطابق الضلعين هو دائماً:",
-            "options": [
-              "زاويتان حادتان",
-              "زاويتان قائمتان",
-              "زاويتان منفرجتان",
-              "إحداهما حادة والأخرى منفرجة"
-            ],
-            "correct": 0,
-            "explanation": "حادتان دائماً لأن مجموعهما أقل من ١٨٠° وتطابقهما يمنع أن تكونا ≥ ٩٠°."
-          },
-          {
-            "q": "المثلث متطابق الضلعين الذي قياس إحدى زواياه ٦٠° يتحول بالضرورة إلى مثلث:",
-            "options": [
-              "مختلف الأضلاع",
-              "متطابق الأضلاع",
-              "قائم الزاوية",
-              "منفرج الزاوية"
-            ],
-            "correct": 1,
-            "explanation": "وجود زاوية ٦٠° في متطابق الضلعين يجعل الزوايا الثلاث ٦٠° فيصبح متطابق الأضلاع."
-          }
-        ],
-        "tf": [
-          {
-            "statement": "زاويتا القاعدة في المثلث متطابق الضلعين يمكن أن تكونا منفرجتين.",
-            "is_true": false,
-            "explanation": "خطأ، حادتان دائماً، لأن زاويتين منفرجتين مجموعهما > ١٨٠° وهذا مستحيل."
-          },
-          {
-            "statement": "المثلث متطابق الأضلاع هو حالة خاصة من المثلث متطابق الضلعين.",
-            "is_true": true,
-            "explanation": "صواب، لأن لديه ضلعين متطابقين وزيادة (ضلع ثالث متطابق)."
-          },
-          {
-            "statement": "إذا كان قياس زاوية الرأس في مثلث متطابق الضلعين ٦٠°، فإن المثلث يكون متطابق الأضلاع.",
-            "is_true": true,
-            "explanation": "صواب، الزاويتان الأخريان ستكونان (١٨٠-٦٠)÷٢ = ٦٠° فيتطابق الأضلاع."
-          },
-          {
-            "statement": "منصف زاوية الرأس في المثلث متطابق الضلعين يكون عمودياً على القاعدة وينصفها.",
-            "is_true": true,
-            "explanation": "صواب، هذه نتيجة هندسية أساسية مثبتة بالتطابق."
-          },
-          {
-            "statement": "محيط مثلث متطابق الأضلاع طول ضلعه ل هو ٣ل.",
-            "is_true": true,
-            "explanation": "صواب، لأن أضلاعه الثلاثة متطابقة: ل + ل + ل = ٣ل."
-          }
-        ]
-      },
-      "socratic": {
-        "lesson_title": "المثلثات المتطابقة الضلعين والمتطابقة الأضلاع",
-        "lesson_number": "٣-٦",
-        "inquiry_question": "هل يكفي تطابق زوايا مثلثين لإثبات تطابقهما التام؟ أم أن التشابه لا يضمن بالضرورة التكافؤ المقاسي؟",
-        "conceptual_dilemma": "الاعتقاد بأن تطابق ثلاث زوايا (AAA) يثبت تطابق المثلثات، بينما هو يثبت التشابه فقط ولا يضمن تساوي الأضلاع.",
-        "dialogue": [
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "إذا تطابقت الزوايا الثلاث لمثلث صغير مع زوايا مثلث ضخم مرسوم على شاشة السينما، هل هما متطابقان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "🎓",
-            "text": "نعم، زواياهما متساوية تماماً!"
-          },
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "لو وضعت المثلث الصغير فوق مثلث الشاشة، هل سينطبقان تماماً بحيث يغطي أحدهما الآخر دون زيادة أو نقصان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "💡",
-            "text": "مستحيل! أحدهما أكبر بكثير من الآخر! إذن الزوايا تحدد الشكل فقط، بينما الأضلاع هي التي تحدد المقاس الفعلي!"
-          }
-        ],
-        "probing_questions": [
-          "لماذا تشترط حالة SAS أن تكون الزاوية محصورة تحديداً بين الضلعين المتطابقين؟",
-          "كم عنصراً مستقلاً على الأقل نحتاج لإثبات تطابق مثلثين، وما هي التوليفات الكافية؟",
-          "كيف يُستخدم البرهان الإحداثي وقانون المسافة بين نقطتين في إثبات خواص المثلثات؟"
-        ],
-        "misconception_buster": {
-          "misconception": "اعتماد حالة تطابق غير صحيحة مثل (SSA) أو (AAA) دون وجود ضلع محصور أو قيود التطابق القطعية.",
-          "correction": "حالات التطابق المعتمدة للمثلثات هي: SSS, SAS, ASA, AAS وتطابق وتر وساق في القائم (HL)."
-        }
-      },
-      "lesson_tools": {
-        "tool_type": "geometry_congruence_lab",
-        "title": "مختبر الهندسة الديناميكية وتطابق المثلثات (٣-٦)",
-        "description": "لوحة رسم هندسي تفاعلية تسمح بسحب وتدوير المثلثات ومطابقة الأضلاع والزوايا في الوقت الحقيقي.",
-        "features": [
-          "محاكاة بصرية تفاعلية تفكك المفاهيم المعقدة إلى عناصر ملموسة.",
-          "مولد أمثلة ومسائل تدريبية لا نهائية مع التحقق الفوري من صحة الحل.",
-          "سبورة بيضاء ذكية تدعم الرسم التوضيحي وتدوين الملاحظات التفاعلية.",
-          "تصدير نتائج الاستقصاء والمحاكاة إلى سجل التعلم بضغطة زر."
-        ],
-        "quick_actions": [
-          {
-            "id": "simulate",
-            "label": "تشغيل المحاكاة التفاعلية",
-            "icon": "🚀",
-            "action": "run_simulation"
-          },
-          {
-            "id": "generate",
-            "label": "توليد مسألة استقصائية جديدة",
-            "icon": "🔄",
-            "action": "new_challenge"
-          },
-          {
-            "id": "whiteboard",
-            "label": "فتح السبورة الذكية للشرح",
-            "icon": "🖍️",
-            "action": "open_whiteboard"
-          }
-        ],
-        "widget_badge": "أداة نشطة ومخصصة للدرس",
-        "interactive_embed_url": "منصة_سقراط_للرياضيات_سادس_ابتدائي.html"
-      }
-    },
-    "g1s-t1-c3-l7": {
-      "id": "g1s-t1-c3-l7",
-      "number": "٣-٧",
-      "title": "المثلثات والبرهان الإحداثي",
-      "english_title": "Triangles & Coordinate Proof",
-      "grade": "الصف الأول الثانوي",
-      "stage": "المرحلة الثانوية",
-      "term": "الفصل الدراسي الأول",
-      "term_id": "term1",
-      "chapter": "الفصل الثالث: المثلثات المتطابقة",
-      "chapter_id": "g1s-t1-c3",
-      "pages": "ص ١٩٥ - ٢٠٠",
-      "status": "completed",
-      "badge": "مكتمل بالكامل",
-      "objectives": [
-        "تحديد مفهوم البرهان الإحداثي واستخدامه لإثبات صحة المفاهيم الهندسية جبرياً.",
-        "رسم وتعيين المثلث في المستوى الإحداثي بطريقة ذكية تسهل الحسابات (وضع رأس عند نقطة الأصل، وضلع على أحد المحاور).",
-        "تحديد إحداثيات الرؤوس المجهولة لمثلثات متطابقة الضلعين وقائمة ومتطابقة الأضلاع بدلالة المتغيرات.",
-        "استخدام قانون المسافة بين نقطتين لإثبات تطابق الأضلاع في المستوى الإحداثي.",
-        "استخدام قانون نقطة المنتصف وقانون الميل لكتابة برهان إحداثي منظم."
-      ],
-      "plan_5es": {
-        "engage": "عرض خريطة رقمية بنظام GPS: كيف تستخدم الأقمار الصناعية إحداثيات (س ، ص) لإثبات أن المسافات متساوية بدقة مليمترية؟ دمج الجبر مع الهندسة.",
-        "explore": "يقوم الطلاب بوضع مثلث قائم في مواضع مختلفة على المستوى الإحداثي ومقارنة صعوبة كتابة الإحداثيات عند وضعه عشوائياً مقابل وضعه على المحورين ونقطة الأصل.",
-        "explain": "إرشادات وضع المثلث في المستوى الإحداثي: ١) جعل نقطة الأصل (٠ ، ٠) رأساً للمثلث. ٢) وضع ضلع واحد على الأقل على أحد المحورين السيني أو الصادي. ٣) إبقاء المثلث في الربع الأول قدر الإمكان لتكون الإحداثيات موجبة. ٤) استخدام إحداثيات مضاعفة (مثل ٢أ) عند التعامل مع نقاط المنتصف لتجنب الكسور.",
-        "elaborate": "كتابة برهان إحداثي كامل يثبت أن القطعة المنصفة لضلعين في مثلث توازي الضلع الثالث وطولها يساوي نصف طوله.",
-        "evaluate": "تمارين تحديد إحداثيات الرؤوس المجهولة، ثم الاختبار المقنن (10 اختيار من متعدد + 5 صواب وخطأ)."
-      },
-      "summary": {
-        "concept": "البرهان الإحداثي هو طريقة برهان تستخدم الأشكال الهندسية في المستوى الإحداثي والجبر لإثبات صحة النظريات والعلاقات الهندسية.",
-        "methods": [
-          "قانون المسافة: ف = جذر[ <span class=\"ar-pow\"><span class=\"ar-base\">(س٢ - س١)</span><sup class=\"ar-exp\">٢</sup></span> + <span class=\"ar-pow\"><span class=\"ar-base\">(ص٢ - ص١)</span><sup class=\"ar-exp\">٢</sup></span> ].",
-          "قانون نقطة المنتصف: م = ( (س١ + س٢)/٢ ، (ص١ + ص٢)/٢ ).",
-          "قانون الميل: م = (ص٢ - ص١) / (س٢ - س١)."
-        ],
-        "golden_rule": "الوضع الذكي للمثلث على المحاور ونقطة الأصل يختصر ٩٠٪ من تعقيد الحسابات الجبرية في البرهان الإحداثي.",
-        "solved_example": "مثلث متطابق الضلعين قاعدته على محور السينات من (٠ ، ٠) إلى (٢أ ، ٠). إحداثيات رأس المثلث تقع في المنتصف السيني تماماً فتكون: (أ ، ب)."
-      },
-      "worksheet": {
-        "title": "ورقة العمل الاستقصائية: المثلثات والبرهان الإحداثي",
-        "questions": [
-          {
-            "q": "١) اذكر خطوتين من الإرشادات المفضلة لوضع مثلث في المستوى الإحداثي لتسهيل البرهان.",
-            "ans": "١) وضع رأس عند نقطة الأصل (٠ ، ٠). ٢) وضع ضلع على أحد المحورين الإحداثيين."
-          },
-          {
-            "q": "٢) مثلث قائم الزاوية رأسه القائم عند (٠ ، ٠) وطولا ضلعي القائمة أ و ب على المحورين. حدد إحداثيات رؤوسه الثلاثة.",
-            "ans": "(٠ ، ٠) ، (أ ، ٠) ، (٠ ، ب)."
-          },
-          {
-            "q": "٣) في مثلث متطابق الضلعين، إذا كانت القاعدة على محور السينات وطولها ٢جـ ونقطة الأصل في منتصفها، فما إحداثيات رؤوس القاعدة؟",
-            "ans": "الرأس الأيمن (جـ ، ٠) والرأس الأيسر (-جـ ، ٠)."
-          },
-          {
-            "q": "٤) ما القانون المستخدم لإثبات توازي مستقيمين في البرهان الإحداثي؟",
-            "ans": "قانون الميل (إثبات أن ميلي المستقيمين متساويان: م١ = م٢)."
-          }
-        ]
-      },
-      "quiz": {
-        "mcq": [
-          {
-            "q": "أفضل موضع لأحد رؤوس المثلث في المستوى الإحداثي لتسهيل البرهان هو:",
-            "options": [
-              "النقطة (١ ، ١)",
-              "نقطة الأصل (٠ ، ٠)",
-              "النقطة (-١ ، ٠)",
-              "أي نقطة عشوائية"
-            ],
-            "correct": 1,
-            "explanation": "نقطة الأصل (٠ ، ٠) تبسط العمليات الحسابية وتجعل الحدود الصفرية ملغية."
-          },
-          {
-            "q": "في البرهان الإحداثي، يُفضل استخدام المتغيرات مثل (٢أ ، ٢ب) بدلاً من (أ ، ب) عند الحاجة إلى:",
-            "options": [
-              "حساب الميل",
-              "إيجاد نقاط المنتصف لتجنب الكسور",
-              "رسم مثلث قائم فقط",
-              "حساب الزوايا"
-            ],
-            "correct": 1,
-            "explanation": "القسمة على ٢ في قانون نقطة المنتصف: ٢أ ÷ ٢ = أ دون ظهور كسور مزعجة."
-          },
-          {
-            "q": "مثلث قائم الزاوية متطابق الضلعين رأسه القائم عند (٠ ، ٠) وطول ضلعه أ، فإن إحداثيات الرأسين الآخرين هما:",
-            "options": [
-              "(أ ، ٠) و (٠ ، أ)",
-              "(أ ، أ) و (٠ ، ٠)",
-              "(٢أ ، ٠) و (٠ ، أ)",
-              "(أ ، -أ)"
-            ],
-            "correct": 0,
-            "explanation": "الرأس على محور س هو (أ ، ٠) وعلى محور ص هو (٠ ، أ)."
-          },
-          {
-            "q": "القانون الجبري المستخدم لإثبات تطابق ضلعين في البرهان الإحداثي هو:",
-            "options": [
-              "قانون الميل",
-              "قانون المسافة بين نقطتين",
-              "قانون نقطة المنتصف",
-              "نظرية فيثاغورس فقط"
-            ],
-            "correct": 1,
-            "explanation": "قانون المسافة يحسب أطوال القطع المستقيمة بدقة."
-          },
-          {
-            "q": "لإثبات تعامد ضلعين في البرهان الإحداثي، نثبت أن حاصل ضرب ميليهما يساوي:",
-            "options": [
-              "٠",
-              "١",
-              "-١",
-              "غير معرف"
-            ],
-            "correct": 2,
-            "explanation": "شرط التعامد الهندسي: م١ × م٢ = -١."
-          },
-          {
-            "q": "مثلث متطابق الضلعين قاعدته على محور س ويمر محور ص برأسه المقابل وينصف القاعدة، فإذا كان أحد رؤوس القاعدة (ك ، ٠)، فإن الرأس الآخر هو:",
-            "options": [
-              "(-ك ، ٠)",
-              "(٠ ، ك)",
-              "(٢ك ، ٠)",
-              "(٠ ، -ك)"
-            ],
-            "correct": 0,
-            "explanation": "للتماثل حول محور الصادات: (-ك ، ٠)."
-          },
-          {
-            "q": "نقطة منتصف القطعة المستقيمة الواصلة بين (٢ ، ٤) و (٦ ، ٨) هي:",
-            "options": [
-              "(٤ ، ٦)",
-              "(٨ ، ١٢)",
-              "(٣ ، ٥)",
-              "(٤ ، ٤)"
-            ],
-            "correct": 0,
-            "explanation": "((٢+٦)÷٢ ، (٤+٨)÷٢) = (٨÷٢ ، ١٢÷٢) = (٤ ، ٦)."
-          },
-          {
-            "q": "ميل المستقيم الموازي لمحور السينات يساوي:",
-            "options": [
-              "١",
-              "٠",
-              "-١",
-              "غير معرف"
-            ],
-            "correct": 1,
-            "explanation": "فرق الصادات = ٠، إذن الميل = ٠."
-          },
-          {
-            "q": "ميل المستقيم العمودي على محور السينات (الموازي لمحور الصادات) هو:",
-            "options": [
-              "٠",
-              "١",
-              "غير معرف (القسمة على صفر)",
-              "-١"
-            ],
-            "correct": 2,
-            "explanation": "فرق السينات = ٠ والقسمة على صفر غير معرفة."
-          },
-          {
-            "q": "البرهان الإحداثي يجمع بين مبادئ:",
-            "options": [
-              "الهندسة والجبر معاً",
-              "الرسم اليدوي فقط",
-              "المنطق اللفظي فقط",
-              "الإحصاء والاحتمال"
-            ],
-            "correct": 0,
-            "explanation": "يوظف الجبر التحليلي لإثبات خصائص الأشكال الهندسية."
-          }
-        ],
-        "tf": [
-          {
-            "statement": "البرهان الإحداثي يعتمد على وضع الشكل الهندسي في المستوى الإحداثي واستخدام القوانين الجبرية.",
-            "is_true": true,
-            "explanation": "صواب، هذا هو التعريف الدقيق للبرهان الإحداثي."
-          },
-          {
-            "statement": "يجب وضع المثلث دائماً في الربع الرابع لتسهيل الحسابات.",
-            "is_true": false,
-            "explanation": "خطأ، يفضل الربع الأول لأن إحداثياته موجبة، ووضع أحد الأضلاع على المحورين."
-          },
-          {
-            "statement": "إذا كان ميل مستقيمين متساوياً، فإنهما مستقيمان متوازيان.",
-            "is_true": true,
-            "explanation": "صواب، شرط التوازي تماثل الميول."
-          },
-          {
-            "statement": "قانون المسافة بين نقطتين مشتق أساساً من نظرية فيثاغورس.",
-            "is_true": true,
-            "explanation": "صواب، المثلث القائم المتشكل من فرق السينات وفرق الصادات."
-          },
-          {
-            "statement": "لا يمكن استخدام المتغيرات والحروف في تعيين إحداثيات رؤوس المثلثات في البرهان الإحداثي.",
-            "is_true": false,
-            "explanation": "خطأ، بل يجب استخدام المتغيرات ليكون البرهان عاماً ينطبق على جميع الحالات وليس لحالة عددية واحدة."
-          }
-        ]
-      },
-      "socratic": {
-        "lesson_title": "المثلثات والبرهان الإحداثي",
-        "lesson_number": "٣-٧",
-        "inquiry_question": "هل يكفي تطابق زوايا مثلثين لإثبات تطابقهما التام؟ أم أن التشابه لا يضمن بالضرورة التكافؤ المقاسي؟",
-        "conceptual_dilemma": "الاعتقاد بأن تطابق ثلاث زوايا (AAA) يثبت تطابق المثلثات، بينما هو يثبت التشابه فقط ولا يضمن تساوي الأضلاع.",
-        "dialogue": [
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "إذا تطابقت الزوايا الثلاث لمثلث صغير مع زوايا مثلث ضخم مرسوم على شاشة السينما، هل هما متطابقان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "🎓",
-            "text": "نعم، زواياهما متساوية تماماً!"
-          },
-          {
-            "speaker": "سقراط المعلم",
-            "role": "teacher",
-            "avatar": "🏛️",
-            "text": "لو وضعت المثلث الصغير فوق مثلث الشاشة، هل سينطبقان تماماً بحيث يغطي أحدهما الآخر دون زيادة أو نقصان؟"
-          },
-          {
-            "speaker": "المتعلم المستكشف",
-            "role": "student",
-            "avatar": "💡",
-            "text": "مستحيل! أحدهما أكبر بكثير من الآخر! إذن الزوايا تحدد الشكل فقط، بينما الأضلاع هي التي تحدد المقاس الفعلي!"
-          }
-        ],
-        "probing_questions": [
-          "لماذا تشترط حالة SAS أن تكون الزاوية محصورة تحديداً بين الضلعين المتطابقين؟",
-          "كم عنصراً مستقلاً على الأقل نحتاج لإثبات تطابق مثلثين، وما هي التوليفات الكافية؟",
-          "كيف يُستخدم البرهان الإحداثي وقانون المسافة بين نقطتين في إثبات خواص المثلثات؟"
-        ],
-        "misconception_buster": {
-          "misconception": "اعتماد حالة تطابق غير صحيحة مثل (SSA) أو (AAA) دون وجود ضلع محصور أو قيود التطابق القطعية.",
-          "correction": "حالات التطابق المعتمدة للمثلثات هي: SSS, SAS, ASA, AAS وتطابق وتر وساق في القائم (HL)."
-        }
-      },
-      "lesson_tools": {
-        "tool_type": "geometry_congruence_lab",
-        "title": "مختبر الهندسة الديناميكية وتطابق المثلثات (٣-٧)",
-        "description": "لوحة رسم هندسي تفاعلية تسمح بسحب وتدوير المثلثات ومطابقة الأضلاع والزوايا في الوقت الحقيقي.",
-        "features": [
-          "محاكاة بصرية تفاعلية تفكك المفاهيم المعقدة إلى عناصر ملموسة.",
-          "مولد أمثلة ومسائل تدريبية لا نهائية مع التحقق الفوري من صحة الحل.",
-          "سبورة بيضاء ذكية تدعم الرسم التوضيحي وتدوين الملاحظات التفاعلية.",
-          "تصدير نتائج الاستقصاء والمحاكاة إلى سجل التعلم بضغطة زر."
-        ],
-        "quick_actions": [
-          {
-            "id": "simulate",
-            "label": "تشغيل المحاكاة التفاعلية",
-            "icon": "🚀",
-            "action": "run_simulation"
-          },
-          {
-            "id": "generate",
-            "label": "توليد مسألة استقصائية جديدة",
-            "icon": "🔄",
-            "action": "new_challenge"
-          },
-          {
-            "id": "whiteboard",
-            "label": "فتح السبورة الذكية للشرح",
-            "icon": "🖍️",
-            "action": "open_whiteboard"
-          }
-        ],
-        "widget_badge": "أداة نشطة ومخصصة للدرس",
-        "interactive_embed_url": "منصة_سقراط_للرياضيات_سادس_ابتدائي.html"
-      }
     }
   },
   "tools": [
@@ -27717,9 +25889,50 @@ window.CURRICULUM_DATA = {
   ]
 };
 
-// Merge Grade 3 Intermediate book data when loaded
-if (typeof window !== 'undefined' && window.CURRICULUM_DATA && window.CURRICULUM_DATA.lessons) {
+// Immediate auto-merge for pre-loaded book data
+if (typeof window !== 'undefined') {
+  if (window.GRADE6_BOOK_DATA && window.GRADE6_BOOK_DATA.lessons) {
+    Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE6_BOOK_DATA.lessons);
+  }
+  if (window.GRADE1M_BOOK_DATA && window.GRADE1M_BOOK_DATA.lessons) {
+    Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE1M_BOOK_DATA.lessons);
+  }
   if (window.GRADE3M_BOOK_DATA && window.GRADE3M_BOOK_DATA.lessons) {
     Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE3M_BOOK_DATA.lessons);
   }
+  if (window.GRADE1S_BOOK_DATA && window.GRADE1S_BOOK_DATA.lessons) {
+    Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE1S_BOOK_DATA.lessons);
+    if (window.CURRICULUM_DATA.stages && window.GRADE1S_BOOK_DATA.chapters) {
+      const secStage = window.CURRICULUM_DATA.stages.find(s => s.id === 'secondary');
+      if (secStage && secStage.grades) {
+        const g1s = secStage.grades.find(g => g.id === 'g1s');
+        if (g1s && g1s.terms) {
+          g1s.badge = window.GRADE1S_BOOK_DATA.bookMeta ? window.GRADE1S_BOOK_DATA.bookMeta.badge : 'مكتمل 100% (4 فصول • 27 درساً)';
+          const t1 = g1s.terms.find(t => t.id === 'term1');
+          if (t1) {
+            t1.chapters = window.GRADE1S_BOOK_DATA.chapters.map(ch => ({
+              id: ch.id,
+              number: ch.number,
+              title: ch.title,
+              pages: ch.pages || '',
+              lessons_count: (ch.lessons || []).length,
+              status: 'completed',
+              badge: ch.badge || 'مكتمل بالكامل',
+              lessons: (ch.lessons || []).map(l => {
+                const fullL = (window.GRADE1S_BOOK_DATA.lessons && window.GRADE1S_BOOK_DATA.lessons[l.id]) || {};
+                return {
+                  id: l.id,
+                  number: l.number || fullL.number || '',
+                  title: fullL.title || l.title || '',
+                  pages: fullL.pages || l.pages || '',
+                  status: 'completed'
+                };
+              })
+            }));
+          }
+        }
+      }
+    }
+  }
 }
+

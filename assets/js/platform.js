@@ -20,10 +20,23 @@
     expandedNodes: new Set(['elementary', 'g6', 'g6-term1', 'g6-t1-c1', 'intermediate', 'g1m', 'g1m-term1', 'g1m-t1-c1', 'g3m', 'g3m-term1', 'secondary', 'g1s', 'g1s-term1'])
   };
 
+  function isCurrentSecondary() {
+    if (state.currentLessonId && state.currentLessonId.startsWith('g1s')) return true;
+    if (window.QuestionBank && window.QuestionBank.getCurrentBookId && window.QuestionBank.getCurrentBookId() === 'g1s') return true;
+    if (window.ExamBuilder && window.ExamBuilder.getCurrentBookId && window.ExamBuilder.getCurrentBookId() === 'g1s') return true;
+    return false;
+  }
+
   function fmtNum(val, forceEastern) {
     if (window.ArabicUtils) {
-      if (typeof val === 'string' && (val.indexOf('ar-pow') !== -1 || val.indexOf('^') !== -1)) {
-        return window.ArabicUtils.renderMathHtml(val);
+      if (isCurrentSecondary()) {
+        if (typeof val === 'string' && (val.indexOf('sec-math') !== -1 || val.indexOf('ltr-math') !== -1 || val.indexOf('sec-pow') !== -1 || val.indexOf('^') !== -1)) {
+          return window.ArabicUtils.renderMathHtml(val, true);
+        }
+        return window.ArabicUtils.toWesternDigits ? window.ArabicUtils.toWesternDigits(val) : String(val);
+      }
+      if (typeof val === 'string' && (val.indexOf('ar-pow') !== -1 || val.indexOf('^') !== -1 || val.indexOf('sec-pow') !== -1)) {
+        return window.ArabicUtils.renderMathHtml(val, false);
       }
       if (forceEastern !== false) {
         return window.ArabicUtils.toEasternDigits(val);
@@ -45,7 +58,7 @@
   }
 
   function isFullBookLesson(lesson) {
-    return !!(lesson && lesson.id && (lesson.id.startsWith('g6') || lesson.id.startsWith('g1m') || lesson.id.startsWith('g3m')));
+    return !!(lesson && lesson.id && (lesson.id.startsWith('g6') || lesson.id.startsWith('g1m') || lesson.id.startsWith('g3m') || lesson.id.startsWith('g1s')));
   }
 
   function mergeBookData() {
@@ -58,6 +71,42 @@
     }
     if (window.GRADE3M_BOOK_DATA && window.GRADE3M_BOOK_DATA.lessons) {
       Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE3M_BOOK_DATA.lessons);
+    }
+    if (window.GRADE1S_BOOK_DATA && window.GRADE1S_BOOK_DATA.lessons) {
+      Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE1S_BOOK_DATA.lessons);
+
+      // Dynamically sync and rebuild the Secondary tree structure in stages from GRADE1S_BOOK_DATA
+      if (window.CURRICULUM_DATA.stages && window.GRADE1S_BOOK_DATA.chapters) {
+        const secStage = window.CURRICULUM_DATA.stages.find(s => s.id === 'secondary');
+        if (secStage && secStage.grades) {
+          const g1s = secStage.grades.find(g => g.id === 'g1s');
+          if (g1s && g1s.terms) {
+            g1s.badge = window.GRADE1S_BOOK_DATA.bookMeta ? window.GRADE1S_BOOK_DATA.bookMeta.badge : 'مكتمل 100% (4 فصول • 27 درساً)';
+            const t1 = g1s.terms.find(t => t.id === 'term1');
+            if (t1) {
+              t1.chapters = window.GRADE1S_BOOK_DATA.chapters.map(ch => ({
+                id: ch.id,
+                number: ch.number,
+                title: ch.title,
+                pages: ch.pages || '',
+                lessons_count: (ch.lessons || []).length,
+                status: 'completed',
+                badge: ch.badge || 'مكتمل بالكامل',
+                lessons: (ch.lessons || []).map(l => {
+                  const fullL = (window.GRADE1S_BOOK_DATA.lessons && window.GRADE1S_BOOK_DATA.lessons[l.id]) || {};
+                  return {
+                    id: l.id,
+                    number: l.number || fullL.number || '',
+                    title: fullL.title || l.title || '',
+                    pages: fullL.pages || l.pages || '',
+                    status: 'completed'
+                  };
+                })
+              }));
+            }
+          }
+        }
+      }
     }
   }
 
@@ -527,7 +576,7 @@
             <div class="smc-title">حساب قيد المراجعة</div>
             <span class="smc-badge pending">بانتظار الاعتماد</span>
           </div>
-          <div class="smc-desc">طلبك قيد المراجعة لدى المدير العام. متاح لك أول درسين من كل فصل كمعاينة وتوليد حتى ٥ أسئلة لكل نوع.</div>
+          <div class="smc-desc">طلبك قيد المراجعة لدى المدير العام. متاح لك أول درسين من كل فصل كمعاينة وتوليد حتى ${fmtNum(5, true)} أسئلة لكل نوع.</div>
         </div>
       `;
     } else {
@@ -538,7 +587,7 @@
             <div class="smc-title">نسخة المعاينة المجانية</div>
             <span class="smc-badge visitor">طلب اعتماد ↗</span>
           </div>
-          <div class="smc-desc">متاح أول درسين من كل فصل كمعاينة وتوليد حتى ٥ أسئلة للنوع. سجّل واطلب الاعتماد لفتح كامل فصول المنهج وبنك الأسئلة.</div>
+          <div class="smc-desc">متاح أول درسين من كل فصل كمعاينة وتوليد حتى ${fmtNum(5, true)} أسئلة للنوع. سجّل واطلب الاعتماد لفتح كامل فصول المنهج وبنك الأسئلة.</div>
         </div>
       `;
     }
@@ -579,13 +628,14 @@
                 const isCompleted = lesson.status === 'completed' || (fullLesson && fullLesson.status === 'completed');
                 const isActive = state.currentLessonId === lesson.id;
                 const isUnlocked = window.FirebaseAuthManager ? window.FirebaseAuthManager.isLessonUnlocked(chapter, lIdx) : true;
+                const lessonNum = lesson.number || (fullLesson && fullLesson.number) || '';
 
                 lessonsHtml += `
                   <div class="tree-lesson-item ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked-lesson' : ''}" onclick="window.Platform.selectLesson('${lesson.id}')" title="${escHtml(title)}${!isUnlocked ? ' (مخصص للأعضاء المعتمدين - المعاينة لدرسين)' : ''}">
                     <span style="display:flex; align-items:center; gap:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                       <span class="lesson-status-dot ${isCompleted ? 'completed' : 'roadmap'}"></span>
-                      <span style="font-weight:700; color:${isActive ? '#ffffff' : (isCompleted ? '#e2e8f0' : '#cbd5e1')}">${lesson.number}</span>
-                      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</span>
+                      ${lessonNum ? `<span style="font-weight:700; color:${isActive ? '#ffffff' : (isCompleted ? '#e2e8f0' : '#cbd5e1')}">${escHtml(lessonNum)}</span>` : ''}
+                      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escHtml(title || '')}</span>
                     </span>
                     <span style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
                       ${isUnlocked ? (isApproved ? '<span class="tree-unlocked-star" title="عضو معتمد: وصول كامل ومفتوح">🌟</span>' : '') : '<span class="tree-lock-badge" title="هذا الدرس متاح للأعضاء المعتمدين والمدير">🔒</span>'}
@@ -752,7 +802,7 @@
   function buildLessonQuestionPayload(lesson, type, idx) {
     const utils = window.ArabicUtils;
     if (!lesson) return null;
-    const inferredGradeId = lesson.gradeId || (lesson.id && lesson.id.startsWith('g3m') ? 'g3m' : (lesson.id && lesson.id.startsWith('g1m') ? 'g1m' : 'g6'));
+    const inferredGradeId = lesson.gradeId || (lesson.id && lesson.id.startsWith('g1s') ? 'g1s' : (lesson.id && lesson.id.startsWith('g3m') ? 'g3m' : (lesson.id && lesson.id.startsWith('g1m') ? 'g1m' : 'g6')));
     if (type === 'mcq') {
       const m = lesson.quiz.mcq[idx];
       if (!m) return null;
@@ -860,7 +910,11 @@
     const lesson = window.CURRICULUM_DATA.lessons[lessonId];
     const qObj = buildLessonQuestionPayload(lesson, type, idx);
     if (qObj && window.ArabicUtils) {
-      window.ArabicUtils.copyQuestionsToWord([qObj], { includeAnswers: false, numbered: false });
+      window.ArabicUtils.copyQuestionsToWord([qObj], {
+        includeAnswers: false,
+        numbered: false,
+        isSecondary: !!(lessonId && lessonId.startsWith('g1s'))
+      });
     }
   }
 
@@ -1112,7 +1166,7 @@
             <h4 style="color:#1e3a8a; font-weight:800; margin-bottom:12px;">مزايا الحساب المعتمد والوصول الإداري:</h4>
             <div class="features-check-grid">
               <div class="feat-item">✓ وصول غير محدود لكافة دروس كتب الرياضيات (سادس ابتدائي + أول متوسط) بالفصلين الأول والثاني.</div>
-              <div class="feat-item">✓ التحضير الميداني الشامل المعتمد بـ ٦ محطات متكاملة وتوزيع زمني واقعي (٤٥ دقيقة).</div>
+              <div class="feat-item">✓ التحضير الميداني الشامل المعتمد بـ ${fmtNum(6, true)} محطات متكاملة وتوزيع زمني واقعي (${fmtNum(45, true)} دقيقة).</div>
               <div class="feat-item">✓ استوديو توليد التحضير بالذكاء الاصطناعي مع تخصيص زمن الحصة والأنماط التدريسية.</div>
               <div class="feat-item">✓ نسخ التحضير الميداني والأسئلة بضغطة زر إلى Word بصيغة جداول رسمية جاهزة للطباعة.</div>
               <div class="feat-item">✓ بنك الأسئلة الشامل ومنشئ الاختبارات مع نماذج الإجابة وسلم الدرجات.</div>
@@ -1192,15 +1246,15 @@
               ` : (isApproved ? `
                 <span class="meta-badge verified-member" title="عضوية معتمدة رسمياً">🌟 العضوية: معتمد رسمي (وصول كامل للمحتوى، التحضير، الطباعة، وبنك الأسئلة) ✓</span>
               ` : (isPending ? `
-                <span class="meta-badge pending-member" title="الحساب قيد مراجعة واعتماد المدير العام">⏳ العضوية: قيد المراجعة (معاينة أول درسين • الحد الأقصى ٥ أسئلة للنوع)</span>
+                <span class="meta-badge pending-member" title="الحساب قيد مراجعة واعتماد المدير العام">⏳ العضوية: قيد المراجعة (معاينة أول درسين • الحد الأقصى ${fmtNum(5, true)} أسئلة للنوع)</span>
               ` : `
-                <span class="meta-badge visitor-member" onclick="window.FirebaseAuthManager.openAuthModal()" style="cursor:pointer;" title="انقر لتسجيل الدخول وطلب الاعتماد">🔒 العضوية: نسخة تجريبية (الحد الأقصى ٥ أسئلة للنوع • اطلب الاعتماد) ↗</span>
+                <span class="meta-badge visitor-member" onclick="window.FirebaseAuthManager.openAuthModal()" style="cursor:pointer;" title="انقر لتسجيل الدخول وطلب الاعتماد">🔒 العضوية: نسخة تجريبية (الحد الأقصى ${fmtNum(5, true)} أسئلة للنوع • اطلب الاعتماد) ↗</span>
               `))}
               <span class="meta-badge green">✓ ${lesson.badge || 'مكتمل وشامل'}</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('prep')" style="cursor:pointer;" title="الانتقال إلى التحضير الميداني الشامل">📋 التحضير الميداني المعتمد</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('socratic')" style="cursor:pointer;" title="الانتقال إلى منصة سقراط التوليدية">🏛️ منصة سقراط الحوارية</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('tools')" style="cursor:pointer;" title="الانتقال إلى الأدوات والمختبر التفاعلي">🛠️ ${(lesson.lesson_tools && lesson.lesson_tools.title) ? lesson.lesson_tools.title.split('(')[0].trim() : 'أدوات الدرس الذكية'}</span>
-              <span class="meta-badge orange" onclick="window.Platform.switchLessonTab('quiz')" style="cursor:pointer;" title="انقر للانتقال المباشر وحل الاختبار المقنن (١٠ اختيار + ٥ صواب وخطأ + ٣ مقالي)">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
+              <span class="meta-badge orange" onclick="window.Platform.switchLessonTab('quiz')" style="cursor:pointer;" title="انقر للانتقال المباشر وحل الاختبار المقنن">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
               <span class="meta-badge" onclick="window.Platform.openCurrentLessonHtmlGenerator()" style="cursor:pointer; background:#ecfdf5; color:#065f46; border-color:#a7f3d0;" title="توليد صفحة تفاعلية مستقلة بصيغة HTML">🌐 مولد HTML التفاعلي</span>
               <span class="meta-badge">💡 إشراف: أ. محمد عبدالله جمعة</span>
             </div>
@@ -1273,10 +1327,13 @@
               <strong style="color:var(--primary); display:block; margin-bottom:10px;">🖼️ الأشكال والتمثيلات المعتمدة في الدرس (اضغط للتكبير):</strong>
               <div class="lesson-figures-grid">
                 ${lesson.figures.map(fig => {
-                  const cap = fmtNum(fig.caption || '', isG6);
+                  const imgSrc = typeof fig === 'string' ? fig : ((fig && fig.image) || '');
+                  if (!imgSrc) return '';
+                  const rawCap = (typeof fig === 'object' && fig && fig.caption) ? fig.caption : '';
+                  const cap = fmtNum(rawCap, true);
                   return `
                     <div class="lesson-figure-card">
-                      <img src="${escHtml(fig.image)}" alt="${escHtml(cap || 'شكل تعليمي')}" loading="lazy"
+                      <img src="${escHtml(imgSrc)}" alt="${escHtml(cap || 'شكل تعليمي')}" loading="lazy"
                         onclick="window.Platform.openImageLightbox(this.getAttribute('src'), this.getAttribute('data-caption'))"
                         data-caption="${escHtml(cap)}" />
                       ${cap ? `<div class="lesson-figure-caption">${escHtml(cap)}</div>` : ''}
@@ -1348,14 +1405,14 @@
                 <div class="quiz-score-badge" id="quiz-live-score">
                   ${isUserFullyAuthorized 
                     ? `الدرجة: ${fmtNum(quizStats.correctCount, true)} / ${fmtNum(totalAutoQ, true)}`
-                    : `الدرجة: ${fmtNum(quizStats.correctCount, true)} / ${fmtNum(totalPreviewCount, true)} (معاينة ٥ أسئلة)`
+                    : `الدرجة: ${fmtNum(quizStats.correctCount, true)} / ${fmtNum(totalPreviewCount, true)} (معاينة ${fmtNum(5, true)} أسئلة)`
                   }
                 </div>
               </div>
 
               <!-- Part 1: 10 MCQs with 4 Horizontal Options -->
               <div class="quiz-part-title">
-                <span>🔹 القسم الأول: أسئلة الاختيار من متعدد (${fmtNum(quiz.mcq.length, true)} فقرات - ٤ خيارات أفقية)${!isUserFullyAuthorized ? ' [معاينة ٥ أسئلة]' : ''}</span>
+                <span>🔹 القسم الأول: أسئلة الاختيار من متعدد (${fmtNum(quiz.mcq.length, true)} فقرات - ${fmtNum(4, true)} خيارات أفقية)${!isUserFullyAuthorized ? ` [معاينة ${fmtNum(5, true)} أسئلة]` : ''}</span>
                 <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(لكل فقرة خيار واحد فقط صحيح)</span>
               </div>
 
@@ -1365,6 +1422,8 @@
                   const isAnswered = userAns !== undefined;
                   const uid = lesson.id + '-mcq-' + (qIdx + 1);
                   const inExam = examApi && examApi.hasQuestion(uid);
+                  const isSecQuiz = isCurrentSecondary();
+                  const letters = isSecQuiz ? ['A', 'B', 'C', 'D'] : ['أ', 'ب', 'ج', 'د'];
                   return `
                     <div class="question-card" id="card-mcq-${qIdx}">
                       <div class="question-header" style="justify-content:space-between; width:100%;">
@@ -1381,7 +1440,6 @@
                       ${renderQuestionFigure(mcq)}
                       <div class="mcq-options-horizontal">
                         ${mcq.options.map((opt, optIdx) => {
-                          const letters = ['أ', 'ب', 'ج', 'د'];
                           let btnClass = 'opt-btn';
                           if (isAnswered) {
                             if (optIdx === mcq.correct) btnClass += ' correct';
@@ -1405,9 +1463,9 @@
                   <div class="quiz-locked-gate">
                     <div class="qlg-shield-icon">🔒</div>
                     <div class="qlg-info">
-                      <div class="qlg-title">الأسئلة المقننة المتبقية (من س ٦ إلى س ١٠) مخصصة للأعضاء المعتمدين والمدير العام</div>
+                      <div class="qlg-title">الأسئلة المقننة المتبقية (من س ${fmtNum(6, true)} إلى س ${fmtNum(10, true)}) مخصصة للأعضاء المعتمدين والمدير العام</div>
                       <div class="qlg-desc">
-                        وفق ضوابط المنصة، يُسمح لغير الأعضاء المعتمدين بمعاينة ٥ أسئلة فقط لكل نوع. سجّل دخولك واطلب اعتماد العضوية فوراً لفتح كافة أسئلة الاختبار المقنن بالكامل (١٠ اختيار من متعدد + ٥ صواب وخطأ + ٣ مقالي) مع التفسيرات الرياضية، وإتاحة تصديرها لـ Word وبنك الأسئلة الشامل.
+                        وفق ضوابط المنصة، يُسمح لغير الأعضاء المعتمدين بمعاينة ${fmtNum(5, true)} أسئلة فقط لكل نوع. سجّل دخولك واطلب اعتماد العضوية فوراً لفتح كافة أسئلة الاختبار المقنن بالكامل (${fmtNum(10, true)} اختيار من متعدد + ${fmtNum(5, true)} صواب وخطأ + ${fmtNum(3, true)} مقالي) مع التفسيرات الرياضية، وإتاحة تصديرها لـ Word وبنك الأسئلة الشامل.
                       </div>
                     </div>
                     <button type="button" class="qlg-action-btn" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()">
@@ -1419,7 +1477,7 @@
 
               <!-- Part 2: 5 True / False Questions -->
               <div class="quiz-part-title">
-                <span>🔹 القسم الثاني: أسئلة الصواب والخطأ (${fmtNum(quiz.tf.length, true)} فقرات)${!isUserFullyAuthorized && hasLockedTfs ? ' [معاينة ٥ أسئلة]' : ''}</span>
+                <span>🔹 القسم الثاني: أسئلة الصواب والخطأ (${fmtNum(quiz.tf.length, true)} فقرات)${!isUserFullyAuthorized && hasLockedTfs ? ` [معاينة ${fmtNum(5, true)} أسئلة]` : ''}</span>
                 <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(حدد صواب أو خطأ مع التبرير)</span>
               </div>
 
@@ -1485,7 +1543,7 @@
               ${displayedEssays.length ? `
                 <!-- Part 3: Essay & Application Problems -->
                 <div class="quiz-part-title">
-                  <span>🔹 القسم الثالث: المسائل المقالية والتطبيقية (${fmtNum(essays.length, true)} مسائل)${!isUserFullyAuthorized && hasLockedEssays ? ' [معاينة ٥ مسائل]' : ''}</span>
+                  <span>🔹 القسم الثالث: المسائل المقالية والتطبيقية (${fmtNum(essays.length, true)} مسائل)${!isUserFullyAuthorized && hasLockedEssays ? ` [معاينة ${fmtNum(5, true)} مسائل]` : ''}</span>
                   <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(تُستخدم في الاختبارات الكتابية والنسخ لـ Word)</span>
                 </div>
                 <div class="tf-list">
@@ -1500,7 +1558,7 @@
                             <span class="q-text">${fmtNum(es.q, isG6)}</span>
                           </div>
                           <div class="q-inline-tools">
-                            <span class="qb-pill marks-pill">${window.ArabicUtils ? window.ArabicUtils.formatMark(es.marks || 2) : 'درجتان'}</span>
+                            <span class="qb-pill marks-pill">${window.ArabicUtils ? window.ArabicUtils.formatMark(es.marks || 2, isCurrentSecondary()) : fmtNum(2, true) + ' درجة'}</span>
                             <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'essay', ${eIdx})">📋 نسخ لـ Word</button>
                             <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'essay', ${eIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
                           </div>
@@ -1789,7 +1847,7 @@
     const isAdmin = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isAdmin === 'function' && window.FirebaseAuthManager.isAdmin();
     if (!isApproved && !isAdmin && qIdx >= 5) {
       if (window.FirebaseAuthManager && window.FirebaseAuthManager.showToast) {
-        window.FirebaseAuthManager.showToast('عفواً، الأسئلة من س ٦ إلى س ١٠ وبقية الاختبار المقنن متاحة حصرياً للأعضاء المعتمدين والمدير العام.', 'warning');
+        window.FirebaseAuthManager.showToast(`عفواً، الأسئلة من س ${fmtNum(6, true)} إلى س ${fmtNum(10, true)} وبقية الاختبار المقنن متاحة حصرياً للأعضاء المعتمدين والمدير العام.`, 'warning');
       }
       return;
     }

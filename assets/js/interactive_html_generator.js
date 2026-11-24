@@ -15,19 +15,31 @@
   function toEasternArabicNumerals(str) {
     if (str === null || str === undefined) return '';
     const s = String(str);
-    const map = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
     return s.replace(/[0-9]/g, function (w) {
-      return map[parseInt(w, 10)];
+      return String.fromCharCode(0x0660 + parseInt(w, 10));
     });
   }
 
-  // Format clean math expression (No carets ^, clean superscripts)
+  function toWesternNumerals(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[٠-٩]/g, function (w) {
+      return String(w.charCodeAt(0) - 0x0660);
+    });
+  }
+
+  // Format clean math expression (No carets ^, clean superscripts, LTR math for secondary)
   function formatMathDisplay(text, isArabicNumerals) {
-    if (!text) return '';
+    if (text === null || text === undefined || text === '') return '';
     let res = String(text);
-    if (isArabicNumerals) {
-      res = toEasternArabicNumerals(res);
+    if (!isArabicNumerals) {
+      if (global.ArabicUtils && typeof global.ArabicUtils.renderMathHtml === 'function') {
+        return global.ArabicUtils.renderMathHtml(res, true);
+      }
+      res = toWesternNumerals(res);
+      res = res.replace(/\^2/g, '²').replace(/\^3/g, '³').replace(/\^(\d+)/g, '($1)');
+      return escapeHtml(res);
     }
+    res = toEasternArabicNumerals(res);
     // Clean any accidental carets
     res = res.replace(/\^2/g, '²').replace(/\^3/g, '³').replace(/\^(\d+)/g, '($1)');
     return res;
@@ -46,6 +58,10 @@
   // Check whether lesson belongs to primary or intermediate (requires Eastern Arabic numerals)
   function isArabicStageLesson(lesson) {
     if (!lesson) return true;
+    if (lesson.gradeId === 'g1s' || lesson.stageId === 'secondary') return false;
+    if (global.ArabicUtils && typeof global.ArabicUtils.isSecondaryStage === 'function' && global.ArabicUtils.isSecondaryStage(lesson)) {
+      return false;
+    }
     const lid = (lesson.id || '').toLowerCase();
     if (lid.startsWith('g1s') || lid.startsWith('g2s') || lid.startsWith('g3s') || lid.includes('sec')) {
       return false;
@@ -60,7 +76,7 @@
     if (!lesson) return '';
 
     const isArabicNum = isArabicStageLesson(lesson);
-    const numFmt = (n) => isArabicNum ? toEasternArabicNumerals(n) : String(n);
+    const numFmt = (n) => isArabicNum ? toEasternArabicNumerals(n) : toWesternNumerals(n);
 
     // Get 6-station field lesson prep if LessonPrepManager is available
     let prep = null;
@@ -78,8 +94,8 @@
     const worksheet = lesson.worksheet || { exploratory: '', exercises: [], reflection: '' };
 
     // Format lesson metadata
-    const lessonTitle = escapeHtml(lesson.title || 'درس رياضيات');
-    const lessonNumber = numFmt(lesson.number || '١');
+    const lessonTitle = escapeHtml(numFmt(lesson.title || 'درس رياضيات'));
+    const lessonNumber = numFmt(lesson.number || '1');
     const lessonPages = numFmt(lesson.pages || 'غير محدد');
 
     // Socratic steps JSON serialized for embedding
@@ -769,6 +785,18 @@
       body { background: #fff !important; color: #000 !important; }
       .section-card, .header-card { box-shadow: none !important; border: 1px solid #ccc !important; }
     }
+
+    .sec-math, .ltr-math, .sec-pow {
+      direction: ltr !important;
+      unicode-bidi: isolate !important;
+      display: inline-block;
+      font-family: 'Times New Roman', serif;
+    }
+    .sec-pow .sec-exp, .ar-pow .ar-exp {
+      font-size: 0.72em;
+      vertical-align: super;
+      line-height: 0;
+    }
   </style>
 </head>
 <body>
@@ -812,12 +840,12 @@
 
       <!-- Quick Step Navigation -->
       <nav class="lesson-roadmap-bar">
-        <a href="#sec-objectives" class="roadmap-step-pill">١. الأهداف والمفاهيم</a>
-        <a href="#sec-socratic" class="roadmap-step-pill">٢. محاورة سقراط التفاعلية</a>
-        <a href="#sec-explanation" class="roadmap-step-pill">٣. الشرح والأمثلة المحلولة</a>
-        <a href="#sec-pitfalls" class="roadmap-step-pill">٤. فخاخ التفكير</a>
-        <a href="#sec-quiz" class="roadmap-step-pill">٥. الاختبار الذاتي الفوري</a>
-        <a href="#sec-closure" class="roadmap-step-pill">٦. الغلق والواجب</a>
+        <a href="#sec-objectives" class="roadmap-step-pill">${numFmt(1)}. الأهداف والمفاهيم</a>
+        <a href="#sec-socratic" class="roadmap-step-pill">${numFmt(2)}. محاورة سقراط التفاعلية</a>
+        <a href="#sec-explanation" class="roadmap-step-pill">${numFmt(3)}. الشرح والأمثلة المحلولة</a>
+        <a href="#sec-pitfalls" class="roadmap-step-pill">${numFmt(4)}. فخاخ التفكير</a>
+        <a href="#sec-quiz" class="roadmap-step-pill">${numFmt(5)}. الاختبار الذاتي الفوري</a>
+        <a href="#sec-closure" class="roadmap-step-pill">${numFmt(6)}. الغلق والواجب</a>
       </nav>
     </div>
 
@@ -825,7 +853,7 @@
     <section class="section-card" id="sec-objectives">
       <div class="section-header">
         <div class="section-title">
-          <span>🎯 ١. نواتج التعلم والمفاهيم والمصطلحات الأساسية</span>
+          <span>🎯 ${numFmt(1)}. نواتج التعلم والمفاهيم والمصطلحات الأساسية</span>
         </div>
         <span class="section-time-badge">محطة الانطلاق</span>
       </div>
@@ -861,7 +889,7 @@
     <section class="section-card" id="sec-socratic">
       <div class="section-header">
         <div class="section-title">
-          <span>🏛️ ٢. المحاورة السقراطية التفاعلية خطوة بخطوة (Socratic Dialogue)</span>
+          <span>🏛️ ${numFmt(2)}. المحاورة السقراطية التفاعلية خطوة بخطوة (Socratic Dialogue)</span>
         </div>
         <span class="section-time-badge">تفكير استقصائي وتوليدي</span>
       </div>
@@ -903,7 +931,7 @@
     <section class="section-card" id="sec-explanation">
       <div class="section-header">
         <div class="section-title">
-          <span>📖 ٣. الشرح المتدرج والأمثلة المحلولة خطوة بخطوة</span>
+          <span>📖 ${numFmt(3)}. الشرح المتدرج والأمثلة المحلولة خطوة بخطوة</span>
         </div>
         <span class="section-time-badge">بناء المفهوم الرياضي</span>
       </div>
@@ -921,7 +949,7 @@
         <div class="example-card">
           <div class="example-header">
             <span class="example-tier-tag ${idx === 1 ? 'tier-2' : (idx >= 2 ? 'tier-3' : '')}">
-              ${idx === 0 ? 'المستوى ١: مثال مباشر وتطبيق أولي' : (idx === 1 ? 'المستوى ٢: مسألة تطبيقية ومتوسطة' : 'المستوى ٣: تفكير عليا وربط بالواقع')}
+              ${idx === 0 ? ('المستوى ' + numFmt(1) + ': مثال مباشر وتطبيق أولي') : (idx === 1 ? ('المستوى ' + numFmt(2) + ': مسألة تطبيقية ومتوسطة') : ('المستوى ' + numFmt(3) + ': تفكير عليا وربط بالواقع'))}
             </span>
             <span style="font-size:0.75rem; color:var(--text-muted);">مثال محلول ${numFmt(idx + 1)}</span>
           </div>
@@ -945,7 +973,7 @@
     <section class="section-card" id="sec-pitfalls">
       <div class="section-header">
         <div class="section-title">
-          <span>⚠️ ٤. فخاخ التفكير ومعالجة الأخطاء الشائعة</span>
+          <span>⚠️ ${numFmt(4)}. فخاخ التفكير ومعالجة الأخطاء الشائعة</span>
         </div>
         <span class="section-time-badge">وقاية ومعالجة فورية</span>
       </div>
@@ -979,7 +1007,7 @@
     <section class="section-card" id="sec-quiz">
       <div class="section-header">
         <div class="section-title">
-          <span>📝 ٥. التقييم الذاتي التفاعلي الفوري (الاختبار المقنن: ١٠ اختيار + ٥ صواب وخطأ + ٣ مقالي)</span>
+          <span>📝 ${numFmt(5)}. التقييم الذاتي التفاعلي الفوري (الاختبار المقنن: ${numFmt(mcqs.length || 10)} اختيار + ${numFmt(tfs.length || 5)} صواب وخطأ + ${numFmt(essays.length || 3)} مقالي)</span>
         </div>
         <span class="section-time-badge">تصحيح إلكتروني لحظي</span>
       </div>
@@ -1004,7 +1032,7 @@
             <div class="quiz-opts-grid">
               ${q.options.map((opt, oIdx) => `
                 <div class="quiz-opt-label" id="opt-lbl-${qIdx}-${oIdx}" onclick="handleQuizAnswer(${qIdx}, ${oIdx})">
-                  <span style="font-weight:800; font-size:0.8rem; color:var(--text-muted); width:20px;">(${numFmt(oIdx + 1)})</span>
+                  <span style="font-weight:800; font-size:0.8rem; color:var(--text-muted); width:20px;">(${q.type === 'mcq' ? (isArabicNum ? (['أ', 'ب', 'ج', 'د'][oIdx] || numFmt(oIdx + 1)) : (['A', 'B', 'C', 'D'][oIdx] || numFmt(oIdx + 1))) : numFmt(oIdx + 1)})</span>
                   <span>${opt}</span>
                 </div>
               `).join('')}
@@ -1065,7 +1093,7 @@
     <section class="section-card" id="sec-closure">
       <div class="section-header">
         <div class="section-title">
-          <span>🏁 ٦. الغلق والواجب المنزلي وسؤال التحدي</span>
+          <span>🏁 ${numFmt(6)}. الغلق والواجب المنزلي وسؤال التحدي</span>
         </div>
         <span class="section-time-badge">تثبيت واستدامة التعلم</span>
       </div>
@@ -1095,7 +1123,7 @@
 
     <!-- Footer Credentials -->
     <footer style="text-align:center; padding:24px 10px; font-size:0.85rem; color:var(--text-muted); border-top:1px solid var(--border-color); margin-top:30px;">
-      <p style="font-weight:700; color:var(--text-main); margin-bottom:4px;">منصة الرائد التعليمية الذكية للرياضيات • الإصدار ٢.٠</p>
+      <p style="font-weight:700; color:var(--text-main); margin-bottom:4px;">منصة الرائد التعليمية الذكية للرياضيات • الإصدار ${numFmt('2.0')}</p>
       <p>إعداد وإشراف خبير الرياضيات: أ. محمد عبدالله جمعة | المدارس المتقدمة للتعلم الذكي</p>
       <p style="font-size:0.75rem; margin-top:4px;">صفحة تفاعلية مستقلة بصيغة HTML تعمل دون اتصال بالإنترنت</p>
     </footer>
@@ -1148,9 +1176,8 @@
     const IS_ARABIC_NUM = ${isArabicNum};
 
     function numToAr(n) {
-      if (!IS_ARABIC_NUM) return String(n);
-      const m = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-      return String(n).replace(/[0-9]/g, w => m[parseInt(w, 10)]);
+      if (!IS_ARABIC_NUM) return String(n).replace(/[\\u0660-\\u0669]/g, w => String(w.charCodeAt(0) - 0x0660));
+      return String(n).replace(/[0-9]/g, w => String.fromCharCode(0x0660 + parseInt(w, 10)));
     }
 
     function handleQuizAnswer(qIdx, optIdx) {
@@ -1297,9 +1324,9 @@
     if (existing) existing.remove();
 
     const isArabicNum = isArabicStageLesson(lesson);
-    const numFmt = (n) => isArabicNum ? toEasternArabicNumerals(n) : String(n);
-    const lessonTitle = lesson.title || 'الدرس';
-    const lessonNumber = numFmt(lesson.number || '١');
+    const numFmt = (n) => isArabicNum ? toEasternArabicNumerals(n) : toWesternNumerals(n);
+    const lessonTitle = numFmt(lesson.title || 'الدرس');
+    const lessonNumber = numFmt(lesson.number || '1');
 
     const htmlContent = buildStandaloneLessonHtml(lesson);
     const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });

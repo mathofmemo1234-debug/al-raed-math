@@ -3458,6 +3458,48 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 }
 
 /* ==========================================================================
+   المرحلة الثانوية: الأرقام الإنجليزية حصراً (0-9) وصيغ المعادلات LTR
+   مع بقاء النصوص والشروح العربية RTL متوازنة
+   ========================================================================== */
+.sec-math, .ltr-math {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  display: inline-block !important;
+  font-family: 'Cambria Math', 'KaTeX_Math', 'Times New Roman', 'Segoe UI', serif, sans-serif !important;
+  font-style: italic !important;
+  font-weight: 600 !important;
+  padding: 0 3px !important;
+  color: #1e293b !important;
+}
+
+.sec-pow {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  direction: ltr !important;
+  align-items: flex-start !important;
+  unicode-bidi: isolate !important;
+  vertical-align: baseline !important;
+  margin: 0 2px !important;
+}
+
+.sec-pow .sec-base {
+  display: inline-block !important;
+  font-family: 'Cambria Math', 'Times New Roman', serif !important;
+  font-style: italic !important;
+  font-size: 1em !important;
+}
+
+.sec-pow .sec-exp {
+  display: inline-block !important;
+  font-size: 0.68em !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+  transform: translateY(-0.42em) !important;
+  margin-left: 1px !important;
+  color: inherit !important;
+}
+
+/* ==========================================================================
    تنسيق الأيقونات المتجاورة والمتعامدة (القاعدة الإلزامية رقم 3)
    تنظيم الأيقونات بشكل متساوٍ ومنتظم في التباعد والمحاذاة وتصغيرها بأبعاد متوازنة
    ========================================================================== */

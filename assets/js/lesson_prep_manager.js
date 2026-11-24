@@ -18,19 +18,39 @@
     };
   }
 
+  function isSecLesson(lesson) {
+    return !!(lesson && ((lesson.id && lesson.id.startsWith('g1s')) || lesson.gradeId === 'g1s' || lesson.stageId === 'secondary'));
+  }
+
+  function dNum(val, mode) {
+    const utils = getUtils();
+    const s = (val === undefined || val === null) ? '' : String(val);
+    if (mode === 'secondary') {
+      return (utils && utils.toWesternDigits) ? utils.toWesternDigits(s) : s;
+    }
+    return utils ? utils.toEasternDigits(s) : s;
+  }
+
   function esc(s) {
     return getUtils().escapeHtml(s);
   }
 
-  function fmt(s, isG6) {
+  function fmt(s, mode) {
     if (s === undefined || s === null) return '';
     const utils = getUtils();
+    const isSec = mode === 'secondary' || (typeof s === 'string' && (s.indexOf('sec-math') !== -1 || s.indexOf('ltr-math') !== -1 || s.indexOf('sec-pow') !== -1));
+    if (isSec) {
+      if (utils.renderMathHtml) return utils.renderMathHtml(s, true);
+      return utils.toWesternDigits ? utils.toWesternDigits(s) : String(s);
+    }
+    if (utils.renderMathHtml) return utils.renderMathHtml(s, false);
     return utils.formatMathText ? utils.formatMathText(s) : utils.toEasternDigits(s);
   }
 
   // Generate 2-3 tailored active learning strategies with teacher/student/outcome steps
   function buildPedagogicalStrategies(lesson, style) {
-    const isG6 = !lesson.id || !lesson.id.startsWith('g1m');
+    const mode = isSecLesson(lesson) ? 'secondary' : true;
+    const n = function (v) { return dNum(v, mode); };
     const title = lesson.title || 'الدرس';
     const vocab = (lesson.vocabulary && lesson.vocabulary.length) ? lesson.vocabulary.join('، ') : 'مفاهيم الدرس';
 
@@ -38,21 +58,21 @@
       return [
         {
           name: 'الاستقصاء الرياضي الموجّه (Guided Inquiry)',
-          time: '٤ دقائق',
+          time: n('٤ دقائق'),
           teacherRole: `يطرح المعلم تحدياً استقصائياً مفتوحاً مرتبطاً بـ (${title})، ويوجه الطلاب بمجموعات للبحث عن النمط الرياضي الكامن دون إعطاء القاعدة الجاهزة فوراً.`,
           studentRole: `يجمع الطلاب الملاحظات، ويجربون فرضيات مختلفة لاكتشاف العلاقة الرياضية، ثم يسجلون النتائج في بطاقات الاستقصاء.`,
           expectedOutcome: `اكتشاف الطلاب للقاعدة الرياضية ذاتياً وتفسير مبرراتها المنطقية قبل الشرح الرسمي للمعلم.`
         },
         {
           name: 'فكر – زاوج – شارك (Think - Pair - Share)',
-          time: '٣ دقائق',
+          time: n('٣ دقائق'),
           teacherRole: `يطرح مسألة تطبيقية متوسطة تتضمن (${vocab})، ويعطي دقيقة للتفكير الفردي، ثم يوجه لمناقشة ثنائية قبل الاستماع لآراء الصف.`,
           studentRole: `يفكر كل طالب منفرداً ويسجل فكرته، ثم يناقش زميله المجاور لتبادل طرق الحل وتصحيح المسار، ثم يشاركان استنتاجهما مع الصف.`,
-          expectedOutcome: `مشاركة ١٠٠٪ من الطلاب في التفكير، وتطوير لغة الحوار الرياضي وتبرير خطوات الحل.`
+          expectedOutcome: `مشاركة ${n('١٠٠')}٪ من الطلاب في التفكير، وتطوير لغة الحوار الرياضي وتبرير خطوات الحل.`
         },
         {
           name: 'حل المشكلات الواقعية (Real-World Problem Solving)',
-          time: '٣ دقائق',
+          time: n('٣ دقائق'),
           teacherRole: `يعرض مسألة حياتية تتطلب توظيف خطوات الحل الرياضي بدقة، ويتابع المجموعات موجهاً أسئلة سبرية تدعم التفكير العميق.`,
           studentRole: `يحلل الطلاب معطيات المسألة، ويميزون المطلوب، ويصوغون نموذجاً رياضياً للحل، ثم يتحققون من معقولية النتائج.`,
           expectedOutcome: `ربط الرياضيات بواقع الحياة اليومية وتنمية التفكير الناقد ومهارات التبرير الرياضي السليم.`
@@ -64,22 +84,22 @@
       return [
         {
           name: 'التمثيل البصري والنمذجة (Visual Representation & Modeling)',
-          time: '٤ دقائق',
+          time: n('٤ دقائق'),
           teacherRole: `يوظف المعلم خط الأعداد، أو شبكات المربعات، أو النماذج الهندسية والمخططات الشجرية لتمثيل مفهوم (${title}) حسياً وبصرياً.`,
           studentRole: `يرسم الطلاب النموذج في دفاترهم أو على السبورة البيضاء المصغرة، ويترجمون المسألة اللفظية إلى رسم تخطيطي دقيق.`,
           expectedOutcome: `تحويل المفهوم المجرد إلى إدراك بصري ملموس يرسخ الفهم العميق ويمنع الأخطاء الشائعة.`
         },
         {
           name: 'التعلم التعاوني ذو الأدوار المحددة (Cooperative Learning)',
-          time: '٣ دقائق',
+          time: n('٣ دقائق'),
           teacherRole: `يقسم الطلاب إلى مجموعات رباعية متجانسة جزئياً، ويوزع الأدوار: (الميسر، الكاتب، المتحدث، المقوم الزمني)، ويطرح مهمة تدريبية.`,
           studentRole: `تتعاون المجموعة في حل المسألة مع التزام كل طالب بدوره، والتأكد من فهم جميع أفراد المجموعة قبل إنهاء الحل.`,
           expectedOutcome: `تعزيز روح الفريق والمسؤولية الفردية والجماعية ورفع مستوى التحصيل لكافة فئات الطلاب.`
         },
         {
           name: 'الرؤوس المرقمة تتعاون (Numbered Heads Together)',
-          time: '٣ دقائق',
-          teacherRole: `يرقم أعضاء كل مجموعة من ١ إلى ٤، يطرح سؤال تحقق سريع، ثم ينادي رقماً عشوائياً للإجابة نيابة عن مجموعته.`,
+          time: n('٣ دقائق'),
+          teacherRole: `يرقم أعضاء كل مجموعة من ${n('١')} إلى ${n('٤')}، يطرح سؤال تحقق سريع، ثم ينادي رقماً عشوائياً للإجابة نيابة عن مجموعته.`,
           studentRole: `يتشاور أعضاء المجموعة للتأكد من أن صاحب كل رقم قادر تماماً على شرح خطوات الحل بالتفصيل.`,
           expectedOutcome: `جاهزية تامة ومسؤولية مشتركة، وإتاحة الفرصة للطلاب الخجولين للمشاركة بثقة.`
         }
@@ -90,21 +110,21 @@
       return [
         {
           name: 'التدريس المتمايز بالمحطات (Differentiated Tiered Learning)',
-          time: '٤ دقائق',
-          teacherRole: `يعد المعلم ٣ مستويات للمهمة التدريبية (تأسيس مباشر، تدريب معياري، وتحدٍ إثرائي)، ويوجه الطلاب حسب جاهزيتهم مع تقديم الدعم المباشر للمتعثرين.`,
+          time: n('٤ دقائق'),
+          teacherRole: `يعد المعلم ${n('٣')} مستويات للمهمة التدريبية (تأسيس مباشر، تدريب معياري، وتحدٍ إثرائي)، ويوجه الطلاب حسب جاهزيتهم مع تقديم الدعم المباشر للمتعثرين.`,
           studentRole: `يعمل كل طالب على المستوى المناسب لقدراته الرياضية، مع إمكانية الانتقال للمستوى الأعلى فور إتقان المستوى الحالي.`,
           expectedOutcome: `تلبية الاحتياجات الفردية للجميع، وضمان وصول المتعثر للإتقان ومنح الموهوب فرصة الإبحار والتوسع.`
         },
         {
           name: 'فكر – زاوج – شارك (Think - Pair - Share)',
-          time: '٣ دقائق',
+          time: n('٣ دقائق'),
           teacherRole: `يطرح سؤالاً مفاهيمياً يمس الفكرة الجوهرية لـ (${title})، ويوجه الأقران لتقويم إجابات بعضهم البعض.`,
           studentRole: `يفكر الطالب مستقلاً، ثم يناقش زميله ويصححان لبعضهما بالرجوع للقاعدة الرياضية.`,
           expectedOutcome: `تفعيل التقويم التكويني بين الأقران وبناء الثقة بالنفس.`
         },
         {
           name: 'النمذجة الرياضية الموجهة (Explicit Teacher Modeling - I Do, We Do, You Do)',
-          time: '٣ دقائق',
+          time: n('٣ دقائق'),
           teacherRole: `يطبق استراتيجية (أنا أحل بصوت عالٍ، ثم نحن نحل معاً، ثم أنتم تحلون بأنفسكم) لترسيخ خوارزمية الحل النظامية.`,
           studentRole: `يلاحظون تفكير المعلم الاستراتيجي، ثم يشاركون جزئياً في الخطوات، ثم يطبقون بأنفسهم باستقلالية كاملة.`,
           expectedOutcome: `انتقال تدريجي للمسؤولية المعرفية واكتساب الكفاية الرياضية بوضوح تام.`
@@ -116,21 +136,21 @@
     return [
       {
         name: 'فكر – زاوج – شارك (Think - Pair - Share)',
-        time: '٣ دقائق',
+        time: n('٣ دقائق'),
         teacherRole: `يطرح المعلم السؤال التأسيسي المرتبط بـ (${title})، ويمنح الطلاب دقيقة للتفكير الفردي، ثم دقيقة للمناقشة الثنائية مع الزميل.`,
         studentRole: `يحلل الطالب السؤال ذاتياً ويسجل محاولته الأولى، ثم يقارن حله مع زميله الملتصق لتعديل التفكير وتبادل المبررات، ثم يعرضان النتيجة.`,
-        expectedOutcome: `مشاركة نشطة وتفاعل ١٠٠٪ من الطلاب، واكتشاف الأخطاء وتصويبها ذاتياً قبل المناقشة الصفية العامة.`
+        expectedOutcome: `مشاركة نشطة وتفاعل ${n('١٠٠')}٪ من الطلاب، واكتشاف الأخطاء وتصويبها ذاتياً قبل المناقشة الصفية العامة.`
       },
       {
         name: 'التمثيل البصري والنمذجة الرياضية (Visual Modeling)',
-        time: '٤ دقائق',
+        time: n('٤ دقائق'),
         teacherRole: `يقدم المعلم نموذجاً بيانياً أو رسمياً يجسد مفهوم (${title}) ويوضح العلاقات الرياضية بشكل حسي وملموس على السبورة.`,
         studentRole: `يرسم الطلاب النموذج المماثل في كراساتهم، ويسجلون الترجمة الرمزية الرياضية المقابلة لكل عنصر من عناصر الشكل البصري.`,
         expectedOutcome: `ربط المفهوم النظري بالتمثيل البصري، وترسيخ الفكرة المحورية في الذاكرة طويلة المدى.`
       },
       {
         name: 'التعلم التعاوني ذو المهام المركبة (Cooperative Problem Solving)',
-        time: '٣ دقائق',
+        time: n('٣ دقائق'),
         teacherRole: `يوزع بطاقات مسائل تطبيقية حياتية على مجموعات العمل، ويتابع التفاعل موفراً التغذية الراجعة الفورية للمتعثرين.`,
         studentRole: `يتعاون أعضاء المجموعة في تفكيك المسألة: فهم المعطيات، صياغة خطة الحل، تنفيذ العمليات الحسابية، ثم التحقق من صحة الناتج.`,
         expectedOutcome: `تنمية مهارات التفكير العليا، والعمل الجماعي، والتبرير الرياضي المقنع.`
@@ -140,7 +160,9 @@
 
   // Extract 3 tiered solved examples from lesson data
   function buildTieredSolvedExamples(lesson) {
-    const isG6 = !lesson.id || !lesson.id.startsWith('g1m');
+    const mode = isSecLesson(lesson) ? 'secondary' : true;
+    const isSec = mode === 'secondary';
+    const n = function (v) { return dNum(v, mode); };
     const title = lesson.title || 'الدرس';
     const summary = lesson.summary || {};
     const worksheet = lesson.worksheet || { questions: [] };
@@ -159,7 +181,7 @@
       ex1.solution = summary.solved_example.includes('الحل') ? summary.solved_example.split('الحل')[1].replace(/^[:\s]*/, '').trim() : 'تطبيق القاعدة الرياضية المباشرة للدرس والوصول للناتج النهائي بدقة.';
     } else if (worksheet.questions && worksheet.questions.length > 0) {
       ex1.problem = worksheet.questions[0].q;
-      ex1.solution = worksheet.questions[0].answer || 'تطبيق القاعدة الرياضية المباشرة.';
+      ex1.solution = worksheet.questions[0].ans || worksheet.questions[0].answer || 'تطبيق القاعدة الرياضية المباشرة.';
     } else {
       ex1.problem = `احسب أو أوجد قيمة العبارة الرياضية المباشرة في درس (${title}).`;
       ex1.solution = `التعويض المباشر في القاعدة وتطبيق العمليات الحسابية بالترتيب الصحيح.`;
@@ -175,13 +197,16 @@
 
     if (worksheet.questions && worksheet.questions.length > 1) {
       ex2.problem = worksheet.questions[1].q;
-      ex2.solution = worksheet.questions[1].answer || 'إجراء الخطوة الأولى للتحويل، ثم إتمام العملية الحسابية الأساسية والتحقق.';
+      ex2.solution = worksheet.questions[1].ans || worksheet.questions[1].answer || 'إجراء الخطوة الأولى للتحويل، ثم إتمام العملية الحسابية الأساسية والتحقق.';
     } else if (quiz.mcq && quiz.mcq.length > 0) {
-      ex2.problem = quiz.mcq[0].q;
-      ex2.solution = `الحل الصحيح: (${quiz.mcq[0].correct}) - التفسير: ${quiz.mcq[0].explanation || 'التحليل الرياضي المنهجي.'}`;
+      const m0 = quiz.mcq[0];
+      const letters = isSec ? ['A', 'B', 'C', 'D'] : ['أ', 'ب', 'ج', 'د'];
+      const optLabel = typeof m0.correct === 'number' ? (letters[m0.correct] || n(m0.correct + 1)) : n(m0.correct);
+      ex2.problem = m0.q;
+      ex2.solution = `الحل الصحيح: (${optLabel}) - التفسير: ${m0.explanation || 'التحليل الرياضي المنهجي.'}`;
     } else {
       ex2.problem = `مسألة تطبيقية تتطلب توظيف مفهومين متصلين في درس (${title}).`;
-      ex2.solution = `الخطوة ١: استخراج العلاقات الرياضية. الخطوة ٢: إجراء الحساب الدقيق والتحقق.`;
+      ex2.solution = `الخطوة ${n('١')}: استخراج العلاقات الرياضية. الخطوة ${n('٢')}: إجراء الحساب الدقيق والتحقق.`;
     }
 
     // Example 3: Complex / Higher-Order Thinking
@@ -194,10 +219,10 @@
 
     if (quiz.essay && quiz.essay.length > 0) {
       ex3.problem = quiz.essay[0].q;
-      ex3.solution = quiz.essay[0].sample_answer || quiz.essay[0].answer || 'صياغة نموذج رياضي لحل المسألة اللفظية ومقارنة الحل بتقدير معقولية الإجابة.';
+      ex3.solution = quiz.essay[0].ans || quiz.essay[0].sample_answer || quiz.essay[0].answer || 'صياغة نموذج رياضي لحل المسألة اللفظية ومقارنة الحل بتقدير معقولية الإجابة.';
     } else if (worksheet.questions && worksheet.questions.length > 2) {
       ex3.problem = worksheet.questions[2].q;
-      ex3.solution = worksheet.questions[2].answer || 'تحليل المسألة وصياغة معادلة رياضية وحلها بالخطوات التفصيلية.';
+      ex3.solution = worksheet.questions[2].ans || worksheet.questions[2].answer || 'تحليل المسألة وصياغة معادلة رياضية وحلها بالخطوات التفصيلية.';
     } else {
       ex3.problem = `اكتشف الخطأ الرياضي أو برر صحة عبارة استقصائية في موضوع (${title}).`;
       ex3.solution = `تفنيد الفرضية الخاطئة، وتطبيق البرهان الرياضي الصحيح خطوة بخطوة.`;
@@ -210,10 +235,11 @@
   function buildCommonMisconceptions(lesson) {
     const socratic = lesson.socratic || {};
     if (socratic.misconception_buster) {
+      const mb = socratic.misconception_buster;
       return {
-        fallacy: socratic.misconception_buster.fallacy || 'الخلط بين المفاهيم الرياضية الشائعة أو التسرع دون اتباع خطوات الحل.',
-        truth: socratic.misconception_buster.truth || 'الالتزام بالقواعد والخصائص الرياضية الدقيقة والتحقق من النتيجة.',
-        remediation: socratic.misconception_buster.proof || 'توجيه أسئلة سبرية واستخدام النماذج البصرية المضادة لإقناع الطالب بالتناقض المنطقي في تفكيره.'
+        fallacy: mb.fallacy || mb.misconception || 'الخلط بين المفاهيم الرياضية الشائعة أو التسرع دون اتباع خطوات الحل.',
+        truth: mb.truth || mb.correction || 'الالتزام بالقواعد والخصائص الرياضية الدقيقة والتحقق من النتيجة.',
+        remediation: mb.proof || 'توجيه أسئلة سبرية واستخدام النماذج البصرية المضادة لإقناع الطالب بالتناقض المنطقي في تفكيره.'
       };
     }
     return {
@@ -225,7 +251,10 @@
 
   // Construct the 6 Comprehensive Stations
   function buildFullPreparation(lesson, opts) {
+    const mode = isSecLesson(lesson) ? 'secondary' : true;
+    const isSec = mode === 'secondary';
     const isG6 = !lesson.id || !lesson.id.startsWith('g1m');
+    const n = function (v) { return dNum(v, mode); };
     const options = Object.assign({
       duration: 45,
       style: 'standard',
@@ -243,8 +272,8 @@
     const timeClosure = duration - (timeHook + timeStrategies + timeTeach + timeAssess);
 
     const title = lesson.title || 'الدرس';
-    const grade = lesson.grade || (isG6 ? 'الصف السادس الابتدائي' : 'الصف الأول المتوسط');
-    const stage = lesson.stage || (isG6 ? 'المرحلة الابتدائية' : 'المرحلة المتوسطة');
+    const grade = lesson.grade || (isSec ? 'الصف الأول الثانوي' : (isG6 ? 'الصف السادس الابتدائي' : 'الصف الأول المتوسط'));
+    const stage = lesson.stage || (isSec ? 'المرحلة الثانوية' : (isG6 ? 'المرحلة الابتدائية' : 'المرحلة المتوسطة'));
     const term = lesson.term || 'الفصل الدراسي الأول';
     const chapter = lesson.chapter || 'الفصل الدراسي';
     const pages = lesson.pages || 'الكتاب المدرسي';
@@ -254,7 +283,7 @@
 
     // Station 1: Data & Measurable Objectives
     const station1 = {
-      number: '١',
+      number: n('١'),
       title: 'البيانات والأهداف التعليمية ونواتج التعلّم',
       metadata: {
         stage: stage,
@@ -269,7 +298,7 @@
       lessonIdea: lessonIdea,
       objectives: objectives.length ? objectives : [
         `أن يتعرف الطالب على المفهوم الرياضي الأساسي لدرس (${title}) بدقة.`,
-        `أن يطبق الطالب خوارزمية الحل المنهجية على مسائل متنوعة بنسبة إتقان لا تقل عن ٨٥٪.`,
+        `أن يطبق الطالب خوارزمية الحل المنهجية على مسائل متنوعة بنسبة إتقان لا تقل عن ${n('٨٥')}٪.`,
         `أن يحل مسائل وتطبيقات حياتية توظف مهارات التفكير العليا وتبرير خطوات الحل.`
       ],
       vocabulary: vocabulary.length ? vocabulary : [title, 'النمذجة الرياضية', 'التحقق والمعقولية']
@@ -279,7 +308,7 @@
     const plan5 = lesson.plan_5es || {};
     const engageText = plan5.engage || `طرح موقف رياضي حياتي مشوق يرتبط باهتمامات الطلاب اليومية (كالنقود، الرياضة، أو التسوق) يبرز الحاجة لمفهوم (${title}).`;
     const station2 = {
-      number: '٢',
+      number: n('٢'),
       title: 'التمهيد والتهيئة المحفزة وكشف الجاهزية',
       timeMinutes: timeHook,
       hookDescription: engageText,
@@ -289,7 +318,7 @@
     // Station 3: Active Pedagogical Strategies
     const strategies = buildPedagogicalStrategies(lesson, options.style);
     const station3 = {
-      number: '٣',
+      number: n('٣'),
       title: 'استراتيجيات التدريس المتنوعة وتطبيقها الإجرائي في الدرس',
       timeMinutes: timeStrategies,
       items: strategies
@@ -300,7 +329,7 @@
     const misconceptions = buildCommonMisconceptions(lesson);
     const conceptExplanation = (lesson.summary && lesson.summary.concept) ? lesson.summary.concept : (plan5.explain || `بناء مفهوم (${title}) من خلال التدرج من المحسوس إلى شبه المحسوس ثم إلى المجرد.`);
     const station4 = {
-      number: '٤',
+      number: n('٤'),
       title: 'عرض الدرس والشرح المتدرج والأمثلة المحلولة ومعالجة الأخطاء',
       timeMinutes: timeTeach,
       conceptBuild: conceptExplanation,
@@ -313,11 +342,11 @@
     const worksheet = lesson.worksheet || { questions: [] };
     const quiz = lesson.quiz || { mcq: [], tf: [] };
     const diagQ = (worksheet.questions && worksheet.questions[0]) ? worksheet.questions[0].q : `ما المتطلب الرياضي الأساسي اللازم للبدء في حل مسائل (${title})؟`;
-    const formQ = (quiz.tf && quiz.tf[0]) ? quiz.tf[0].q : (quiz.mcq && quiz.mcq[0] ? quiz.mcq[0].q : `طبق القاعدة في حساب قيمة المقدار المعطى وتحقق من صحة الناتج.`);
+    const formQ = (quiz.tf && quiz.tf[0]) ? (quiz.tf[0].statement || quiz.tf[0].q) : (quiz.mcq && quiz.mcq[0] ? quiz.mcq[0].q : `طبق القاعدة في حساب قيمة المقدار المعطى وتحقق من صحة الناتج.`);
     const summQ = (quiz.mcq && quiz.mcq[1]) ? quiz.mcq[1].q : `اختر الإجابة الصحيحة لحل المسألة الختامية الشاملة لمخرجات الدرس.`;
 
     const station5 = {
-      number: '٥',
+      number: n('٥'),
       title: 'منظومة التقويم الشاملة ومراعاة الفروق الفردية (التمايز)',
       timeMinutes: timeAssess,
       diagnostic: {
@@ -349,7 +378,7 @@
 
     // Station 6: Closure & Homework
     const station6 = {
-      number: '٦',
+      number: n('٦'),
       title: 'الغلق والواجب المنزلي المتدرج',
       timeMinutes: timeClosure,
       closure: `غلق الدرس: تلخيص مركز يربط أجزاء الدرس في جملة ختامية مفتاحية يصوغها الطلاب، مع ربط الفكرة بالدرس القادم وتثبيت المفهوم في الذاكرة.`,
@@ -369,7 +398,7 @@
 
   // ================= Render Preparation Tab Pane =================
   function renderPrepPaneHTML(lesson, currentMode, aiGeneratedData) {
-    const isG6 = !lesson.id || !lesson.id.startsWith('g1m');
+    const isG6 = isSecLesson(lesson) ? 'secondary' : true;
     const activeSubTab = currentMode || 'approved'; // 'approved' | 'ai-studio'
     const prepData = (activeSubTab === 'ai-studio' && aiGeneratedData) 
       ? aiGeneratedData 
@@ -430,9 +459,9 @@
 
             <div class="prep-lesson-banner-strip">
               <div class="banner-col"><strong>عنوان الدرس:</strong> ${esc(m.lessonTitle)}</div>
-              <div class="banner-col"><strong>الفصل:</strong> ${esc(m.chapter)}</div>
+              <div class="banner-col"><strong>الفصل:</strong> ${fmt(m.chapter, isG6)}</div>
               <div class="banner-col"><strong>صفحات الكتاب:</strong> ${fmt(m.pages, isG6)}</div>
-              <div class="banner-col"><strong>التوزيع الزمني:</strong> ٥ + ١٠ + ١٥ + ١٠ + ٥ = <strong>${fmt(m.durationMinutes, isG6)} دقيقة</strong></div>
+              <div class="banner-col"><strong>التوزيع الزمني:</strong> ${dNum('٥ + ١٠ + ١٥ + ١٠ + ٥', isG6)} = <strong>${fmt(m.durationMinutes, isG6)} دقيقة</strong></div>
             </div>
           </div>
 
@@ -662,19 +691,19 @@
           
           <div class="prep-assessment-grid">
             <div class="assessment-card diag">
-              <div class="assessment-card-title">🔍 ١. ${esc(s.diagnostic.label)}</div>
+              <div class="assessment-card-title">🔍 ${dNum('١', isG6)}. ${esc(s.diagnostic.label)}</div>
               <div class="assessment-card-purpose">${esc(s.diagnostic.purpose)}</div>
               <div class="assessment-card-task"><strong>المهمة:</strong> ${fmt(s.diagnostic.task, isG6)}</div>
             </div>
 
             <div class="assessment-card form">
-              <div class="assessment-card-title">⚡ ٢. ${esc(s.formative.label)}</div>
+              <div class="assessment-card-title">⚡ ${dNum('٢', isG6)}. ${esc(s.formative.label)}</div>
               <div class="assessment-card-purpose">${esc(s.formative.purpose)}</div>
               <div class="assessment-card-task"><strong>المهمة:</strong> ${fmt(s.formative.task, isG6)}</div>
             </div>
 
             <div class="assessment-card summ">
-              <div class="assessment-card-title">🎯 ٣. ${esc(s.summative.label)}</div>
+              <div class="assessment-card-title">🎯 ${dNum('٣', isG6)}. ${esc(s.summative.label)}</div>
               <div class="assessment-card-purpose">${esc(s.summative.purpose)}</div>
               <div class="assessment-card-task"><strong>المهمة:</strong> ${fmt(s.summative.task, isG6)}</div>
             </div>
@@ -727,6 +756,7 @@
 
   // AI Studio Configuration Box
   function renderAiStudioControls(lesson) {
+    const mode = isSecLesson(lesson) ? 'secondary' : true;
     return `
       <div class="ai-studio-config-card">
         <div class="ai-studio-header">
@@ -741,8 +771,8 @@
           <div class="ai-control-group">
             <label>⏱️ مدة الحصة المقررة:</label>
             <select id="ai-duration-select" class="ai-select">
-              <option value="45" selected>٤٥ دقيقة (حصة اعتيادية قياسية)</option>
-              <option value="90">٩٠ دقيقة (حصة مزدوجة / تدريب مكثف)</option>
+              <option value="45" selected>${dNum('٤٥', mode)} دقيقة (حصة اعتيادية قياسية)</option>
+              <option value="90">${dNum('٩٠', mode)} دقيقة (حصة مزدوجة / تدريب مكثف)</option>
             </select>
           </div>
 
@@ -847,7 +877,7 @@
         ? cachedAiPreparations[lessonId] 
         : buildFullPreparation(lesson, { style: 'standard', focus: 'balanced' });
 
-      const isG6 = !lesson.id || !lesson.id.startsWith('g1m');
+      const isG6 = isSecLesson(lesson) ? 'secondary' : true;
       const m = prepData.metadata;
 
       const htmlContent = `
@@ -863,6 +893,7 @@
             .sub-header-cell { background-color: #dbeafe; color: #1e3a8a; font-weight: bold; }
             .station-title { background-color: #1e3a8a; color: #ffffff; font-weight: bold; font-size: 12pt; }
             .badge { background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+            .sec-math, .ltr-math, .sec-pow { direction: ltr; unicode-bidi: isolate; display: inline-block; font-family: 'Times New Roman', serif; font-weight: bold; }
           </style>
         </head>
         <body>
@@ -889,14 +920,14 @@
           <table>
             <tr class="sub-header-cell">
               <td><strong>عنوان الدرس:</strong> ${esc(m.lessonTitle)}</td>
-              <td><strong>الباب / الفصل:</strong> ${esc(m.chapter)}</td>
+              <td><strong>الباب / الفصل:</strong> ${fmt(m.chapter, isG6)}</td>
               <td><strong>صفحات الكتاب:</strong> ${fmt(m.pages, isG6)}</td>
             </tr>
           </table>
 
           <!-- Station 1 -->
           <table>
-            <tr><td colspan="2" class="station-title">١. البيانات والأهداف التعليمية ونواتج التعلّم</td></tr>
+            <tr><td colspan="2" class="station-title">${dNum('١', isG6)}. البيانات والأهداف التعليمية ونواتج التعلّم</td></tr>
             ${prepData.stations[0].lessonIdea ? `<tr><td style="width:25%;"><strong>فكرة الدرس:</strong></td><td>${fmt(prepData.stations[0].lessonIdea, isG6)}</td></tr>` : ''}
             <tr>
               <td style="width:25%;"><strong>نواتج التعلم (الأهداف السلوكية):</strong></td>
@@ -914,7 +945,7 @@
 
           <!-- Station 2 -->
           <table>
-            <tr><td colspan="2" class="station-title">٢. التمهيد والتهيئة المحفزة وكشف الجاهزية (٥ دقائق)</td></tr>
+            <tr><td colspan="2" class="station-title">${dNum('٢', isG6)}. التمهيد والتهيئة المحفزة وكشف الجاهزية (${fmt(prepData.stations[1].timeMinutes, isG6)} دقائق)</td></tr>
             <tr>
               <td style="width:25%;"><strong>التهيئة والموقف الحياتي:</strong></td>
               <td>${fmt(prepData.stations[1].hookDescription, isG6)}</td>
@@ -927,7 +958,7 @@
 
           <!-- Station 3 -->
           <table>
-            <tr><td colspan="4" class="station-title">٣. استراتيجيات التدريس المتنوعة وتطبيقها الإجرائي في الدرس (١٠ دقائق)</td></tr>
+            <tr><td colspan="4" class="station-title">${dNum('٣', isG6)}. استراتيجيات التدريس المتنوعة وتطبيقها الإجرائي في الدرس (${fmt(prepData.stations[2].timeMinutes, isG6)} دقائق)</td></tr>
             <tr class="sub-header-cell">
               <td style="width:25%;">الاستراتيجية</td>
               <td style="width:25%;">دور المعلم</td>
@@ -946,7 +977,7 @@
 
           <!-- Station 4 -->
           <table>
-            <tr><td colspan="2" class="station-title">٤. عرض الدرس والشرح المتدرج والأمثلة المحلولة ومعالجة الأخطاء (١٥ دقيقة)</td></tr>
+            <tr><td colspan="2" class="station-title">${dNum('٤', isG6)}. عرض الدرس والشرح المتدرج والأمثلة المحلولة ومعالجة الأخطاء (${fmt(prepData.stations[3].timeMinutes, isG6)} دقيقة)</td></tr>
             <tr>
               <td style="width:25%;"><strong>بناء المفهوم وشرح الفكرة:</strong></td>
               <td>${fmt(prepData.stations[3].conceptBuild, isG6)}</td>
@@ -980,7 +1011,7 @@
 
           <!-- Station 5 -->
           <table>
-            <tr><td colspan="2" class="station-title">٥. منظومة التقويم الشاملة والتعليم المتمايز (١٠ دقائق)</td></tr>
+            <tr><td colspan="2" class="station-title">${dNum('٥', isG6)}. منظومة التقويم الشاملة والتعليم المتمايز (${fmt(prepData.stations[4].timeMinutes, isG6)} دقائق)</td></tr>
             <tr>
               <td style="width:25%;"><strong>التقويم التشخيصي:</strong></td>
               <td>${fmt(prepData.stations[4].diagnostic.task, isG6)}</td>
@@ -1004,7 +1035,7 @@
 
           <!-- Station 6 -->
           <table>
-            <tr><td colspan="2" class="station-title">٦. الغلق والواجب المنزلي (٥ دقائق)</td></tr>
+            <tr><td colspan="2" class="station-title">${dNum('٦', isG6)}. الغلق والواجب المنزلي (${fmt(prepData.stations[5].timeMinutes, isG6)} دقائق)</td></tr>
             <tr>
               <td style="width:25%;"><strong>غلق الدرس وتثبيت الفكرة:</strong></td>
               <td>${fmt(prepData.stations[5].closure, isG6)}</td>

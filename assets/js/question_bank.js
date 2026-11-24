@@ -11,6 +11,12 @@
   const PAGE_SIZE = 20;
 
   const BOOKS_CONFIG = {
+    g1s: {
+      id: 'g1s',
+      label: 'الأول الثانوي (1 ث)',
+      heading: '🏦 بنك أسئلة الصف الأول الثانوي (الفصل الدراسي الأول)',
+      subtitle: 'مستخرج ومنقح بالكامل من كتاب الرياضيات «1 ث» • 4 فصول • 27 درساً • أرقام إنجليزية ومعادلات LTR وجاهز للنسخ المباشر إلى Word'
+    },
     g3m: {
       id: 'g3m',
       label: 'الثالث المتوسط (٣ م)',
@@ -32,7 +38,7 @@
   };
 
   const state = {
-    bookId: global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6'),
+    bookId: global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6')),
     chapterId: 'all',
     lessonId: 'all',
     type: 'all', // 'all' | 'mcq' | 'tf' | 'essay'
@@ -56,11 +62,14 @@
 
   function getBookData(bookId) {
     const id = bookId || state.bookId;
+    if (id === 'g1s' && global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (id === 'g3m' && global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (id === 'g1m' && global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
-    if (global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
-    if (global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
+    if (id === 'g6' && global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
+    if (global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
+    if (global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
+    if (global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
     return { bookMeta: {}, chapters: [], lessons: {}, flatQuestionBank: [] };
   }
 
@@ -132,6 +141,10 @@
     const totalEssay = bank.filter(function (q) { return q.type === 'essay'; }).length;
     const totalIllustrated = bank.filter(function (q) { return !!q.image; }).length;
     const bookInfo = BOOKS_CONFIG[state.bookId] || BOOKS_CONFIG.g1m;
+    const isSec = state.bookId === 'g1s';
+    const dNum = function (v) {
+      return isSec ? utils.toWesternDigits(v == null ? '' : v) : utils.toEasternDigits(v == null ? '' : v);
+    };
 
     const filtered = getFilteredQuestions();
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -160,9 +173,11 @@
         <div class="qb-hero-banner">
           <div>
             <div class="qb-grade-switcher" role="group" aria-label="اختيار المرحلة الدراسية">
-              ${['g3m', 'g1m', 'g6'].map(function (bid) {
+              ${['g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
                 const cfg = BOOKS_CONFIG[bid];
-                const hasData = bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA);
+                const hasData = bid === 'g1s'
+                  ? !!global.GRADE1S_BOOK_DATA
+                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA));
                 if (!hasData) return '';
                 return '<button type="button" class="qb-grade-btn ' + (state.bookId === bid ? 'active' : '') +
                   '" onclick="window.QuestionBank.setBook(\'' + bid + '\')">📘 ' + utils.escapeHtml(cfg.label) + '</button>';
@@ -173,29 +188,29 @@
           </div>
           <div class="qb-stats-row">
             <div class="qb-stat-pill">
-              <span class="qb-stat-num">${utils.toEasternDigits(bank.length)}</span>
+              <span class="qb-stat-num">${dNum(bank.length)}</span>
               <span class="qb-stat-lbl">إجمالي الأسئلة</span>
             </div>
             <div class="qb-stat-pill">
-              <span class="qb-stat-num">${utils.toEasternDigits(totalMcq)}</span>
+              <span class="qb-stat-num">${dNum(totalMcq)}</span>
               <span class="qb-stat-lbl">اختيار من متعدد</span>
             </div>
             <div class="qb-stat-pill">
-              <span class="qb-stat-num">${utils.toEasternDigits(totalTf)}</span>
+              <span class="qb-stat-num">${dNum(totalTf)}</span>
               <span class="qb-stat-lbl">صواب وخطأ</span>
             </div>
             <div class="qb-stat-pill">
-              <span class="qb-stat-num">${utils.toEasternDigits(totalEssay)}</span>
+              <span class="qb-stat-num">${dNum(totalEssay)}</span>
               <span class="qb-stat-lbl">مسائل مقالية</span>
             </div>
             ${totalIllustrated ? `
               <div class="qb-stat-pill">
-                <span class="qb-stat-num">${utils.toEasternDigits(totalIllustrated)}</span>
+                <span class="qb-stat-num">${dNum(totalIllustrated)}</span>
                 <span class="qb-stat-lbl">أسئلة مصورة</span>
               </div>
             ` : ''}
             <div class="qb-stat-pill accent">
-              <span class="qb-stat-num">${utils.toEasternDigits(selectedCount)}</span>
+              <span class="qb-stat-num">${dNum(selectedCount)}</span>
               <span class="qb-stat-lbl">محدد للنسخ</span>
             </div>
           </div>
@@ -215,8 +230,8 @@
           <div class="qb-tier-banner preview">
             <div class="qb-tier-icon">🔒</div>
             <div class="qb-tier-info">
-              <strong>نسخة المعاينة المجانية (محدد بـ ٥ أسئلة كحد أقصى لكل نوع)</strong>
-              <span>يمكنك استعراض الأسئلة وإضافة حتى ٥ أسئلة فقط من كل نوع لمنشئ الاختبارات. لفتح البنك بالكامل، يُرجى طلب الاعتماد.</span>
+              <strong>نسخة المعاينة المجانية (محدد بـ ${dNum(5)} أسئلة كحد أقصى لكل نوع)</strong>
+              <span>يمكنك استعراض الأسئلة وإضافة حتى ${dNum(5)} أسئلة فقط من كل نوع لمنشئ الاختبارات. لفتح البنك بالكامل، يُرجى طلب الاعتماد.</span>
             </div>
             <button type="button" class="qb-tier-btn" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()">
               طلب الاعتماد الكامل ↗
@@ -230,10 +245,10 @@
             <div class="qb-filter-field">
               <label for="qb-filter-chapter">الفصل (الوحدة):</label>
               <select id="qb-filter-chapter" onchange="window.QuestionBank.setFilter('chapterId', this.value)">
-                <option value="all" ${state.chapterId === 'all' ? 'selected' : ''}>جميع الفصول (${utils.toEasternDigits(chapters.length)} فصول)</option>
+                <option value="all" ${state.chapterId === 'all' ? 'selected' : ''}>جميع الفصول (${dNum(chapters.length)} فصول)</option>
                 ${chapters.map(function (ch) {
                   return '<option value="' + utils.escapeHtml(ch.id) + '"' + (state.chapterId === ch.id ? ' selected' : '') + '>' +
-                    utils.escapeHtml(utils.toEasternDigits(ch.number + ': ' + ch.title)) + '</option>';
+                    utils.escapeHtml(dNum(ch.number + ': ' + ch.title)) + '</option>';
                 }).join('')}
               </select>
             </div>
@@ -241,10 +256,10 @@
             <div class="qb-filter-field">
               <label for="qb-filter-lesson">الدرس:</label>
               <select id="qb-filter-lesson" onchange="window.QuestionBank.setFilter('lessonId', this.value)">
-                <option value="all" ${state.lessonId === 'all' ? 'selected' : ''}>جميع الدروس (${utils.toEasternDigits(availableLessons.length)})</option>
+                <option value="all" ${state.lessonId === 'all' ? 'selected' : ''}>جميع الدروس (${dNum(availableLessons.length)})</option>
                 ${availableLessons.map(function (ls) {
                   return '<option value="' + utils.escapeHtml(ls.id) + '"' + (state.lessonId === ls.id ? ' selected' : '') + '>' +
-                    utils.escapeHtml(utils.toEasternDigits(ls.number + ' ' + ls.title)) + '</option>';
+                    utils.escapeHtml(dNum(ls.number + ' ' + ls.title)) + '</option>';
                 }).join('')}
               </select>
             </div>
@@ -272,7 +287,7 @@
             <div class="qb-filter-field qb-search-field">
               <label for="qb-filter-search">بحث في نص السؤال أو الإجابة:</label>
               <input id="qb-filter-search" type="text" value="${utils.escapeHtml(state.search)}"
-                placeholder="اكتب كلمة مفتاحية أو عدداً (مثال: القاسم، كسر، ٢٥)..."
+                placeholder="${isSec ? 'اكتب كلمة مفتاحية أو عدداً (مثال: البرهان، ميل، 25)...' : 'اكتب كلمة مفتاحية أو عدداً (مثال: القاسم، كسر، ٢٥)...'}"
                 oninput="window.QuestionBank.setSearch(this.value)">
             </div>
           </div>
@@ -280,10 +295,10 @@
           <div class="qb-filter-footer">
             <span class="qb-result-count">
               ${isUserApproved() ? `
-                عرض <strong>${utils.toEasternDigits(filtered.length)}</strong> سؤال من أصل <strong>${utils.toEasternDigits(bank.length)}</strong>
-                • صفحة <strong>${utils.toEasternDigits(state.page)}</strong> من <strong>${utils.toEasternDigits(totalPages)}</strong>
+                عرض <strong>${dNum(filtered.length)}</strong> سؤال من أصل <strong>${dNum(bank.length)}</strong>
+                • صفحة <strong>${dNum(state.page)}</strong> من <strong>${dNum(totalPages)}</strong>
               ` : `
-                🔒 وضع المعاينة: تم حصر العرض في <strong>${utils.toEasternDigits(filtered.length)}</strong> أسئلة (٥ أسئلة للنوع كحد أقصى) • باقي بنك الأسئلة (${utils.toEasternDigits(bank.length)} سؤالاً) مخصص للأعضاء المعتمدين
+                🔒 وضع المعاينة: تم حصر العرض في <strong>${dNum(filtered.length)}</strong> أسئلة (${dNum(5)} أسئلة للنوع كحد أقصى) • باقي بنك الأسئلة (${dNum(bank.length)} سؤالاً) مخصص للأعضاء المعتمدين
               `}
             </span>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
@@ -291,7 +306,7 @@
                 <label class="qb-checkbox-toggle">
                   <input type="checkbox" ${state.onlyImages ? 'checked' : ''}
                     onchange="window.QuestionBank.toggleOnlyImages(this.checked)">
-                  <span>📷 الأسئلة المصورة فقط (${utils.toEasternDigits(totalIllustrated)})</span>
+                  <span>📷 الأسئلة المصورة فقط (${dNum(totalIllustrated)})</span>
                 </label>
               ` : ''}
               <button class="nav-btn" type="button" onclick="window.QuestionBank.resetFilters()">🔄 إعادة ضبط التصفية</button>
@@ -303,7 +318,7 @@
         <div class="qb-bulk-bar">
           <div class="qb-bulk-left">
             <button class="nav-btn" type="button" onclick="window.QuestionBank.selectAllOnPage()">☑️ تحديد الكل في هذه الصفحة</button>
-            <button class="nav-btn" type="button" onclick="window.QuestionBank.clearSelection()">✖️ إلغاء التحديد (${utils.toEasternDigits(selectedCount)})</button>
+            <button class="nav-btn" type="button" onclick="window.QuestionBank.clearSelection()">✖️ إلغاء التحديد (${dNum(selectedCount)})</button>
             <label class="qb-checkbox-toggle">
               <input type="checkbox" ${state.includeAnswersOnCopy ? 'checked' : ''}
                 onchange="window.QuestionBank.toggleIncludeAnswers(this.checked)">
@@ -312,7 +327,7 @@
           </div>
           <div class="qb-bulk-right">
             <button class="nav-btn primary" type="button" onclick="window.QuestionBank.copySelectedToWord()">
-              📋 نسخ الأسئلة المحددة لـ Word (${utils.toEasternDigits(selectedCount)})
+              📋 نسخ الأسئلة المحددة لـ Word (${dNum(selectedCount)})
             </button>
             <button class="nav-btn success-btn" type="button" onclick="window.QuestionBank.addSelectedToExam()">
               ➕ إضافة المحددة لمنشئ الاختبارات
@@ -335,14 +350,17 @@
             const approved = isUserApproved();
             const visitorTypeCounts = { mcq: 0, tf: 0, essay: 0 };
 
+            const isSec = state.bookId === 'g1s';
+            const choiceLetters = (isSec && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : utils.CHOICE_LETTERS;
+
             return pageItems.map(function (q, i) {
               let displayNum;
               if (approved) {
-                displayNum = utils.toEasternDigits(startIdx + i + 1);
+                displayNum = isSec ? String(startIdx + i + 1) : utils.toEasternDigits(startIdx + i + 1);
               } else {
                 const t = q.type || 'mcq';
                 visitorTypeCounts[t] = (visitorTypeCounts[t] || 0) + 1;
-                displayNum = utils.toEasternDigits(visitorTypeCounts[t]);
+                displayNum = isSec ? String(visitorTypeCounts[t]) : utils.toEasternDigits(visitorTypeCounts[t]);
               }
               const isSelected = state.selectedUids.has(q.uid);
               const isRevealed = state.revealedAnswers.has(q.uid);
@@ -355,21 +373,21 @@
 
               if (q.type === 'mcq') {
                 bodyHtml = '<div class="qb-mcq-options">' + q.options.map(function (opt, oIdx) {
-                  const letter = utils.CHOICE_LETTERS[oIdx] || 'أ';
+                  const letter = choiceLetters[oIdx] || (isSec ? 'A' : 'أ');
                   const isCorrectOpt = isRevealed && oIdx === q.correct;
                   return (
                     '<div class="qb-mcq-opt ' + (isCorrectOpt ? 'is-correct' : '') + '">' +
                     '<span class="opt-letter">' + letter + '</span>' +
-                    '<span>' + utils.renderMathHtml(opt) + '</span>' +
+                    '<span>' + utils.renderMathHtml(opt, isSec) + '</span>' +
                     '</div>'
                   );
                 }).join('') + '</div>';
 
-                const corrLetter = utils.CHOICE_LETTERS[q.correct] || 'أ';
+                const corrLetter = choiceLetters[q.correct] || (isSec ? 'A' : 'أ');
                 answerDetailHtml =
                   '<strong>الإجابة الصحيحة:</strong> ' + corrLetter + ') ' +
-                  utils.renderMathHtml(q.options[q.correct] || '') +
-                  (q.explanation ? '<br><strong>التفسير:</strong> ' + utils.renderMathHtml(q.explanation) : '');
+                  utils.renderMathHtml(q.options[q.correct] || '', isSec) +
+                  (q.explanation ? '<br><strong>التفسير:</strong> ' + utils.renderMathHtml(q.explanation, isSec) : '');
               } else if (q.type === 'tf') {
                 bodyHtml =
                   '<div class="qb-tf-preview">' +
@@ -379,11 +397,17 @@
 
                 answerDetailHtml =
                   '<strong>الإجابة الصحيحة:</strong> ' + (q.is_true ? 'صواب (✓)' : 'خطأ (✗)') +
-                  (q.explanation ? '<br><strong>التفسير:</strong> ' + utils.renderMathHtml(q.explanation) : '');
+                  (q.explanation ? '<br><strong>التفسير:</strong> ' + utils.renderMathHtml(q.explanation, isSec) : '');
               } else {
-                bodyHtml = '<div class="qb-essay-hint">✍️ مسألة تطبيقية مفتوحة (' + utils.toEasternDigits(q.lines || 3) + ' أسطر للإجابة)</div>';
-                answerDetailHtml = '<strong>الحل النموذجي:</strong> ' + utils.renderMathHtml(q.ans || '');
+                bodyHtml = '<div class="qb-essay-hint">✍️ مسألة تطبيقية مفتوحة (' + (isSec ? (q.lines || 3) : utils.toEasternDigits(q.lines || 3)) + ' أسطر للإجابة)</div>';
+                answerDetailHtml = '<strong>الحل النموذجي:</strong> ' + utils.renderMathHtml(q.ans || '', isSec);
               }
+
+              const chLessonPill = isSec
+                ? (utils.escapeHtml(dNum(q.chapterNumber || '')) + ' • ' + utils.escapeHtml(dNum((q.lessonNumber || '') + ' ' + (q.lessonTitle || ''))))
+                : (utils.escapeHtml(utils.toEasternDigits(q.chapterNumber || '')) + ' • ' + utils.escapeHtml(utils.toEasternDigits((q.lessonNumber || '') + ' ' + (q.lessonTitle || ''))));
+
+              const capText = q.imageCaption ? dNum(q.imageCaption) : '';
 
               return `
                 <div class="qb-question-card ${isSelected ? 'selected' : ''}">
@@ -394,19 +418,19 @@
                       <span class="q-badge">س ${displayNum}</span>
                     </label>
                     <div class="qb-q-badges">
-                      <span class="qb-pill chapter-pill">${utils.escapeHtml(utils.toEasternDigits(q.chapterNumber))} • ${utils.escapeHtml(utils.toEasternDigits(q.lessonNumber + ' ' + q.lessonTitle))}</span>
+                      <span class="qb-pill chapter-pill">${chLessonPill}</span>
                       <span class="qb-pill ${typeBadgeClass}">${utils.escapeHtml(q.typeLabel)}</span>
                       ${q.image ? '<span class="qb-pill" style="background:#e0f2fe;color:#0369a1;">🖼️ مصور</span>' : ''}
                       <span class="qb-pill ${diffBadgeClass}">${utils.escapeHtml(q.difficulty)}</span>
-                      <span class="qb-pill marks-pill">${utils.escapeHtml(utils.formatMark(q.marks))}</span>
+                      <span class="qb-pill marks-pill">${utils.escapeHtml(utils.formatMark(q.marks, isSec))}</span>
                     </div>
                   </div>
 
-                  <div class="qb-q-text">${utils.renderMathHtml(q.q)}</div>
+                  <div class="qb-q-text">${utils.renderMathHtml(q.q, isSec)}</div>
                   ${q.image ? (
                     '<div class="q-figure-box">' +
-                    '<img class="q-figure-img" src="' + utils.escapeHtml(q.image) + '" alt="' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption || 'شكل السؤال')) + '" loading="lazy" title="اضغط للتكبير" data-caption="' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption || '')) + '" onclick="if(window.Platform&&window.Platform.openImageLightbox){window.Platform.openImageLightbox(this.getAttribute(\'src\'),this.getAttribute(\'data-caption\'));}" />' +
-                    (q.imageCaption ? '<div class="q-figure-caption">' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption)) + '</div>' : '') +
+                    '<img class="q-figure-img" src="' + utils.escapeHtml(q.image) + '" alt="' + utils.escapeHtml(capText || 'شكل السؤال') + '" loading="lazy" title="اضغط للتكبير" data-caption="' + utils.escapeHtml(capText) + '" onclick="if(window.Platform&&window.Platform.openImageLightbox){window.Platform.openImageLightbox(this.getAttribute(\'src\'),this.getAttribute(\'data-caption\'));}" />' +
+                    (capText ? '<div class="q-figure-caption">' + utils.escapeHtml(capText) + '</div>' : '') +
                     '</div>'
                   ) : ''}
                   ${bodyHtml}
@@ -437,9 +461,9 @@
             <div style="display:flex; align-items:center; gap:14px;">
               <span style="font-size:2rem;">🔒</span>
               <div>
-                <h4 style="margin:0 0 4px 0; font-size:1.05rem; font-weight:800; color:#92400e;">تم إيقاف العرض عند الحد المسموح به للمعاينة (٥ أسئلة لكل نوع)</h4>
+                <h4 style="margin:0 0 4px 0; font-size:1.05rem; font-weight:800; color:#92400e;">تم إيقاف العرض عند الحد المسموح به للمعاينة (${dNum(5)} أسئلة لكل نوع)</h4>
                 <p style="margin:0; font-size:0.88rem; color:#78350f;">
-                  لبقية أسئلة بنك الأسئلة الشامل (أكثر من ٤٥٠ سؤالاً لكل صف دراسي) وميزات النسخ الكامل لـ Word والتوليد الشامل للاختبارات، سجّل دخولك واطلب اعتماد حسابك.
+                  لبقية أسئلة بنك الأسئلة الشامل (أكثر من ${dNum(450)} سؤالاً لكل صف دراسي) وميزات النسخ الكامل لـ Word والتوليد الشامل للاختبارات، سجّل دخولك واطلب اعتماد حسابك.
                 </p>
               </div>
             </div>
@@ -469,6 +493,7 @@
   function renderPagination(totalPages) {
     if (totalPages <= 1) return '';
     const utils = getUtils();
+    const isSec = state.bookId === 'g1s';
     let pagesHtml = '';
     const maxButtons = 7;
     let startP = Math.max(1, state.page - 3);
@@ -479,7 +504,7 @@
 
     for (let p = startP; p <= endP; p++) {
       pagesHtml += '<button type="button" class="qb-page-btn ' + (p === state.page ? 'active' : '') +
-        '" onclick="window.QuestionBank.goToPage(' + p + ')">' + utils.toEasternDigits(p) + '</button>';
+        '" onclick="window.QuestionBank.goToPage(' + p + ')">' + (isSec ? String(p) : utils.toEasternDigits(p)) + '</button>';
     }
 
     return `
@@ -579,7 +604,8 @@
     if (!q) return;
     getUtils().copyQuestionsToWord([q], {
       includeAnswers: state.includeAnswersOnCopy,
-      numbered: false
+      numbered: false,
+      isSecondary: state.bookId === 'g1s'
     });
   }
 
@@ -590,6 +616,7 @@
       return;
     }
     const approved = isUserApproved();
+    const isSec = state.bookId === 'g1s';
     if (!approved) {
       const counts = { mcq: 0, tf: 0, essay: 0 };
       const safeList = [];
@@ -604,17 +631,19 @@
         }
       });
       if (hadExcess) {
-        getUtils().showToast('🔒 تم تقييد النسخ إلى ٥ أسئلة كحد أقصى لكل نوع لغير الأعضاء المعتمدين.', 'warning');
+        getUtils().showToast('🔒 تم تقييد النسخ إلى ' + (isSec ? '5' : '٥') + ' أسئلة كحد أقصى لكل نوع لغير الأعضاء المعتمدين.', 'warning', isSec);
       }
       getUtils().copyQuestionsToWord(safeList, {
         includeAnswers: state.includeAnswersOnCopy,
-        numbered: true
+        numbered: true,
+        isSecondary: isSec
       });
       return;
     }
     getUtils().copyQuestionsToWord(selected, {
       includeAnswers: state.includeAnswersOnCopy,
-      numbered: true
+      numbered: true,
+      isSecondary: isSec
     });
   }
 

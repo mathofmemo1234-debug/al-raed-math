@@ -84,15 +84,22 @@
     const questions = examData.questions || [];
     const options = examData.options || {};
 
+    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && questions[0].gradeId === 'g1s'));
+    const dNum = function (v) {
+      const s = v === null || v === undefined ? '' : String(v);
+      return isSec ? (utils && utils.toWesternDigits ? utils.toWesternDigits(s) : s) : (utils ? utils.toEasternDigits(s) : s);
+    };
+    const choiceLetters = (isSec && utils && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : WORD_CHOICE_LETTERS;
+
     const totalMarks = computeTotalMarks(questions);
-    const totalStr = utils.formatMarkShort(totalMarks);
+    const totalStr = utils.formatMarkShort(totalMarks, isSec);
     const sections = groupQuestions(questions, options.groupByType !== false);
     const includeLogo = header.includeLogo !== false;
     const includeAnswerKey = options.includeAnswerKey !== false;
 
     function renderA4Figure(q, extraClass) {
       if (!q || !q.image) return '';
-      const cap = q.imageCaption ? utils.escapeHtml(utils.toEasternDigits(q.imageCaption)) : '';
+      const cap = q.imageCaption ? utils.escapeHtml(dNum(q.imageCaption)) : '';
       return (
         '<div class="a4-q-fig ' + (extraClass || '') + '">' +
         '<img src="' + utils.escapeHtml(q.image) + '" alt="' + (cap || 'شكل السؤال') + '" />' +
@@ -104,7 +111,7 @@
     function formatMathForDoc(text) {
       if (text === null || text === undefined) return '';
       if (utils && utils.renderMathHtml) {
-        return utils.renderMathHtml(text);
+        return utils.renderMathHtml(text, isSec);
       }
       let s = String(text);
       if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('span') !== -1)) {
@@ -113,10 +120,10 @@
       const powers = [];
       s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
         const ph = '___ARPOW_' + powers.length + '___';
-        powers.push({ base: utils.toEasternDigits(base), exp: utils.toEasternDigits(exp) });
+        powers.push({ base: dNum(base), exp: dNum(exp) });
         return ph;
       });
-      s = utils.escapeHtml(utils.toEasternDigits(s));
+      s = utils.escapeHtml(dNum(s));
       powers.forEach(function (p, i) {
         const ph = '___ARPOW_' + i + '___';
         s = s.replace(ph, '<span class="ar-pow"><span class="ar-base">' + p.base + '</span><sup class="ar-exp">' + p.exp + '</sup></span>');
@@ -127,10 +134,10 @@
     let globalQ = 0;
     const sectionsHtml = sections.map(function (sec) {
       const secMarks = computeTotalMarks(sec.items);
-      const secMarksStr = utils.formatMarkShort(secMarks);
+      const secMarksStr = utils.formatMarkShort(secMarks, isSec);
       const secHeader =
         '<div class="a4-doc-sec-bar">' +
-        '<div class="a4-doc-sec-title">' + utils.escapeHtml(utils.toEasternDigits(sec.title)) + '</div>' +
+        '<div class="a4-doc-sec-title">' + utils.escapeHtml(dNum(sec.title)) + '</div>' +
         '<table class="a4-doc-score-box" dir="rtl">' +
         '<tr><td class="a4-doc-score-top">الدرجة</td></tr>' +
         '<tr><td class="a4-doc-score-val"><span class="a4-doc-score-blank"></span> / ' + utils.escapeHtml(secMarksStr) + '</td></tr>' +
@@ -148,7 +155,7 @@
             const qOpts = (q.options || []).slice(0, 4);
             while (qOpts.length < 4) qOpts.push('');
             const optTds = qOpts.map(function (opt, idx) {
-              const letCh = WORD_CHOICE_LETTERS[idx] || 'أ';
+              const letCh = choiceLetters[idx] || (isSec ? 'A' : 'أ');
               return (
                 '<td class="a4-doc-mcq-let">' + letCh + '</td>' +
                 '<td class="a4-doc-mcq-opt">' + formatMathForDoc(opt) + '</td>'
@@ -157,7 +164,7 @@
             return (
               '<tbody class="a4-q-pair">' +
               '<tr>' +
-              '<td rowspan="2" class="a4-doc-num">' + utils.toEasternDigits(globalQ) + '</td>' +
+              '<td rowspan="2" class="a4-doc-num">' + dNum(globalQ) + '</td>' +
               '<td colspan="8" class="a4-doc-prompt">' + qText + renderA4Figure(q) + '</td>' +
               '</tr>' +
               '<tr>' + optTds + '</tr>' +
@@ -172,7 +179,7 @@
             globalQ++;
             return (
               '<tr>' +
-              '<td class="a4-doc-tf-num">' + utils.toEasternDigits(globalQ) + '</td>' +
+              '<td class="a4-doc-tf-num">' + dNum(globalQ) + '</td>' +
               '<td class="a4-doc-tf-stmt">' + formatMathForDoc(q.statement || q.q || '') + renderA4Figure(q, 'a4-q-fig-tf') + '</td>' +
               '<td class="a4-doc-tf-ans">( &nbsp;&nbsp;&nbsp;&nbsp; )</td>' +
               '</tr>'
@@ -197,7 +204,7 @@
           return (
             '<tbody class="a4-q-pair">' +
             '<tr>' +
-            '<td rowspan="2" class="a4-doc-es-num">' + utils.toEasternDigits(globalQ) + '</td>' +
+            '<td rowspan="2" class="a4-doc-es-num">' + dNum(globalQ) + '</td>' +
             '<td class="a4-doc-es-prompt">' + qText + renderA4Figure(q) + '</td>' +
             '</tr>' +
             '<tr>' +
@@ -223,7 +230,7 @@
         let ansTxt = '';
         if (q.type === 'mcq') {
           const cIdx = typeof q.correct === 'number' ? q.correct : 0;
-          const letter = WORD_CHOICE_LETTERS[cIdx] || 'أ';
+          const letter = choiceLetters[cIdx] || (isSec ? 'A' : 'أ');
           const optVal = (q.options && q.options[cIdx]) ? q.options[cIdx] : '';
           ansTxt = letter + ') ' + optVal + (q.explanation ? (' — ' + q.explanation) : '');
         } else if (q.type === 'tf') {
@@ -235,17 +242,17 @@
         }
         return (
           '<tr>' +
-          '<td class="a4-c-num">' + utils.toEasternDigits(idx + 1) + '</td>' +
+          '<td class="a4-c-num">' + dNum(idx + 1) + '</td>' +
           '<td>' + tLbl + '</td>' +
           '<td class="a4-ak-ans">' + formatMathForDoc(ansTxt) + '</td>' +
-          '<td class="a4-c-num">' + utils.escapeHtml(utils.formatMarkShort(q.marks !== undefined ? q.marks : 1)) + '</td>' +
+          '<td class="a4-c-num">' + utils.escapeHtml(utils.formatMarkShort(q.marks !== undefined ? q.marks : 1, isSec)) + '</td>' +
           '</tr>'
         );
       }).join('');
 
       answerKeyHtml =
         '<div class="a4-page-break"></div>' +
-        '<div class="a4-ak-header">نموذج الإجابة وتوزيع الدرجات — ' + utils.escapeHtml(utils.toEasternDigits(header.examTitle || 'اختبار الرياضيات')) + '</div>' +
+        '<div class="a4-ak-header">نموذج الإجابة وتوزيع الدرجات — ' + utils.escapeHtml(dNum(header.examTitle || 'اختبار الرياضيات')) + '</div>' +
         '<table class="a4-ak-tbl" dir="rtl">' +
         '<thead><tr><th class="a4-c-num">س</th><th>النوع</th><th>الإجابة النموذجية والشرح</th><th class="a4-c-num">الدرجة</th></tr></thead>' +
         '<tbody>' + akRows + '</tbody>' +
@@ -255,7 +262,7 @@
 
     const instructions = (header.instructions || '').trim();
     const instHtml = instructions
-      ? '<div class="a4-inst-box"><strong>تعليمات:</strong> ' + utils.escapeHtml(utils.toEasternDigits(instructions)) + '</div>'
+      ? '<div class="a4-inst-box"><strong>تعليمات:</strong> ' + utils.escapeHtml(dNum(instructions)) + '</div>'
       : '';
 
     const logoSrc = (header.customLogoDataUrl || '').trim() || 'assets/img/logo.png';
@@ -270,11 +277,11 @@
       header.school || 'مدارس المتقدمة – للتعلم الذكي (جدة)',
       header.stage || ''
     ].filter(function (v) { return (v || '').trim(); }).map(function (v) {
-      return '<div>' + utils.escapeHtml(utils.toEasternDigits(v)) + '</div>';
+      return '<div>' + utils.escapeHtml(dNum(v)) + '</div>';
     }).join('');
 
-    const teacherName = utils.escapeHtml(utils.toEasternDigits(header.teacher || 'أ. محمد عبدالله جمعة'));
-    const principalName = utils.escapeHtml(utils.toEasternDigits(header.principal || 'حسين عبد الله أزيبي'));
+    const teacherName = utils.escapeHtml(dNum(header.teacher || 'أ. محمد عبدالله جمعة'));
+    const principalName = utils.escapeHtml(dNum(header.principal || 'حسين عبد الله أزيبي'));
 
     const docBodyContent = `
       <img src="assets/img/exam_top_ribbon.png" alt="" class="a4-doc-top-ribbon" onerror="this.style.display='none'">
@@ -283,9 +290,9 @@
           <td class="a4-doc-hdr-right">${rightLinesHtml}</td>
           <td class="a4-doc-hdr-mid">
             <img src="assets/img/moe_logo.png" alt="وزارة التعليم" class="a4-doc-moe-logo" onerror="this.style.display='none'">
-            <div class="a4-doc-title">${utils.escapeHtml(utils.toEasternDigits(header.examTitle || 'اختبار مادة الرياضيات'))}</div>
-            <div class="a4-doc-sub">المادة: ${utils.escapeHtml(utils.toEasternDigits(header.subject || 'الرياضيات'))} &nbsp;|&nbsp; الصف: ${utils.escapeHtml(utils.toEasternDigits(header.grade || ''))} &nbsp;|&nbsp; الفصل: ${utils.escapeHtml(utils.toEasternDigits(header.term || 'الأول'))}</div>
-            <div class="a4-doc-sub">العام الدراسي: ${utils.escapeHtml(utils.toEasternDigits(header.year || '١٤٤٨ هـ'))} &nbsp;|&nbsp; الزمن: ${utils.escapeHtml(utils.toEasternDigits(header.duration || '٤٥ دقيقة'))}</div>
+            <div class="a4-doc-title">${utils.escapeHtml(dNum(header.examTitle || 'اختبار مادة الرياضيات'))}</div>
+            <div class="a4-doc-sub">المادة: ${utils.escapeHtml(dNum(header.subject || 'الرياضيات'))} &nbsp;|&nbsp; الصف: ${utils.escapeHtml(dNum(header.grade || ''))} &nbsp;|&nbsp; الفصل: ${utils.escapeHtml(dNum(header.term || 'الأول'))}</div>
+            <div class="a4-doc-sub">العام الدراسي: ${utils.escapeHtml(dNum(header.year || (isSec ? '1448 هـ' : '١٤٤٨ هـ')))} &nbsp;|&nbsp; الزمن: ${utils.escapeHtml(dNum(header.duration || (isSec ? '45 دقيقة' : '٤٥ دقيقة')))}</div>
           </td>
           <td class="a4-doc-hdr-left">${logoHtml}</td>
         </tr>
@@ -299,7 +306,7 @@
         </tr>
         <tr>
           <td class="a4-doc-stu-lbl">الصف</td>
-          <td class="a4-doc-stu-fill">${utils.escapeHtml(utils.toEasternDigits(header.grade || ''))} &nbsp;/&nbsp; ( &nbsp;&nbsp;&nbsp;&nbsp; )</td>
+          <td class="a4-doc-stu-fill">${utils.escapeHtml(dNum(header.grade || ''))} &nbsp;/&nbsp; ( &nbsp;&nbsp;&nbsp;&nbsp; )</td>
           <td class="a4-doc-score-val">&nbsp;&nbsp;&nbsp;&nbsp; / ${utils.escapeHtml(totalStr)}</td>
         </tr>
       </table>
@@ -328,7 +335,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>${utils.escapeHtml(utils.toEasternDigits(header.examTitle || 'اختبار الرياضيات'))}</title>
+<title>${utils.escapeHtml(dNum(header.examTitle || 'اختبار الرياضيات'))}</title>
 <style>
   @page { size: A4 portrait; margin: 8mm; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -422,6 +429,17 @@
     margin-right: 2px !important;
     margin-left: 1px !important;
     color: inherit !important;
+  }
+  .sec-math, .ltr-math, .sec-pow {
+    direction: ltr !important;
+    unicode-bidi: isolate !important;
+    display: inline-block;
+    font-family: 'Times New Roman', serif;
+  }
+  .sec-pow .sec-exp {
+    font-size: 0.72em;
+    vertical-align: super;
+    line-height: 0;
   }
 </style>
 </head>
@@ -544,49 +562,60 @@
 
   function wRun(text, opts) {
     const utils = getUtils();
-    const o = Object.assign({ sizePt: 14, bold: false, color: '0F172A', sup: false }, opts || {});
+    const o = Object.assign({ sizePt: 14, bold: false, color: '0F172A', sup: false, isSecondary: false, ltr: false }, opts || {});
     const textStr = String(text || '');
 
-    function _buildSingleRunXml(t, isSup) {
+    function _buildSingleRunXml(t, isSup, isLtr) {
       const cleanText = String(t || '').replace(/<[^>]+>/g, '');
-      const clean = escXml(utils.toEasternDigits(cleanText));
+      const digitsNorm = o.isSecondary
+        ? (utils && utils.toWesternDigits ? utils.toWesternDigits(cleanText) : cleanText)
+        : utils.toEasternDigits(cleanText);
+      const clean = escXml(digitsNorm);
       const sizeVal = isSup ? Math.max(6.5, Math.round(o.sizePt * 0.62)) : o.sizePt;
       const sz = String(Math.round(sizeVal * 2));
+      const useLtr = !!(isLtr || o.ltr);
+      const fontXml = useLtr
+        ? '<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Traditional Arabic"/>'
+        : '<w:rFonts w:ascii="Traditional Arabic" w:hAnsi="Traditional Arabic" w:cs="Traditional Arabic"/>';
       return (
         '<w:r>' +
         '<w:rPr>' +
-        '<w:rFonts w:ascii="Traditional Arabic" w:hAnsi="Traditional Arabic" w:cs="Traditional Arabic"/>' +
+        fontXml +
         (o.bold ? '<w:b/><w:bCs/>' : '') +
         '<w:color w:val="' + o.color + '"/>' +
         '<w:sz w:val="' + sz + '"/><w:szCs w:val="' + sz + '"/>' +
         (isSup ? '<w:vertAlign w:val="superscript"/>' : '') +
-        '<w:rtl/>' +
+        (useLtr ? '' : '<w:rtl/>') +
         '</w:rPr>' +
         '<w:t xml:space="preserve">' + clean + '</w:t>' +
         '</w:r>'
       );
     }
 
-    if (textStr.indexOf('ar-pow') === -1) {
-      return _buildSingleRunXml(textStr, o.sup);
+    if (textStr.indexOf('ar-pow') === -1 && textStr.indexOf('sec-pow') === -1 && textStr.indexOf('sec-math') === -1 && textStr.indexOf('ltr-math') === -1) {
+      return _buildSingleRunXml(textStr, o.sup, false);
     }
 
-    const pat = /<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi;
+    const pat = /<span\s+class=["'](?:ar-pow|sec-pow)["']\s*>\s*<span\s+class=["'](?:ar-base|sec-base)["']>([\s\S]*?)<\/span>\s*<sup\s+class=["'](?:ar-exp|sec-exp)["']>([\s\S]*?)<\/sup>\s*<\/span>|<span\s+class=["'](?:sec-math|ltr-math)["'][^>]*>([\s\S]*?)<\/span>/gi;
     let outXml = '';
     let lastEnd = 0;
     let match;
     while ((match = pat.exec(textStr)) !== null) {
       if (match.index > lastEnd) {
         const seg = textStr.substring(lastEnd, match.index);
-        if (seg) outXml += _buildSingleRunXml(seg, false);
+        if (seg) outXml += _buildSingleRunXml(seg, false, false);
       }
-      outXml += _buildSingleRunXml(match[1], false);
-      outXml += _buildSingleRunXml(match[2], true);
+      if (match[1] !== undefined) {
+        outXml += _buildSingleRunXml(match[1], false, o.isSecondary);
+        outXml += _buildSingleRunXml(match[2], true, o.isSecondary);
+      } else if (match[3] !== undefined) {
+        outXml += _buildSingleRunXml(match[3], false, true);
+      }
       lastEnd = pat.lastIndex;
     }
     if (lastEnd < textStr.length) {
       const seg = textStr.substring(lastEnd);
-      if (seg) outXml += _buildSingleRunXml(seg, false);
+      if (seg) outXml += _buildSingleRunXml(seg, false, false);
     }
     return outXml;
   }
@@ -767,7 +796,7 @@
     );
   }
 
-  function buildDrawingParaXml(rId, docPrId, name, wPx, hPx, maxWcm, maxHcm, captionText, keepNext) {
+  function buildDrawingParaXml(rId, docPrId, name, wPx, hPx, maxWcm, maxHcm, captionText, keepNext, isSecondary) {
     const utils = getUtils();
     const runXml = buildInlineDrawingRun(rId, docPrId, name, wPx, hPx, maxWcm, maxHcm);
     const drawingPara =
@@ -777,8 +806,11 @@
       '</w:p>';
 
     if (!captionText) return drawingPara;
+    const capNorm = isSecondary
+      ? (utils && utils.toWesternDigits ? utils.toWesternDigits(captionText) : String(captionText))
+      : utils.toEasternDigits(captionText);
     return drawingPara + wPara(
-      wRun(utils.toEasternDigits(captionText), { sizePt: 10, color: '475569' }),
+      wRun(capNorm, { sizePt: 10, color: '475569', isSecondary: !!isSecondary }),
       { align: 'center', before: 0, after: 40 }
     );
   }
@@ -788,13 +820,21 @@
     const header = examData.header || {};
     const questions = examData.questions || [];
     const options = examData.options || {};
+    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && questions[0].gradeId === 'g1s'));
+    const choiceLetters = (isSec && utils && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : WORD_CHOICE_LETTERS;
     const totalMarks = computeTotalMarks(questions);
-    const totalStr = utils.formatMarkShort(totalMarks);
+    const totalStr = utils.formatMarkShort(totalMarks, isSec);
     const sections = groupQuestions(questions, options.groupByType !== false);
     const includeLogo = header.includeLogo !== false;
     const includeAnswerKey = options.includeAnswerKey !== false;
 
-    const ed = function (v) { return utils.toEasternDigits(v == null ? '' : String(v)); };
+    const ed = function (v) {
+      const s = v == null ? '' : String(v);
+      return isSec ? (utils && utils.toWesternDigits ? utils.toWesternDigits(s) : s) : utils.toEasternDigits(s);
+    };
+    const secRun = function (txt, rOpts) {
+      return wRun(txt, Object.assign({ isSecondary: isSec }, rOpts || {}));
+    };
 
     const mediaFiles = [];
     const mediaRelList = [];
@@ -827,7 +867,7 @@
       const reg = registerMedia(key, assetObj.bytes, assetObj.width, assetObj.height, assetObj.ext);
       if (!reg) return '';
       const docId = nextDocPrId++;
-      return buildDrawingParaXml(reg.rId, docId, reg.fname, reg.wPx, reg.hPx, maxWcm, maxHcm, captionText || '');
+      return buildDrawingParaXml(reg.rId, docId, reg.fname, reg.wPx, reg.hPx, maxWcm, maxHcm, captionText || '', false, isSec);
     }
 
     function maybeImageXml(q, maxWcm, maxHcm) {
@@ -850,7 +890,7 @@
       const reg = registerMedia(key, b, wPx, hPx, ext);
       if (!reg) return '';
       const docId = nextDocPrId++;
-      return buildDrawingParaXml(reg.rId, docId, reg.fname, reg.wPx, reg.hPx, maxWcm, maxHcm, q.imageCaption || '');
+      return buildDrawingParaXml(reg.rId, docId, reg.fname, reg.wPx, reg.hPx, maxWcm, maxHcm, q.imageCaption || '', false, isSec);
     }
 
     const bodyParts = [];
@@ -871,15 +911,15 @@
       header.school || 'مدارس المتقدمة – للتعلم الذكي (جدة)',
       header.stage || ''
     ].filter(function (v) { return (v || '').trim(); }).map(function (v, idx) {
-      return wPara(wRun(ed(v), { sizePt: idx === 0 ? 12 : 11.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 15 });
+      return wPara(secRun(ed(v), { sizePt: idx === 0 ? 12 : 11.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 15 });
     }).join('');
 
     const moeXml = assetsMap.moeLogo ? assetParaXml('__moe_logo__', assetsMap.moeLogo, 4.2, 1.45) : '';
     const midXml =
       moeXml +
-      wPara(wRun(ed(header.examTitle || 'اختبار مادة الرياضيات'), { sizePt: 13.5, bold: true, color: '000000' }), { align: 'center', before: 15, after: 15 }) +
-      wPara(wRun('المادة: ' + ed(header.subject || 'الرياضيات') + '  |  الصف: ' + ed(header.grade || '') + '  |  الفصل: ' + ed(header.term || 'الأول'), { sizePt: 11, bold: true, color: '0F172A' }), { align: 'center', before: 0, after: 15 }) +
-      wPara(wRun('العام الدراسي: ' + ed(header.year || '١٤٤٨ هـ') + '  |  الزمن: ' + ed(header.duration || '٤٥ دقيقة'), { sizePt: 11, color: '475569' }), { align: 'center', before: 0, after: 15 });
+      wPara(secRun(ed(header.examTitle || 'اختبار مادة الرياضيات'), { sizePt: 13.5, bold: true, color: '000000' }), { align: 'center', before: 15, after: 15 }) +
+      wPara(secRun('المادة: ' + ed(header.subject || 'الرياضيات') + '  |  الصف: ' + ed(header.grade || '') + '  |  الفصل: ' + ed(header.term || 'الأول'), { sizePt: 11, bold: true, color: '0F172A' }), { align: 'center', before: 0, after: 15 }) +
+      wPara(secRun('العام الدراسي: ' + ed(header.year || (isSec ? '1448 هـ' : '١٤٤٨ هـ')) + '  |  الزمن: ' + ed(header.duration || (isSec ? '45 دقيقة' : '٤٥ دقيقة')), { sizePt: 11, color: '475569' }), { align: 'center', before: 0, after: 15 });
 
     let schoolLogoAsset = assetsMap.schoolLogo || null;
     if (!schoolLogoAsset && includeLogo && header.customLogoDataUrl) {
@@ -902,22 +942,22 @@
     const stuWidths = [1587, 6917, 1984];
     const stuRow0 =
       '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-      wCell(wPara(wRun('اسم الطالب', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), stuWidths[0], { fill: 'F2F2F2' }) +
-      wCell(wPara(wRun('..................................................................................', { sizePt: 11, color: '475569' }), { before: 0, after: 0 }), stuWidths[1]) +
-      wCell(wPara(wRun('الدرجة الكلية', { sizePt: 11.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), stuWidths[2], { fill: 'F2F2F2' }) +
+      wCell(wPara(secRun('اسم الطالب', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), stuWidths[0], { fill: 'F2F2F2' }) +
+      wCell(wPara(secRun('..................................................................................', { sizePt: 11, color: '475569' }), { before: 0, after: 0 }), stuWidths[1]) +
+      wCell(wPara(secRun('الدرجة الكلية', { sizePt: 11.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), stuWidths[2], { fill: 'F2F2F2' }) +
       '</w:tr>';
     const stuRow1 =
       '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-      wCell(wPara(wRun('الصف', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), stuWidths[0], { fill: 'F2F2F2' }) +
-      wCell(wPara(wRun(ed(header.grade || '') + '   /   (          )', { sizePt: 12, bold: true, color: '000000' }), { before: 0, after: 0 }), stuWidths[1]) +
-      wCell(wPara(wRun('          /  ' + totalStr, { sizePt: 13, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), stuWidths[2]) +
+      wCell(wPara(secRun('الصف', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), stuWidths[0], { fill: 'F2F2F2' }) +
+      wCell(wPara(secRun(ed(header.grade || '') + '   /   (          )', { sizePt: 12, bold: true, color: '000000' }), { before: 0, after: 0 }), stuWidths[1]) +
+      wCell(wPara(secRun('          /  ' + totalStr, { sizePt: 13, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), stuWidths[2]) +
       '</w:tr>';
     bodyParts.push(wTable(stuRow0 + stuRow1, true, '000000', stuWidths));
 
     if ((header.instructions || '').trim()) {
       bodyParts.push(wPara(
-        wRun('تعليمات: ', { sizePt: 11.5, bold: true, color: '1E3A8A' }) +
-        wRun(ed(header.instructions), { sizePt: 11.5, color: '475569' }),
+        secRun('تعليمات: ', { sizePt: 11.5, bold: true, color: '1E3A8A' }) +
+        secRun(ed(header.instructions), { sizePt: 11.5, color: '475569' }),
         { before: 50, after: 40 }
       ));
     }
@@ -934,16 +974,16 @@
     let globalQ = 0;
     sections.forEach(function (sec) {
       const secMarks = computeTotalMarks(sec.items);
-      const secMarksStr = utils.formatMarkShort(secMarks);
+      const secMarksStr = utils.formatMarkShort(secMarks, isSec);
       const shWidths = [8504, 1984];
       const shRows =
         '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-        wCell(wPara(wRun(ed(sec.title), { sizePt: 13.5, bold: true, color: '000000' }), { before: 0, after: 0, keepNext: true }), shWidths[0], { vMerge: 'restart', borders: noBdr }) +
-        wCell(wPara(wRun('الدرجة', { sizePt: 11, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), shWidths[1], { fill: 'F2F2F2', borders: boxBdr }) +
+        wCell(wPara(secRun(ed(sec.title), { sizePt: 13.5, bold: true, color: '000000' }), { before: 0, after: 0, keepNext: true }), shWidths[0], { vMerge: 'restart', borders: noBdr }) +
+        wCell(wPara(secRun('الدرجة', { sizePt: 11, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), shWidths[1], { fill: 'F2F2F2', borders: boxBdr }) +
         '</w:tr>' +
         '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
         wCell('', shWidths[0], { vMerge: 'continue', borders: noBdr }) +
-        wCell(wPara(wRun('          /  ' + secMarksStr, { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), shWidths[1], { borders: boxBdr }) +
+        wCell(wPara(secRun('          /  ' + secMarksStr, { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), shWidths[1], { borders: boxBdr }) +
         '</w:tr>';
       bodyParts.push(wPara('', { before: 35, after: 15 }));
       bodyParts.push(wTable(shRows, false, '000000', shWidths));
@@ -960,20 +1000,20 @@
             globalQ++;
             const qImgXml = maybeImageXml(q, 10.4, 4.6);
             const promptParas =
-              wPara(wRun(ed(q.q || q.statement || ''), { sizePt: 12.5, bold: true, color: '000000' }), { before: 0, after: qImgXml ? 20 : 0, keepNext: true }) +
+              wPara(secRun(ed(q.q || q.statement || ''), { sizePt: 12.5, bold: true, color: '000000' }), { before: 0, after: qImgXml ? 20 : 0, keepNext: true }) +
               qImgXml;
             const qOpts = (q.options || []).slice(0, 4);
             while (qOpts.length < 4) qOpts.push('');
             const optCells = qOpts.map(function (opt, oIdx) {
               return (
-                wCell(wPara(wRun(WORD_CHOICE_LETTERS[oIdx] || 'أ', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), mcqWidths[1 + 2 * oIdx], { marLeft: 30, marRight: 30 }) +
-                wCell(wPara(wRun(ed(opt), { sizePt: 12 }), { before: 0, after: 0 }), mcqWidths[2 + 2 * oIdx], { marLeft: 55, marRight: 55 })
+                wCell(wPara(secRun(choiceLetters[oIdx] || (isSec ? 'A' : 'أ'), { sizePt: 12, bold: true, color: '000000', ltr: isSec }), { align: 'center', before: 0, after: 0 }), mcqWidths[1 + 2 * oIdx], { marLeft: 30, marRight: 30 }) +
+                wCell(wPara(secRun(ed(opt), { sizePt: 12 }), { before: 0, after: 0 }), mcqWidths[2 + 2 * oIdx], { marLeft: 55, marRight: 55 })
               );
             }).join('');
 
             return (
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-              wCell(wPara(wRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }), mcqWidths[0], { vMerge: 'restart', marLeft: 30, marRight: 30 }) +
+              wCell(wPara(secRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }), mcqWidths[0], { vMerge: 'restart', marLeft: 30, marRight: 30 }) +
               wCell(promptParas, promptSpanW, { gridSpan: 8, fill: 'F2F2F2', vAlign: 'top' }) +
               '</w:tr>' +
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
@@ -998,9 +1038,9 @@
             const tfImg = maybeImageXml(q, 7.0, 3.5);
             return (
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-              wCell(wPara(wRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), tfWidths[0]) +
-              wCell(wPara(wRun(ed(q.statement || q.q || ''), { sizePt: 12.5, color: '000000' }), { before: 0, after: tfImg ? 20 : 0 }) + tfImg, tfWidths[1]) +
-              wCell(wPara(wRun('(          )', { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), tfWidths[2]) +
+              wCell(wPara(secRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), tfWidths[0]) +
+              wCell(wPara(secRun(ed(q.statement || q.q || ''), { sizePt: 12.5, color: '000000' }), { before: 0, after: tfImg ? 20 : 0 }) + tfImg, tfWidths[1]) +
+              wCell(wPara(secRun('(          )', { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), tfWidths[2]) +
               '</w:tr>'
             );
           }).join('');
@@ -1014,12 +1054,12 @@
             let solParas = '';
             for (let l = 0; l < lc; l++) {
               const prefix = l === 0 ? 'الحل /  ' : '';
-              solParas += wPara(wRun(prefix + '....................................................................................................', { sizePt: 11.5, bold: l === 0, color: '475569' }), { before: 20, after: 25 });
+              solParas += wPara(secRun(prefix + '....................................................................................................', { sizePt: 11.5, bold: l === 0, color: '475569' }), { before: 20, after: 25 });
             }
             return (
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-              wCell(wPara(wRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }), esWidths[0], { vMerge: 'restart' }) +
-              wCell(wPara(wRun(ed(q.q || q.statement || ''), { sizePt: 12.5, bold: true, color: '000000' }), { before: 0, after: qImgXml ? 20 : 0, keepNext: true }) + qImgXml, esWidths[1], { fill: 'F2F2F2', vAlign: 'top' }) +
+              wCell(wPara(secRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }), esWidths[0], { vMerge: 'restart' }) +
+              wCell(wPara(secRun(ed(q.q || q.statement || ''), { sizePt: 12.5, bold: true, color: '000000' }), { before: 0, after: qImgXml ? 20 : 0, keepNext: true }) + qImgXml, esWidths[1], { fill: 'F2F2F2', vAlign: 'top' }) +
               '</w:tr>' +
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
               wCell('', esWidths[0], { vMerge: 'continue' }) +
@@ -1036,7 +1076,7 @@
 
     // 4. Closing Blessing + Teacher & Principal Signatures + Bottom Ribbon
     bodyParts.push(wPara(
-      wRun('انتهت الأسئلة                   مع خالص الدعوات بالتوفيق والنجاح', { sizePt: 13, bold: true, color: '000000' }),
+      secRun('انتهت الأسئلة                   مع خالص الدعوات بالتوفيق والنجاح', { sizePt: 13, bold: true, color: '000000' }),
       { align: 'center', before: 100, after: 60, keepNext: true }
     ));
 
@@ -1045,8 +1085,8 @@
     const principalName = header.principal || 'حسين عبد الله أزيبي';
     const sigRow =
       '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-      wCell(wPara(wRun('معلم المادة', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 15 }) + wPara(wRun(ed(teacherName), { sizePt: 12, bold: true, color: '0F172A' }), { align: 'center', before: 0, after: 0 }), sigWidths[0], { borders: noBdr }) +
-      wCell(wPara(wRun('مدير المدرسة', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 15 }) + wPara(wRun(ed(principalName), { sizePt: 12, bold: true, color: '0F172A' }), { align: 'center', before: 0, after: 0 }), sigWidths[1], { borders: noBdr }) +
+      wCell(wPara(secRun('معلم المادة', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 15 }) + wPara(secRun(ed(teacherName), { sizePt: 12, bold: true, color: '0F172A' }), { align: 'center', before: 0, after: 0 }), sigWidths[0], { borders: noBdr }) +
+      wCell(wPara(secRun('مدير المدرسة', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 15 }) + wPara(secRun(ed(principalName), { sizePt: 12, bold: true, color: '0F172A' }), { align: 'center', before: 0, after: 0 }), sigWidths[1], { borders: noBdr }) +
       '</w:tr>';
     bodyParts.push(wTable(sigRow, false, '000000', sigWidths));
 
@@ -1059,7 +1099,7 @@
     if (includeAnswerKey && questions.length) {
       bodyParts.push('<w:p><w:r><w:br w:type="page"/></w:r></w:p>');
       bodyParts.push(wPara(
-        wRun('نموذج الإجابة وتوزيع الدرجات — ' + ed(header.examTitle || 'اختبار الرياضيات'), { sizePt: 14.5, bold: true, color: '1E3A8A' }),
+        secRun('نموذج الإجابة وتوزيع الدرجات — ' + ed(header.examTitle || 'اختبار الرياضيات'), { sizePt: 14.5, bold: true, color: '1E3A8A' }),
         { align: 'center', before: 40, after: 100 }
       ));
 
@@ -1068,10 +1108,10 @@
       const akWidths = [900, 1800, 6588, 1200];
       const akRows = [
         '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-        wCell(wPara(wRun('السؤال', { sizePt: 12, bold: true, color: '047857' }), { align: 'center', before: 0, after: 0 }), akWidths[0], { fill: 'D1FAE5' }) +
-        wCell(wPara(wRun('النوع', { sizePt: 12, bold: true, color: '047857' }), { before: 0, after: 0 }), akWidths[1], { fill: 'D1FAE5' }) +
-        wCell(wPara(wRun('الإجابة النموذجية والشرح', { sizePt: 12, bold: true, color: '047857' }), { before: 0, after: 0 }), akWidths[2], { fill: 'D1FAE5' }) +
-        wCell(wPara(wRun('الدرجة', { sizePt: 12, bold: true, color: '047857' }), { align: 'center', before: 0, after: 0 }), akWidths[3], { fill: 'D1FAE5' }) +
+        wCell(wPara(secRun('السؤال', { sizePt: 12, bold: true, color: '047857' }), { align: 'center', before: 0, after: 0 }), akWidths[0], { fill: 'D1FAE5' }) +
+        wCell(wPara(secRun('النوع', { sizePt: 12, bold: true, color: '047857' }), { before: 0, after: 0 }), akWidths[1], { fill: 'D1FAE5' }) +
+        wCell(wPara(secRun('الإجابة النموذجية والشرح', { sizePt: 12, bold: true, color: '047857' }), { before: 0, after: 0 }), akWidths[2], { fill: 'D1FAE5' }) +
+        wCell(wPara(secRun('الدرجة', { sizePt: 12, bold: true, color: '047857' }), { align: 'center', before: 0, after: 0 }), akWidths[3], { fill: 'D1FAE5' }) +
         '</w:tr>'
       ];
       ordered.forEach(function (q, idx) {
@@ -1079,7 +1119,7 @@
         let ansTxt = '';
         if (q.type === 'mcq') {
           const c = typeof q.correct === 'number' ? q.correct : 0;
-          const letter = WORD_CHOICE_LETTERS[c] || 'أ';
+          const letter = choiceLetters[c] || (isSec ? 'A' : 'أ');
           ansTxt = letter + ') ' + ((q.options && q.options[c]) || '') + (q.explanation ? ' — ' + q.explanation : '');
         } else if (q.type === 'tf') {
           tLbl = 'صواب وخطأ';
@@ -1090,15 +1130,15 @@
         }
         akRows.push(
           '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-          wCell(wPara(wRun(ed(idx + 1), { sizePt: 11.5, bold: true, color: '1E3A8A' }), { align: 'center', before: 0, after: 0 }), akWidths[0]) +
-          wCell(wPara(wRun(tLbl, { sizePt: 11.5 }), { before: 0, after: 0 }), akWidths[1]) +
-          wCell(wPara(wRun(ed(ansTxt), { sizePt: 11.5, color: '047857' }), { before: 0, after: 0 }), akWidths[2]) +
-          wCell(wPara(wRun(utils.formatMarkShort(q.marks !== undefined ? q.marks : 1), { sizePt: 11.5, bold: true }), { align: 'center', before: 0, after: 0 }), akWidths[3]) +
+          wCell(wPara(secRun(ed(idx + 1), { sizePt: 11.5, bold: true, color: '1E3A8A' }), { align: 'center', before: 0, after: 0 }), akWidths[0]) +
+          wCell(wPara(secRun(tLbl, { sizePt: 11.5 }), { before: 0, after: 0 }), akWidths[1]) +
+          wCell(wPara(secRun(ed(ansTxt), { sizePt: 11.5, color: '047857' }), { before: 0, after: 0 }), akWidths[2]) +
+          wCell(wPara(secRun(utils.formatMarkShort(q.marks !== undefined ? q.marks : 1, isSec), { sizePt: 11.5, bold: true }), { align: 'center', before: 0, after: 0 }), akWidths[3]) +
           '</w:tr>'
         );
       });
       bodyParts.push(wTable(akRows.join(''), true, '047857', akWidths));
-      bodyParts.push(wPara(wRun('المجموع الكلي للدرجات: ' + totalStr + ' درجة', { sizePt: 13, bold: true, color: '1E3A8A' }), { align: 'left', before: 100 }));
+      bodyParts.push(wPara(secRun('المجموع الكلي للدرجات: ' + totalStr + ' درجة', { sizePt: 13, bold: true, color: '1E3A8A' }), { align: 'left', before: 100 }));
     }
 
     const pgBordersXml =
@@ -1205,7 +1245,9 @@
 
   function defaultExportBaseName(examData) {
     const grade = (examData.header && examData.header.grade) || '';
-    const fallback = grade.indexOf('متوسط') !== -1 ? 'اختبار_الرياضيات_أول_متوسط' : 'اختبار_الرياضيات_سادس';
+    const fallback = grade.indexOf('ثانوي') !== -1
+      ? 'اختبار_الرياضيات_أول_ثانوي'
+      : (grade.indexOf('متوسط') !== -1 ? 'اختبار_الرياضيات_أول_متوسط' : 'اختبار_الرياضيات_سادس');
     return ((examData.header && examData.header.examTitle) || fallback).replace(/[\\/:*?"<>|]/g, '_');
   }
 

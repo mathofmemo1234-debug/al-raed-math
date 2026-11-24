@@ -93,6 +93,9 @@
           }
           authService = window.firebase.auth();
           firestoreService = window.firebase.firestore();
+          if (cfg.measurementId && typeof window.firebase.analytics === 'function') {
+            try { window.firebase.analytics(); } catch (e) {}
+          }
           isLiveFirebase = true;
           console.log('✓ Firebase Live Cloud Connected successfully!');
           setupLiveSessionSync();

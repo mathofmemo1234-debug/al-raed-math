@@ -1157,7 +1157,7 @@
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('prep')" style="cursor:pointer;" title="الانتقال إلى التحضير الميداني الشامل">📋 التحضير الميداني المعتمد</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('socratic')" style="cursor:pointer;" title="الانتقال إلى منصة سقراط التوليدية">🏛️ منصة سقراط الحوارية</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('tools')" style="cursor:pointer;" title="الانتقال إلى الأدوات والمختبر التفاعلي">🛠️ ${(lesson.lesson_tools && lesson.lesson_tools.title) ? lesson.lesson_tools.title.split('(')[0].trim() : 'أدوات الدرس الذكية'}</span>
-              <span class="meta-badge orange">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
+              <span class="meta-badge orange" onclick="window.Platform.switchLessonTab('quiz')" style="cursor:pointer;" title="انقر للانتقال المباشر وحل الاختبار المقنن (١٠ اختيار + ٥ صواب وخطأ + ٣ مقالي)">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
               <span class="meta-badge" onclick="window.Platform.openCurrentLessonHtmlGenerator()" style="cursor:pointer; background:#ecfdf5; color:#065f46; border-color:#a7f3d0;" title="توليد صفحة تفاعلية مستقلة بصيغة HTML">🌐 مولد HTML التفاعلي</span>
               <span class="meta-badge">💡 إشراف: أ. محمد عبدالله جمعة</span>
             </div>
@@ -1758,6 +1758,12 @@
     state.activeLessonTab = tabName;
     triggerFlashTransition();
     renderLessonCockpit();
+    setTimeout(() => {
+      const targetPane = document.getElementById('tab-' + tabName) || document.querySelector('.lesson-nav-tabs');
+      if (targetPane && typeof targetPane.scrollIntoView === 'function') {
+        targetPane.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 40);
   }
 
   function switchView(viewName) {

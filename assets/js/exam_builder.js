@@ -16,6 +16,18 @@
   const PROFILE_KEYS = ['ministry', 'district', 'schoolCompany', 'school', 'teacher', 'principal', 'includeLogo'];
 
   const BOOK_PRESETS = {
+    g3m: {
+      id: 'g3m',
+      label: 'الثالث المتوسط (٣ م)',
+      heroTitle: '📝 منشئ الاختبارات التفاعلي (اختبار فترة / اختبار نهائي) — الصف الثالث المتوسط',
+      autogenTitle: '⚡ التوليد المتوازن التلقائي من فصول كتاب «٣ م»',
+      grade: 'الثالث المتوسط',
+      stage: 'المرحلة المتوسطة',
+      periodTitle: 'اختبار الفترة الأولى — رياضيات الثالث المتوسط',
+      finalTitle: 'الاختبار النهائي للفصل الدراسي الأول — رياضيات الثالث المتوسط',
+      periodChapters: ['g3m-t1-c1', 'g3m-t1-c2'],
+      finalChapters: ['g3m-t1-c1', 'g3m-t1-c2', 'g3m-t1-c3', 'g3m-t1-c4', 'g3m-t1-c5']
+    },
     g1m: {
       id: 'g1m',
       label: 'الأول المتوسط (١ م)',
@@ -151,12 +163,13 @@
       if (typeof localStorage !== 'undefined') {
         const savedBook = localStorage.getItem(ACTIVE_BOOK_STORAGE_KEY);
         if (savedBook && BOOK_PRESETS[savedBook]) {
+          if (savedBook === 'g3m' && global.GRADE3M_BOOK_DATA) return 'g3m';
           if (savedBook === 'g1m' && global.GRADE1M_BOOK_DATA) return 'g1m';
           if (savedBook === 'g6' && global.GRADE6_BOOK_DATA) return 'g6';
         }
       }
     } catch (e) { /* ignore */ }
-    return global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6';
+    return global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6');
   })();
 
   const state = {
@@ -190,14 +203,19 @@
 
   function getBookData(bookId) {
     const bid = bookId || state.bookId;
+    if (bid === 'g3m' && global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (bid === 'g1m' && global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
     if (global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
     if (global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
+    if (global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     return { chapters: [], flatQuestionBank: [] };
   }
 
   function inferQuestionBookId(q) {
     if (!q) return state.bookId;
+    if (q.gradeId === 'g3m' || (q.lessonId && q.lessonId.indexOf('g3m') === 0) || (q.chapterId && q.chapterId.indexOf('g3m') === 0)) {
+      return 'g3m';
+    }
     if (q.gradeId === 'g1m' || (q.lessonId && q.lessonId.indexOf('g1m') === 0) || (q.chapterId && q.chapterId.indexOf('g1m') === 0)) {
       return 'g1m';
     }
@@ -905,9 +923,9 @@
         <div class="eb-hero-banner">
           <div>
             <div class="qb-grade-switcher" role="group" aria-label="اختيار الصف الدراسي للاختبار">
-              ${['g1m', 'g6'].map(function (bid) {
+              ${['g3m', 'g1m', 'g6'].map(function (bid) {
                 const cfg = BOOK_PRESETS[bid];
-                const hasData = bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA;
+                const hasData = bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA);
                 if (!hasData) return '';
                 return '<button type="button" class="qb-grade-btn ' + (state.bookId === bid ? 'active' : '') +
                   '" onclick="window.ExamBuilder.setBook(\'' + bid + '\')">📘 ' + utils.escapeHtml(cfg.label) + '</button>';

@@ -45,7 +45,7 @@
   }
 
   function isFullBookLesson(lesson) {
-    return !!(lesson && lesson.id && (lesson.id.startsWith('g6') || lesson.id.startsWith('g1m')));
+    return !!(lesson && lesson.id && (lesson.id.startsWith('g6') || lesson.id.startsWith('g1m') || lesson.id.startsWith('g3m')));
   }
 
   function mergeBookData() {
@@ -55,6 +55,9 @@
     }
     if (window.GRADE1M_BOOK_DATA && window.GRADE1M_BOOK_DATA.lessons) {
       Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE1M_BOOK_DATA.lessons);
+    }
+    if (window.GRADE3M_BOOK_DATA && window.GRADE3M_BOOK_DATA.lessons) {
+      Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE3M_BOOK_DATA.lessons);
     }
   }
 
@@ -749,7 +752,7 @@
   function buildLessonQuestionPayload(lesson, type, idx) {
     const utils = window.ArabicUtils;
     if (!lesson) return null;
-    const inferredGradeId = lesson.gradeId || (lesson.id && lesson.id.startsWith('g1m') ? 'g1m' : 'g6');
+    const inferredGradeId = lesson.gradeId || (lesson.id && lesson.id.startsWith('g3m') ? 'g3m' : (lesson.id && lesson.id.startsWith('g1m') ? 'g1m' : 'g6'));
     if (type === 'mcq') {
       const m = lesson.quiz.mcq[idx];
       if (!m) return null;

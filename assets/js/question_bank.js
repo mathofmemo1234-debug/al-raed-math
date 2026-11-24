@@ -11,6 +11,12 @@
   const PAGE_SIZE = 20;
 
   const BOOKS_CONFIG = {
+    g3m: {
+      id: 'g3m',
+      label: 'الثالث المتوسط (٣ م)',
+      heading: '🏦 بنك أسئلة الصف الثالث المتوسط (الفصل الدراسي الأول)',
+      subtitle: 'مستخرج ومنقح بالكامل من كتاب الرياضيات «٣ م» • ٥ فصول • ٢٥ درساً • أرقام عربية مشرقية ١٠٠٪ وجاهز للنسخ المباشر إلى Word'
+    },
     g1m: {
       id: 'g1m',
       label: 'الأول المتوسط (١ م)',
@@ -26,7 +32,7 @@
   };
 
   const state = {
-    bookId: global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6',
+    bookId: global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6'),
     chapterId: 'all',
     lessonId: 'all',
     type: 'all', // 'all' | 'mcq' | 'tf' | 'essay'
@@ -44,11 +50,17 @@
     return global.ArabicUtils;
   }
 
+  function isUserApproved() {
+    return !!(global.FirebaseAuthManager && typeof global.FirebaseAuthManager.isApproved === 'function' && global.FirebaseAuthManager.isApproved());
+  }
+
   function getBookData(bookId) {
     const id = bookId || state.bookId;
+    if (id === 'g3m' && global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (id === 'g1m' && global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
     if (global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
     if (global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
+    if (global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     return { bookMeta: {}, chapters: [], lessons: {}, flatQuestionBank: [] };
   }
 
@@ -56,6 +68,10 @@
     const utils = getUtils();
     const bank = getBookData().flatQuestionBank || [];
     const searchNorm = utils.normalizeSearchText(state.search);
+    const approved = isUserApproved();
+
+    const typeCounters = { mcq: 0, tf: 0, essay: 0 };
+    const maxPerType = approved ? Infinity : 5;
 
     return bank.filter(function (q) {
       if (state.chapterId !== 'all' && q.chapterId !== state.chapterId) return false;
@@ -76,6 +92,13 @@
         ].join(' ');
         if (!utils.normalizeSearchText(parts).includes(searchNorm)) return false;
       }
+
+      if (!approved) {
+        const t = q.type || 'mcq';
+        if ((typeCounters[t] || 0) >= maxPerType) return false;
+        typeCounters[t] = (typeCounters[t] || 0) + 1;
+      }
+
       return true;
     });
   }
@@ -137,9 +160,9 @@
         <div class="qb-hero-banner">
           <div>
             <div class="qb-grade-switcher" role="group" aria-label="اختيار المرحلة الدراسية">
-              ${['g1m', 'g6'].map(function (bid) {
+              ${['g3m', 'g1m', 'g6'].map(function (bid) {
                 const cfg = BOOKS_CONFIG[bid];
-                const hasData = bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA;
+                const hasData = bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA);
                 if (!hasData) return '';
                 return '<button type="button" class="qb-grade-btn ' + (state.bookId === bid ? 'active' : '') +
                   '" onclick="window.QuestionBank.setBook(\'' + bid + '\')">📘 ' + utils.escapeHtml(cfg.label) + '</button>';
@@ -179,7 +202,7 @@
         </div>
 
         <!-- شريط تمييز حالة العضوية في بنك الأسئلة -->
-        ${(window.FirebaseAuthManager && window.FirebaseAuthManager.isApproved()) ? `
+        ${isUserApproved() ? `
           <div class="qb-tier-banner approved">
             <div class="qb-tier-icon">🌟</div>
             <div class="qb-tier-info">
@@ -256,8 +279,12 @@
 
           <div class="qb-filter-footer">
             <span class="qb-result-count">
-              عرض <strong>${utils.toEasternDigits(filtered.length)}</strong> سؤال من أصل <strong>${utils.toEasternDigits(bank.length)}</strong>
-              • صفحة <strong>${utils.toEasternDigits(state.page)}</strong> من <strong>${utils.toEasternDigits(totalPages)}</strong>
+              ${isUserApproved() ? `
+                عرض <strong>${utils.toEasternDigits(filtered.length)}</strong> سؤال من أصل <strong>${utils.toEasternDigits(bank.length)}</strong>
+                • صفحة <strong>${utils.toEasternDigits(state.page)}</strong> من <strong>${utils.toEasternDigits(totalPages)}</strong>
+              ` : `
+                🔒 وضع المعاينة: تم حصر العرض في <strong>${utils.toEasternDigits(filtered.length)}</strong> أسئلة (٥ أسئلة للنوع كحد أقصى) • باقي بنك الأسئلة (${utils.toEasternDigits(bank.length)} سؤالاً) مخصص للأعضاء المعتمدين
+              `}
             </span>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
               ${totalIllustrated ? `
@@ -295,100 +322,132 @@
 
         <!-- قائمة الأسئلة -->
         <div class="qb-questions-list">
-          ${pageItems.length ? pageItems.map(function (q, i) {
-            const globalNum = startIdx + i + 1;
-            const isSelected = state.selectedUids.has(q.uid);
-            const isRevealed = state.revealedAnswers.has(q.uid);
-            const inExam = examApi && examApi.hasQuestion(q.uid);
-            const typeBadgeClass = q.type === 'mcq' ? 'type-mcq' : (q.type === 'tf' ? 'type-tf' : 'type-essay');
-            const diffBadgeClass = q.difficulty === 'سهل' ? 'diff-easy' : (q.difficulty === 'متوسط' ? 'diff-med' : 'diff-hard');
-
-            let bodyHtml = '';
-            let answerDetailHtml = '';
-
-            if (q.type === 'mcq') {
-              bodyHtml = '<div class="qb-mcq-options">' + q.options.map(function (opt, oIdx) {
-                const letter = utils.CHOICE_LETTERS[oIdx] || 'أ';
-                const isCorrectOpt = isRevealed && oIdx === q.correct;
-                return (
-                  '<div class="qb-mcq-opt ' + (isCorrectOpt ? 'is-correct' : '') + '">' +
-                  '<span class="opt-letter">' + letter + '</span>' +
-                  '<span>' + utils.renderMathHtml(opt) + '</span>' +
-                  '</div>'
-                );
-              }).join('') + '</div>';
-
-              const corrLetter = utils.CHOICE_LETTERS[q.correct] || 'أ';
-              answerDetailHtml =
-                '<strong>الإجابة الصحيحة:</strong> ' + corrLetter + ') ' +
-                utils.renderMathHtml(q.options[q.correct] || '') +
-                (q.explanation ? '<br><strong>التفسير:</strong> ' + utils.renderMathHtml(q.explanation) : '');
-            } else if (q.type === 'tf') {
-              bodyHtml =
-                '<div class="qb-tf-preview">' +
-                '<span class="qb-tf-chip ' + (isRevealed && q.is_true ? 'is-correct' : '') + '">( &nbsp; ) صواب</span>' +
-                '<span class="qb-tf-chip ' + (isRevealed && !q.is_true ? 'is-correct' : '') + '">( &nbsp; ) خطأ</span>' +
-                '</div>';
-
-              answerDetailHtml =
-                '<strong>الإجابة الصحيحة:</strong> ' + (q.is_true ? 'صواب (✓)' : 'خطأ (✗)') +
-                (q.explanation ? '<br><strong>التفسير:</strong> ' + utils.renderMathHtml(q.explanation) : '');
-            } else {
-              bodyHtml = '<div class="qb-essay-hint">✍️ مسألة تطبيقية مفتوحة (' + utils.toEasternDigits(q.lines || 3) + ' أسطر للإجابة)</div>';
-              answerDetailHtml = '<strong>الحل النموذجي:</strong> ' + utils.renderMathHtml(q.ans || '');
+          ${(() => {
+            if (!pageItems.length) {
+              return `
+                <div class="objectives-card" style="text-align:center; padding:40px;">
+                  <h3>لا توجد أسئلة مطابقة لمعايير التصفية الحالية</h3>
+                  <p style="color:var(--text-muted); margin:8px 0 16px 0;">جرّب مسح نص البحث أو اختيار «جميع الفصول والدروس».</p>
+                  <button class="nav-btn primary" type="button" onclick="window.QuestionBank.resetFilters()">عرض جميع الأسئلة</button>
+                </div>
+              `;
             }
+            const approved = isUserApproved();
+            const visitorTypeCounts = { mcq: 0, tf: 0, essay: 0 };
 
-            return `
-              <div class="qb-question-card ${isSelected ? 'selected' : ''}">
-                <div class="qb-q-top">
-                  <label class="qb-q-select-label">
-                    <input type="checkbox" ${isSelected ? 'checked' : ''}
-                      onchange="window.QuestionBank.toggleSelect('${utils.escapeHtml(q.uid)}', this.checked)">
-                    <span class="q-badge">س ${utils.toEasternDigits(globalNum)}</span>
-                  </label>
-                  <div class="qb-q-badges">
-                    <span class="qb-pill chapter-pill">${utils.escapeHtml(utils.toEasternDigits(q.chapterNumber))} • ${utils.escapeHtml(utils.toEasternDigits(q.lessonNumber + ' ' + q.lessonTitle))}</span>
-                    <span class="qb-pill ${typeBadgeClass}">${utils.escapeHtml(q.typeLabel)}</span>
-                    ${q.image ? '<span class="qb-pill" style="background:#e0f2fe;color:#0369a1;">🖼️ مصور</span>' : ''}
-                    <span class="qb-pill ${diffBadgeClass}">${utils.escapeHtml(q.difficulty)}</span>
-                    <span class="qb-pill marks-pill">${utils.escapeHtml(utils.formatMark(q.marks))}</span>
+            return pageItems.map(function (q, i) {
+              let displayNum;
+              if (approved) {
+                displayNum = utils.toEasternDigits(startIdx + i + 1);
+              } else {
+                const t = q.type || 'mcq';
+                visitorTypeCounts[t] = (visitorTypeCounts[t] || 0) + 1;
+                displayNum = utils.toEasternDigits(visitorTypeCounts[t]);
+              }
+              const isSelected = state.selectedUids.has(q.uid);
+              const isRevealed = state.revealedAnswers.has(q.uid);
+              const inExam = examApi && examApi.hasQuestion(q.uid);
+              const typeBadgeClass = q.type === 'mcq' ? 'type-mcq' : (q.type === 'tf' ? 'type-tf' : 'type-essay');
+              const diffBadgeClass = q.difficulty === 'سهل' ? 'diff-easy' : (q.difficulty === 'متوسط' ? 'diff-med' : 'diff-hard');
+
+              let bodyHtml = '';
+              let answerDetailHtml = '';
+
+              if (q.type === 'mcq') {
+                bodyHtml = '<div class="qb-mcq-options">' + q.options.map(function (opt, oIdx) {
+                  const letter = utils.CHOICE_LETTERS[oIdx] || 'أ';
+                  const isCorrectOpt = isRevealed && oIdx === q.correct;
+                  return (
+                    '<div class="qb-mcq-opt ' + (isCorrectOpt ? 'is-correct' : '') + '">' +
+                    '<span class="opt-letter">' + letter + '</span>' +
+                    '<span>' + utils.renderMathHtml(opt) + '</span>' +
+                    '</div>'
+                  );
+                }).join('') + '</div>';
+
+                const corrLetter = utils.CHOICE_LETTERS[q.correct] || 'أ';
+                answerDetailHtml =
+                  '<strong>الإجابة الصحيحة:</strong> ' + corrLetter + ') ' +
+                  utils.renderMathHtml(q.options[q.correct] || '') +
+                  (q.explanation ? '<br><strong>التفسير:</strong> ' + utils.renderMathHtml(q.explanation) : '');
+              } else if (q.type === 'tf') {
+                bodyHtml =
+                  '<div class="qb-tf-preview">' +
+                  '<span class="qb-tf-chip ' + (isRevealed && q.is_true ? 'is-correct' : '') + '">( &nbsp; ) صواب</span>' +
+                  '<span class="qb-tf-chip ' + (isRevealed && !q.is_true ? 'is-correct' : '') + '">( &nbsp; ) خطأ</span>' +
+                  '</div>';
+
+                answerDetailHtml =
+                  '<strong>الإجابة الصحيحة:</strong> ' + (q.is_true ? 'صواب (✓)' : 'خطأ (✗)') +
+                  (q.explanation ? '<br><strong>التفسير:</strong> ' + utils.renderMathHtml(q.explanation) : '');
+              } else {
+                bodyHtml = '<div class="qb-essay-hint">✍️ مسألة تطبيقية مفتوحة (' + utils.toEasternDigits(q.lines || 3) + ' أسطر للإجابة)</div>';
+                answerDetailHtml = '<strong>الحل النموذجي:</strong> ' + utils.renderMathHtml(q.ans || '');
+              }
+
+              return `
+                <div class="qb-question-card ${isSelected ? 'selected' : ''}">
+                  <div class="qb-q-top">
+                    <label class="qb-q-select-label">
+                      <input type="checkbox" ${isSelected ? 'checked' : ''}
+                        onchange="window.QuestionBank.toggleSelect('${utils.escapeHtml(q.uid)}', this.checked)">
+                      <span class="q-badge">س ${displayNum}</span>
+                    </label>
+                    <div class="qb-q-badges">
+                      <span class="qb-pill chapter-pill">${utils.escapeHtml(utils.toEasternDigits(q.chapterNumber))} • ${utils.escapeHtml(utils.toEasternDigits(q.lessonNumber + ' ' + q.lessonTitle))}</span>
+                      <span class="qb-pill ${typeBadgeClass}">${utils.escapeHtml(q.typeLabel)}</span>
+                      ${q.image ? '<span class="qb-pill" style="background:#e0f2fe;color:#0369a1;">🖼️ مصور</span>' : ''}
+                      <span class="qb-pill ${diffBadgeClass}">${utils.escapeHtml(q.difficulty)}</span>
+                      <span class="qb-pill marks-pill">${utils.escapeHtml(utils.formatMark(q.marks))}</span>
+                    </div>
+                  </div>
+
+                  <div class="qb-q-text">${utils.renderMathHtml(q.q)}</div>
+                  ${q.image ? (
+                    '<div class="q-figure-box">' +
+                    '<img class="q-figure-img" src="' + utils.escapeHtml(q.image) + '" alt="' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption || 'شكل السؤال')) + '" loading="lazy" title="اضغط للتكبير" data-caption="' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption || '')) + '" onclick="if(window.Platform&&window.Platform.openImageLightbox){window.Platform.openImageLightbox(this.getAttribute(\'src\'),this.getAttribute(\'data-caption\'));}" />' +
+                    (q.imageCaption ? '<div class="q-figure-caption">' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption)) + '</div>' : '') +
+                    '</div>'
+                  ) : ''}
+                  ${bodyHtml}
+
+                  ${isRevealed ? '<div class="qb-answer-box">' + answerDetailHtml + '</div>' : ''}
+
+                  <div class="qb-q-actions">
+                    <button type="button" class="qb-act-btn" onclick="window.QuestionBank.toggleRevealAnswer('${utils.escapeHtml(q.uid)}')">
+                      ${isRevealed ? '🙈 إخفاء الإجابة' : '💡 إظهار الإجابة النموذجية'}
+                    </button>
+                    <div class="qb-q-actions-left">
+                      <button type="button" class="qb-act-btn copy-word-btn" onclick="window.QuestionBank.copySingleToWord('${utils.escapeHtml(q.uid)}')">
+                        📋 نسخ السؤال لـ Word
+                      </button>
+                      <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.QuestionBank.toggleExamQuestion('${utils.escapeHtml(q.uid)}')">
+                        ${inExam ? '✓ مضاف للاختبار (إزالة)' : '➕ أضف للاختبار'}
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-                <div class="qb-q-text">${utils.renderMathHtml(q.q)}</div>
-                ${q.image ? (
-                  '<div class="q-figure-box">' +
-                  '<img class="q-figure-img" src="' + utils.escapeHtml(q.image) + '" alt="' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption || 'شكل السؤال')) + '" loading="lazy" title="اضغط للتكبير" data-caption="' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption || '')) + '" onclick="if(window.Platform&&window.Platform.openImageLightbox){window.Platform.openImageLightbox(this.getAttribute(\'src\'),this.getAttribute(\'data-caption\'));}" />' +
-                  (q.imageCaption ? '<div class="q-figure-caption">' + utils.escapeHtml(utils.toEasternDigits(q.imageCaption)) + '</div>' : '') +
-                  '</div>'
-                ) : ''}
-                ${bodyHtml}
-
-                ${isRevealed ? '<div class="qb-answer-box">' + answerDetailHtml + '</div>' : ''}
-
-                <div class="qb-q-actions">
-                  <button type="button" class="qb-act-btn" onclick="window.QuestionBank.toggleRevealAnswer('${utils.escapeHtml(q.uid)}')">
-                    ${isRevealed ? '🙈 إخفاء الإجابة' : '💡 إظهار الإجابة النموذجية'}
-                  </button>
-                  <div class="qb-q-actions-left">
-                    <button type="button" class="qb-act-btn copy-word-btn" onclick="window.QuestionBank.copySingleToWord('${utils.escapeHtml(q.uid)}')">
-                      📋 نسخ السؤال لـ Word
-                    </button>
-                    <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.QuestionBank.toggleExamQuestion('${utils.escapeHtml(q.uid)}')">
-                      ${inExam ? '✓ مضاف للاختبار (إزالة)' : '➕ أضف للاختبار'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('') : `
-            <div class="objectives-card" style="text-align:center; padding:40px;">
-              <h3>لا توجد أسئلة مطابقة لمعايير التصفية الحالية</h3>
-              <p style="color:var(--text-muted); margin:8px 0 16px 0;">جرّب مسح نص البحث أو اختيار «جميع الفصول والدروس».</p>
-              <button class="nav-btn primary" type="button" onclick="window.QuestionBank.resetFilters()">عرض جميع الأسئلة</button>
-            </div>
-          `}
+              `;
+            }).join('');
+          })()}
         </div>
+
+        ${!isUserApproved() ? `
+          <div class="qb-locked-gate-banner" style="margin:20px 0; background:linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%); border:2px dashed #f59e0b; border-radius:12px; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <span style="font-size:2rem;">🔒</span>
+              <div>
+                <h4 style="margin:0 0 4px 0; font-size:1.05rem; font-weight:800; color:#92400e;">تم إيقاف العرض عند الحد المسموح به للمعاينة (٥ أسئلة لكل نوع)</h4>
+                <p style="margin:0; font-size:0.88rem; color:#78350f;">
+                  لبقية أسئلة بنك الأسئلة الشامل (أكثر من ٤٥٠ سؤالاً لكل صف دراسي) وميزات النسخ الكامل لـ Word والتوليد الشامل للاختبارات، سجّل دخولك واطلب اعتماد حسابك.
+                </p>
+              </div>
+            </div>
+            <button type="button" class="nav-btn primary" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()" style="font-weight:700;">
+              🔑 تسجيل الدخول وطلب الاعتماد ↗
+            </button>
+          </div>
+        ` : ''}
 
         <!-- الترقيم والتنقل بين الصفحات -->
         ${renderPagination(totalPages)}
@@ -530,6 +589,29 @@
       getUtils().showToast('يرجى تحديد سؤال واحد على الأقل للنسخ إلى Word.', 'warning');
       return;
     }
+    const approved = isUserApproved();
+    if (!approved) {
+      const counts = { mcq: 0, tf: 0, essay: 0 };
+      const safeList = [];
+      let hadExcess = false;
+      selected.forEach(function (q) {
+        const t = q.type || 'mcq';
+        if ((counts[t] || 0) < 5) {
+          counts[t] = (counts[t] || 0) + 1;
+          safeList.push(q);
+        } else {
+          hadExcess = true;
+        }
+      });
+      if (hadExcess) {
+        getUtils().showToast('🔒 تم تقييد النسخ إلى ٥ أسئلة كحد أقصى لكل نوع لغير الأعضاء المعتمدين.', 'warning');
+      }
+      getUtils().copyQuestionsToWord(safeList, {
+        includeAnswers: state.includeAnswersOnCopy,
+        numbered: true
+      });
+      return;
+    }
     getUtils().copyQuestionsToWord(selected, {
       includeAnswers: state.includeAnswersOnCopy,
       numbered: true
@@ -563,6 +645,8 @@
   global.QuestionBank = {
     render: render,
     setBook: setBook,
+    getBookData: getBookData,
+    isUserApproved: isUserApproved,
     toggleOnlyImages: toggleOnlyImages,
     setFilter: setFilter,
     setSearch: setSearch,

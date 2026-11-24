@@ -696,145 +696,238 @@ window.CURRICULUM_DATA = {
         {
           "id": "g3m",
           "name": "الصف الثالث المتوسط",
-          "badge": "شهادة متوسطة",
+          "badge": "مكتمل بالكامل (٥ فصول - ٢٥ درساً)",
           "terms": [
             {
               "id": "term1",
               "name": "الفصل الدراسي الأول",
               "chapters": [
-                {
-                  "id": "g3m-t1-c1",
-                  "number": "الفصل ١",
-                  "title": "المعادلات الخطية",
-                  "status": "roadmap",
-                  "lessons": [
-                    {
-                      "id": "g3m-t1-c1-l1",
-                      "title": "الدرس ١-١: حل المعادلات ذات الخطوة الواحدة",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c1-l2",
-                      "title": "الدرس ١-٢: حل المعادلات متعددة الخطوات",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c1-l3",
-                      "title": "الدرس ١-٣: حل المعادلات التي تحتوي متغيراً في طرفيها",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c1-l4",
-                      "title": "الدرس ١-٤: حل معادلات القيمة المطلقة",
-                      "status": "roadmap"
-                    }
-                  ]
-                },
-                {
-                  "id": "g3m-t1-c2",
-                  "number": "الفصل ٢",
-                  "title": "العلاقات والدوال الخطية وميل المستقيم",
-                  "status": "active",
-                  "badge": "الحقيبة التفاعلية لمعادلة المستقيم",
-                  "lessons": [
-                    {
-                      "id": "g3m-t1-c2-l1",
-                      "title": "الدرس ٢-١: العلاقات والدوال",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c2-l2",
-                      "title": "الدرس ٢-٢: تمثيل المعادلات الخطية بيانياً",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c2-l3",
-                      "title": "الدرس ٢-٣: معدل التغير والميل",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c2-lines",
-                      "title": "الحقيبة التفاعلية الشاملة: صيغ معادلة المستقيم (الميل والمقطع، الميل ونقطة، القياسية)",
-                      "status": "completed"
-                    }
-                  ]
-                },
-                {
-                  "id": "g3m-t1-c3",
-                  "number": "الفصل ٣",
-                  "title": "الدوال الخطية وصيغ معادلة المستقيم",
-                  "status": "roadmap",
-                  "lessons": [
-                    {
-                      "id": "g3m-t1-c3-l1",
-                      "title": "الدرس ٣-١: تمثيل المعادلات المكتوبة بصيغة الميل والمقطع",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c3-l2",
-                      "title": "الدرس ٣-٢: كتابة المعادلات بصيغة الميل والمقطع",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c3-l3",
-                      "title": "الدرس ٣-٣: كتابة المعادلات بصيغة الميل ونقطة",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c3-l4",
-                      "title": "الدرس ٣-٤: المستقيمات المتوازية والمستقيمات المتعامدة",
-                      "status": "roadmap"
-                    }
-                  ]
-                },
-                {
-                  "id": "g3m-t1-c4",
-                  "number": "الفصل ٤",
-                  "title": "المتباينات الخطية",
-                  "status": "active",
-                  "badge": "مكتمل بالكامل (ص ١٣٠ - ١٤٧)",
-                  "lessons": [
-                    {
-                      "id": "g3m-t1-c4-l1",
-                      "title": "الدرس ٤-١: حل المتباينات بالجمع أو بالطرح",
-                      "status": "roadmap"
-                    },
-                    {
-                      "id": "g3m-t1-c4-l2",
-                      "title": "الدرس ٤-٢: حل المتباينات بالضرب أو بالقسمة",
-                      "status": "completed"
-                    },
-                    {
-                      "id": "g3m-t1-c4-l3",
-                      "title": "الدرس ٤-٣: حل المتباينات متعددة الخطوات",
-                      "status": "completed"
-                    },
-                    {
-                      "id": "g3m-t1-c4-mid",
-                      "title": "خطة وتقويم: اختبار منتصف الفصل الرابع ومعمل الجبر",
-                      "status": "completed"
-                    },
-                    {
-                      "id": "g3m-t1-c4-l4",
-                      "title": "الدرس ٤-٤: حل المتباينات المركبة (و / أو)",
-                      "status": "completed"
-                    },
-                    {
-                      "id": "g3m-t1-c4-l5",
-                      "title": "الدرس ٤-٥: حل متباينات القيمة المطلقة",
-                      "status": "roadmap"
-                    }
-                  ]
-                },
-                {
-                  "id": "g3m-t1-c5",
-                  "number": "الفصل ٥",
-                  "title": "أنظمة المعادلات الخطية",
-                  "status": "roadmap",
-                  "term_id": "term1",
-                  "term": "الفصل الدراسي الأول"
-                }
-              ]
+                  {
+                                    "id": "g3m-t1-c1",
+                                    "number": "الفصل ١",
+                                    "title": "المعادلات الخطية",
+                                    "pages": "ص ١٢ – ٤٣",
+                                    "status": "completed",
+                                    "badge": "مكتمل بالكامل (ص ١٢ – ٤٣)",
+                                    "lessons": [
+                                                      {
+                                                                        "id": "g3m-t1-c1-l1",
+                                                                        "number": "١-١",
+                                                                        "title": "الدرس ١-١: المعادلات",
+                                                                        "pages": "ص ١٢-١٧",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c1-l2",
+                                                                        "number": "١-٢",
+                                                                        "title": "الدرس ١-٢: حل المعادلات ذات الخطوة الواحدة",
+                                                                        "pages": "ص ٢٠-٢٥",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c1-l3",
+                                                                        "number": "١-٣",
+                                                                        "title": "الدرس ١-٣: حل المعادلات المتعددة الخطوات",
+                                                                        "pages": "ص ٢٧-٣١",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c1-l4",
+                                                                        "number": "١-٤",
+                                                                        "title": "الدرس ١-٤: حل المعادلات التي تحتوي متغيراً في طرفيها",
+                                                                        "pages": "ص ٣٣-٣٧",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c1-l5",
+                                                                        "number": "١-٥",
+                                                                        "title": "الدرس ١-٥: حل المعادلات التي تتضمن القيمة المطلقة",
+                                                                        "pages": "ص ٣٨-٤٣",
+                                                                        "status": "completed"
+                                                      }
+                                    ]
+                  },
+                  {
+                                    "id": "g3m-t1-c2",
+                                    "number": "الفصل ٢",
+                                    "title": "العلاقات والدوال الخطية",
+                                    "pages": "ص ٥٠ – ٨٨",
+                                    "status": "completed",
+                                    "badge": "مكتمل بالكامل (ص ٥٠ – ٨٨)",
+                                    "lessons": [
+                                                      {
+                                                                        "id": "g3m-t1-c2-l1",
+                                                                        "number": "٢-١",
+                                                                        "title": "الدرس ٢-١: العلاقات",
+                                                                        "pages": "ص ٥٠-٥٥",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c2-l2",
+                                                                        "number": "٢-٢",
+                                                                        "title": "الدرس ٢-٢: الدوال",
+                                                                        "pages": "ص ٥٦-٦٢",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c2-l3",
+                                                                        "number": "٢-٣",
+                                                                        "title": "الدرس ٢-٣: تمثيل المعادلات الخطية بيانياً",
+                                                                        "pages": "ص ٦٣-٦٩",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c2-l4",
+                                                                        "number": "٢-٤",
+                                                                        "title": "الدرس ٢-٤: حل المعادلات الخطية بيانياً",
+                                                                        "pages": "ص ٧١-٧٥",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c2-l5",
+                                                                        "number": "٢-٥",
+                                                                        "title": "الدرس ٢-٥: معدل التغير والميل",
+                                                                        "pages": "ص ٧٦-٨٢",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c2-l6",
+                                                                        "number": "٢-٦",
+                                                                        "title": "الدرس ٢-٦: المتتابعات الحسابية كدوال خطية",
+                                                                        "pages": "ص ٨٣-٨٨",
+                                                                        "status": "completed"
+                                                      }
+                                    ]
+                  },
+                  {
+                                    "id": "g3m-t1-c3",
+                                    "number": "الفصل ٣",
+                                    "title": "الدوال الخطية",
+                                    "pages": "ص ٩٤ – ١١٨",
+                                    "status": "completed",
+                                    "badge": "مكتمل بالكامل (ص ٩٤ – ١١٨)",
+                                    "lessons": [
+                                                      {
+                                                                        "id": "g3m-t1-c3-l1",
+                                                                        "number": "٣-١",
+                                                                        "title": "الدرس ٣-١: تمثيل المعادلات المكتوبة بصيغة الميل والمقطع بيانياً",
+                                                                        "pages": "ص ٩٤-٩٩",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c3-l2",
+                                                                        "number": "٣-٢",
+                                                                        "title": "الدرس ٣-٢: كتابة المعادلات بصيغة الميل والمقطع",
+                                                                        "pages": "ص ١٠٠-١٠٦",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c3-l3",
+                                                                        "number": "٣-٣",
+                                                                        "title": "الدرس ٣-٣: كتابة المعادلات بصيغة الميل ونقطة",
+                                                                        "pages": "ص ١٠٨-١١٢",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c3-l4",
+                                                                        "number": "٣-٤",
+                                                                        "title": "الدرس ٣-٤: المستقيمات المتوازية والمستقيمات المتعامدة",
+                                                                        "pages": "ص ١١٣-١١٨",
+                                                                        "status": "completed"
+                                                      }
+                                    ]
+                  },
+                  {
+                                    "id": "g3m-t1-c4",
+                                    "number": "الفصل ٤",
+                                    "title": "المتباينات الخطية",
+                                    "pages": "ص ١٢٤ – ١٥٢",
+                                    "status": "completed",
+                                    "badge": "مكتمل بالكامل (ص ١٢٤ – ١٥٢)",
+                                    "lessons": [
+                                                      {
+                                                                        "id": "g3m-t1-c4-l1",
+                                                                        "number": "٤-١",
+                                                                        "title": "الدرس ٤-١: حل المتباينات بالجمع أو بالطرح",
+                                                                        "pages": "ص ١٢٤-١٢٨",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c4-l2",
+                                                                        "number": "٤-٢",
+                                                                        "title": "الدرس ٤-٢: حل المتباينات بالضرب أو بالقسمة",
+                                                                        "pages": "ص ١٣٠-١٣٤",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c4-l3",
+                                                                        "number": "٤-٣",
+                                                                        "title": "الدرس ٤-٣: حل المتباينات المتعددة الخطوات",
+                                                                        "pages": "ص ١٣٥-١٤٠",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c4-l4",
+                                                                        "number": "٤-٤",
+                                                                        "title": "الدرس ٤-٤: حل المتباينات المركبة",
+                                                                        "pages": "ص ١٤٣-١٤٧",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c4-l5",
+                                                                        "number": "٤-٥",
+                                                                        "title": "الدرس ٤-٥: حل المتباينات التي تتضمن القيمة المطلقة",
+                                                                        "pages": "ص ١٤٨-١٥٢",
+                                                                        "status": "completed"
+                                                      }
+                                    ]
+                  },
+                  {
+                                    "id": "g3m-t1-c5",
+                                    "number": "الفصل ٥",
+                                    "title": "أنظمة المعادلات الخطية",
+                                    "pages": "ص ١٥٨ – ١٨٩",
+                                    "status": "completed",
+                                    "badge": "مكتمل بالكامل (ص ١٥٨ – ١٨٩)",
+                                    "lessons": [
+                                                      {
+                                                                        "id": "g3m-t1-c5-l1",
+                                                                        "number": "٥-١",
+                                                                        "title": "الدرس ٥-١: حل نظام من معادلتين خطيتين بيانياً",
+                                                                        "pages": "ص ١٥٨-١٦٣",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c5-l2",
+                                                                        "number": "٥-٢",
+                                                                        "title": "الدرس ٥-٢: حل نظام من معادلتين خطيتين بالتعويض",
+                                                                        "pages": "ص ١٦٦-١٧٠",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c5-l3",
+                                                                        "number": "٥-٣",
+                                                                        "title": "الدرس ٥-٣: حل نظام من معادلتين خطيتين بالحذف باستعمال الجمع أو الطرح",
+                                                                        "pages": "ص ١٧١-١٧٧",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c5-l4",
+                                                                        "number": "٥-٤",
+                                                                        "title": "الدرس ٥-٤: حل نظام من معادلتين خطيتين بالحذف باستعمال الضرب",
+                                                                        "pages": "ص ١٧٩-١٨٤",
+                                                                        "status": "completed"
+                                                      },
+                                                      {
+                                                                        "id": "g3m-t1-c5-l5",
+                                                                        "number": "٥-٥",
+                                                                        "title": "الدرس ٥-٥: تطبيقات على النظام المكون من معادلتين خطيتين",
+                                                                        "pages": "ص ١٨٥-١٨٩",
+                                                                        "status": "completed"
+                                                      }
+                                    ]
+                  }
+]
             },
             {
               "id": "term2",
@@ -27623,3 +27716,10 @@ window.CURRICULUM_DATA = {
     }
   ]
 };
+
+// Merge Grade 3 Intermediate book data when loaded
+if (typeof window !== 'undefined' && window.CURRICULUM_DATA && window.CURRICULUM_DATA.lessons) {
+  if (window.GRADE3M_BOOK_DATA && window.GRADE3M_BOOK_DATA.lessons) {
+    Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE3M_BOOK_DATA.lessons);
+  }
+}

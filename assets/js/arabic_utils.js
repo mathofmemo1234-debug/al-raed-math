@@ -77,6 +77,9 @@
   function formatMathForWordHtml(input) {
     if (input === null || input === undefined) return '';
     let s = String(input);
+    if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1)) {
+      s = s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    }
     const powers = [];
     s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const ph = '___ARPOW' + numToAlpha(powers.length) + '___';
@@ -163,6 +166,9 @@
   function renderMathHtml(input) {
     if (input === null || input === undefined) return '';
     let s = String(input);
+    if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1)) {
+      s = s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    }
     const powers = [];
     s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const ph = '___ARPOW' + numToAlpha(powers.length) + '___';

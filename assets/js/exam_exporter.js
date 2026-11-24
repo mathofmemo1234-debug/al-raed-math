@@ -107,8 +107,11 @@
         return utils.renderMathHtml(text);
       }
       let s = String(text);
+      if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('span') !== -1)) {
+        s = s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+      }
       const powers = [];
-      s = s.replace(/<span class="ar-pow"><span class="ar-base">([\s\S]*?)<\/span><sup class="ar-exp">([\s\S]*?)<\/sup><\/span>/g, function (_, base, exp) {
+      s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
         const ph = '___ARPOW_' + powers.length + '___';
         powers.push({ base: utils.toEasternDigits(base), exp: utils.toEasternDigits(exp) });
         return ph;
@@ -545,7 +548,8 @@
     const textStr = String(text || '');
 
     function _buildSingleRunXml(t, isSup) {
-      const clean = escXml(utils.toEasternDigits(t));
+      const cleanText = String(t || '').replace(/<[^>]+>/g, '');
+      const clean = escXml(utils.toEasternDigits(cleanText));
       const sizeVal = isSup ? Math.max(6.5, Math.round(o.sizePt * 0.62)) : o.sizePt;
       const sz = String(Math.round(sizeVal * 2));
       return (
@@ -563,11 +567,11 @@
       );
     }
 
-    if (textStr.indexOf('<span class="ar-pow">') === -1) {
+    if (textStr.indexOf('ar-pow') === -1) {
       return _buildSingleRunXml(textStr, o.sup);
     }
 
-    const pat = /<span class="ar-pow"><span class="ar-base">([\s\S]*?)<\/span><sup class="ar-exp">([\s\S]*?)<\/sup><\/span>/g;
+    const pat = /<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi;
     let outXml = '';
     let lastEnd = 0;
     let match;

@@ -110,17 +110,17 @@
   <!-- ================= App Container ================= -->
   <div class="app-container">
     
-    <!-- Sidebar: Hierarchical Curriculum Tree -->
+    <!-- Sidebar: Hierarchical Curriculum Navigation -->
     <aside class="app-sidebar" id="app-sidebar">
       <div class="sidebar-header">
         <div class="sidebar-title-row">
           <div class="sidebar-title">
-            <span>🌳 شجرة المناهج</span>
+            <span>📚 دليل المناهج</span>
           </div>
           <div class="sidebar-quick-tools">
-            <button type="button" class="sidebar-tool-btn" onclick="window.Platform.expandAll()" title="توسيع كافة الفروع الشجرية">⤢ توسيع</button>
-            <button type="button" class="sidebar-tool-btn" onclick="window.Platform.collapseAll()" title="طي كافة الفروع الشجرية">⤡ طي</button>
-            <button type="button" class="sidebar-tool-btn toggle-sidebar-btn" onclick="window.Platform.toggleSidebar()" title="طي القائمة الجانبية">◀</button>
+            <button type="button" class="sidebar-tool-btn" onclick="window.Platform.expandAll()" title="توسيع كافة الفروع">⤢ توسيع</button>
+            <button type="button" class="sidebar-tool-btn" onclick="window.Platform.collapseAll()" title="طي كافة الفروع">⤡ طي</button>
+            <button type="button" class="sidebar-tool-btn toggle-sidebar-btn" onclick="window.Platform.toggleSidebar()" title="إخفاء/إظهار القائمة">◀</button>
           </div>
         </div>
 
@@ -132,7 +132,7 @@
         </div>
       </div>
 
-      <!-- Scrollable Tree Structure -->
+      <!-- Scrollable Curriculum Structure -->
       <div class="sidebar-scrollable" id="sidebar-tree">
         <!-- Rendered dynamically by platform.js -->
       </div>
@@ -144,8 +144,8 @@
       <!-- Views Navigation Bar -->
       <div class="viewport-top-tabs">
         <div class="view-switcher-group">
-          <button type="button" class="sidebar-open-pill" id="sidebar-open-pill" onclick="window.Platform.toggleSidebar()" title="إظهار شجرة المناهج" style="display:none;">
-            🌳 شجرة المناهج ◀
+          <button type="button" class="sidebar-open-pill" id="sidebar-open-pill" onclick="window.Platform.toggleSidebar()" title="إظهار دليل المناهج" style="display:none;">
+            📚 دليل المناهج ◀
           </button>
           <button class="view-tab-btn active" data-view="cockpit">
             🎯 مركز الدرس التفاعلي
@@ -157,7 +157,7 @@
             📝 منشئ الاختبارات (فترة / نهائي) <span class="exam-count-badge" id="exam-count-badge">٠</span>
           </button>
           <button class="view-tab-btn" data-view="visual-tree">
-            🌳 خريطة المناهج الشجرية
+            🗺️ خريطة المناهج الدراسية
           </button>
           <button class="view-tab-btn" data-view="suites">
             🌟 الأجنحة والمختبرات الذكية

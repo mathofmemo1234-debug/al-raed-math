@@ -370,11 +370,12 @@
 
   function expandAll() {
     if (!window.CURRICULUM_DATA || !window.CURRICULUM_DATA.stages) return;
+    state.expandedNodes.clear();
     window.CURRICULUM_DATA.stages.forEach(stage => {
       state.expandedNodes.add(stage.id);
-      stage.grades.forEach(grade => {
+      (stage.grades || []).forEach(grade => {
         state.expandedNodes.add(grade.id);
-        grade.terms.forEach(term => {
+        (grade.terms || []).forEach(term => {
           state.expandedNodes.add(grade.id + '-' + term.id);
           (term.chapters || []).forEach(ch => {
             state.expandedNodes.add(ch.id);
@@ -387,13 +388,6 @@
 
   function collapseAll() {
     state.expandedNodes.clear();
-    const p = findLessonPath(state.currentLessonId);
-    if (p) {
-      state.expandedNodes.add(p.stage.id);
-      state.expandedNodes.add(p.grade.id);
-      state.expandedNodes.add(p.termKey);
-      state.expandedNodes.add(p.chapter.id);
-    }
     renderTree();
   }
 
@@ -422,7 +416,7 @@
     }
   }
 
-  // ================= Hierarchical Branching Tree Rendering =================
+  // ================= Hierarchical Navigation Rendering =================
   function renderTree() {
     if (!sidebarTreeContainer || !window.CURRICULUM_DATA) return;
     const stages = window.CURRICULUM_DATA.stages || [];
@@ -540,7 +534,7 @@
       });
 
       if (stageMatches || !state.searchQuery) {
-        const isStageOpen = state.expandedNodes.has(stage.id) !== false; // stages open by default
+        const isStageOpen = state.expandedNodes.has(stage.id) || !!state.searchQuery;
         html += `
           <div class="tree-stage-group">
             <div class="tree-stage-header" onclick="window.Platform.toggleNode('${stage.id}')">
@@ -830,9 +824,9 @@
       `).join('');
 
       topTreeBreadcrumbsHtml = `
-        <nav class="tree-breadcrumb-nav" aria-label="شجرة المسار الهرمية">
+        <nav class="tree-breadcrumb-nav" aria-label="المسار التعليمي الهرمي">
           <div class="tree-crumb-root-label">
-            <span>🌳 شجرة المسار:</span>
+            <span>🧭 المسار التعليمي:</span>
           </div>
 
           <div class="tree-crumb-item" onclick="window.Platform.toggleCrumbDropdown(event, 'crumb-drop-stage')" title="المرحلة التعليمية">
@@ -1279,9 +1273,9 @@
     viewportArea.innerHTML = `
       <div class="objectives-card" style="text-align:center; padding:48px 24px;">
         <span style="font-size:3.5rem;">🏗️</span>
-        <h2 style="font-size:1.6rem; font-weight:800; margin:16px 0 8px 0;">هذا الدرس مدرج في شجرة المنهج وجاهز للتوسعة</h2>
+        <h2 style="font-size:1.6rem; font-weight:800; margin:16px 0 8px 0;">هذا الدرس مدرج في الخطة التعليمية وجاهز للتوسعة</h2>
         <p style="color:var(--text-muted); max-width:600px; margin:0 auto 24px auto;">
-          تم تسجيل هذا الدرس بكافة معاييره وتصنيفه الشجري حسب الفصلين الدراسيين (الأول والثاني). يمكنك استخدام "استوديو إضافة المناهج" لإدراج محتوى هذا الدرس أو اختباراته مباشرة!
+          تم تسجيل هذا الدرس بكافة معاييره وتصنيفه الهيكلي حسب الفصلين الدراسيين (الأول والثاني). يمكنك استخدام "استوديو إضافة المناهج" لإدراج محتوى هذا الدرس أو اختباراته مباشرة!
         </p>
         <div style="display:flex; gap:10px; justify-content:center;">
           <button class="nav-btn primary" onclick="window.Platform.switchView('builder')">➕ إضافة محتوى الدرس الآن</button>
@@ -1314,7 +1308,7 @@
             <h4>السؤال التوليدي الاستقصائي للدرس</h4>
           </div>
           <div class="socratic-card-body inquiry-text">
-            ${s.inquiry_question || 'كيف يمثل هذا الدرس مدخلاً لفهم النماذج الرياضية في واقع الحياة؟'}
+            ${fmtNum(s.inquiry_question || 'كيف يمثل هذا الدرس مدخلاً لفهم النماذج الرياضية في واقع الحياة؟', isG6)}
           </div>
         </div>
 
@@ -1326,7 +1320,7 @@
               <h4>المأزق المفاهيمي (Cognitive Dissonance)</h4>
             </div>
             <div class="socratic-card-body dilemma-text">
-              ${s.conceptual_dilemma}
+              ${fmtNum(s.conceptual_dilemma, isG6)}
             </div>
           </div>
         ` : ''}
@@ -1343,7 +1337,7 @@
                 <div class="turn-avatar">${turn.avatar || (turn.role === 'teacher' ? '🏛️' : '🎓')}</div>
                 <div class="turn-bubble">
                   <div class="turn-speaker">${turn.speaker}</div>
-                  <div class="turn-content">${turn.text}</div>
+                  <div class="turn-content">${fmtNum(turn.text, isG6)}</div>
                 </div>
               </div>
             `).join('')}
@@ -1361,7 +1355,7 @@
               ${probing.map((q, idx) => `
                 <div class="probing-item">
                   <span class="probing-num">${fmtNum(idx + 1, true)}</span>
-                  <span>${q}</span>
+                  <span>${fmtNum(q, isG6)}</span>
                 </div>
               `).join('')}
             </div>
@@ -1378,11 +1372,11 @@
             <div class="socratic-card-body buster-grid">
               <div class="buster-side wrong">
                 <div class="buster-title">❌ الفهم الخاطئ الشائع:</div>
-                <div>${mb.misconception}</div>
+                <div>${fmtNum(mb.misconception, isG6)}</div>
               </div>
               <div class="buster-side right">
                 <div class="buster-title">✓ التصحيح والبرهان الرياضي:</div>
-                <div>${mb.correction}</div>
+                <div>${fmtNum(mb.correction, isG6)}</div>
               </div>
             </div>
           </div>
@@ -1571,10 +1565,10 @@
       <div class="visual-tree-container">
         <div class="tree-canvas-header">
           <div>
-            <h2 style="font-size:1.4rem; font-weight:800; color:var(--text-main);">🌳 خريطة المناهج الشجرية التفاعلية الكاملة</h2>
-            <p style="color:var(--text-muted); font-size:0.9rem;">استعراض شجري شامل لكافة المراحل والصفوف الدراسية والفصول الثلاثة والأبواب والدروس:</p>
+            <h2 style="font-size:1.4rem; font-weight:800; color:var(--text-main);">🗺️ خريطة المناهج الدراسية التفاعلية الكاملة</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">استعراض هيكلي شامل لكافة المراحل والصفوف الدراسية والفصول الثلاثة والأبواب والدروس:</p>
           </div>
-          <button class="nav-btn primary" onclick="window.print()">🖨️ طباعة المخطط الشجري</button>
+          <button class="nav-btn primary" onclick="window.print()">🖨️ طباعة المخطط الهيكلي</button>
         </div>
         <div class="tree-chart-wrapper">
     `;
@@ -1701,7 +1695,7 @@
           <span>➕ استوديو توسيع المناهج وإدراج الدروس الجديدة</span>
         </div>
         <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:20px;">
-          يتيح هذا الاستوديو للمعلم (أ. محمد عبدالله جمعة) إدراج وحدات ودروس جديدة في شجرة المنهج مع خططها وأسئلتها وحفظها محلياً:
+          يتيح هذا الاستوديو للمعلم (أ. محمد عبدالله جمعة) إدراج وحدات ودروس جديدة في الخطة الدراسية مع خططها وأسئلتها وحفظها محلياً:
         </p>
         <form onsubmit="window.Platform.saveNewLesson(event)" style="display:flex; flex-direction:column; gap:16px; max-width:700px;">
           <div>
@@ -1732,7 +1726,7 @@
             <textarea id="new-lesson-objectives" rows="4" placeholder="الهدف الأول...&#10;الهدف الثاني..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-light);"></textarea>
           </div>
           <button type="submit" class="nav-btn primary" style="padding:12px; font-size:1rem; justify-content:center;">
-            💾 حفظ الدرس وإدراجه في الشجرة
+            💾 حفظ الدرس وإدراجه في الخطة
           </button>
         </form>
       </div>
@@ -1797,7 +1791,7 @@
     };
 
     window.CURRICULUM_DATA.lessons[newId] = newLessonObj;
-    alert('تم حفظ وإدراج الدرس الجديد بنجاح في الشجرة الدراسية!');
+    alert('تم حفظ وإدراج الدرس الجديد بنجاح في الخطة الدراسية!');
     selectLesson(newId);
   }
 

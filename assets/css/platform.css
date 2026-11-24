@@ -417,14 +417,14 @@ body {
   min-height: calc(100vh - 72px);
 }
 
-/* ================= Sidebar: Hierarchical Tree ================= */
+/* ================= Sidebar: Hierarchical Navigation (Light Practical Theme) ================= */
 .app-sidebar {
-  width: 250px;
-  min-width: 250px;
-  max-width: 250px;
-  background-color: var(--bg-sidebar);
-  color: var(--sidebar-text);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  width: 215px;
+  min-width: 215px;
+  max-width: 215px;
+  background-color: #ffffff;
+  color: #1e293b;
+  border-left: 1.5px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -432,6 +432,7 @@ body {
   overflow: hidden;
   position: relative;
   z-index: 40;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.03);
 }
 
 .app-sidebar.collapsed {
@@ -445,85 +446,87 @@ body {
 }
 
 .sidebar-header {
-  padding: 12px 14px 10px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 23, 42, 0.4);
+  padding: 10px 10px 8px 10px;
+  border-bottom: 1.5px solid #e2e8f0;
+  background: #f8fafc;
 }
 
 .sidebar-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
-  gap: 6px;
+  margin-bottom: 7px;
+  gap: 4px;
 }
 
 .sidebar-title {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   white-space: nowrap;
 }
 
 .sidebar-quick-tools {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .sidebar-tool-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #cbd5e1;
-  font-size: 0.68rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 0.66rem;
   font-weight: 700;
-  padding: 3px 6px;
+  padding: 3px 5px;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.16s ease;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .sidebar-tool-btn:hover {
   background: #2563eb;
   color: #ffffff;
-  border-color: #3b82f6;
+  border-color: #2563eb;
 }
 
 .sidebar-tool-btn.toggle-sidebar-btn {
-  padding: 3px 7px;
-  color: #93c5fd;
+  padding: 3px 6px;
+  color: #2563eb;
+  font-weight: 800;
 }
 
 .sidebar-open-pill {
-  background: #2563eb;
-  color: #ffffff;
-  border: 1px solid #3b82f6;
-  padding: 6px 14px;
+  background: #ffffff;
+  color: #2563eb;
+  border: 1.5px solid #bfdbfe;
+  padding: 6px 12px;
   border-radius: 20px;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 800;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  gap: 5px;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.12);
   transition: all 0.2s;
-  animation: fadeIn 0.2s ease;
 }
 
 .sidebar-open-pill:hover {
-  background: #1d4ed8;
+  background: #eff6ff;
+  border-color: #2563eb;
   transform: translateY(-1px);
 }
 
 .term-filter-tabs {
   display: flex;
-  background: #1e293b;
-  border-radius: var(--radius-sm);
+  background: #e2e8f0;
+  border-radius: 6px;
   padding: 2px;
   gap: 2px;
 }
@@ -532,11 +535,11 @@ body {
   flex: 1;
   background: transparent;
   border: none;
-  color: #94a3b8;
-  font-size: 0.72rem;
+  color: #64748b;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 5px 3px;
-  border-radius: 5px;
+  padding: 4px 2px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
@@ -545,37 +548,40 @@ body {
 .term-tab-btn.active {
   background: #2563eb;
   color: #ffffff;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
 }
 
 .sidebar-scrollable {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 10px 8px 24px 8px;
+  padding: 8px 6px 24px 6px;
+  background: #ffffff;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar for Light Theme */
 .sidebar-scrollable::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 .sidebar-scrollable::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.16);
+  background: #cbd5e1;
   border-radius: 3px;
 }
+.sidebar-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
 
-/* ================= tasaami-inspired Hierarchical Branching Tree ================= */
+/* ================= Hierarchical Branching Elements (Clean Daylight Theme) ================= */
 .tree-stage-group {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .tree-stage-header {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 800;
   text-transform: uppercase;
-  color: #93c5fd;
-  padding: 5px 8px;
-  letter-spacing: 0.4px;
+  color: #1e3a8a;
+  padding: 5px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -583,79 +589,83 @@ body {
   cursor: pointer;
   user-select: none;
   transition: background 0.16s ease;
+  background: #f1f5f9;
 }
 
 .tree-stage-header:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #bfdbfe;
+  background: #e2e8f0;
+  color: #1d4ed8;
 }
 
 /* Stage Children Container with Vertical Stem Guide */
 .tree-stage-children {
   position: relative;
-  margin-right: 11px;
-  padding-right: 9px;
-  border-right: 1.5px solid rgba(59, 130, 246, 0.28);
+  margin-right: 9px;
+  padding-right: 7px;
+  border-right: 1.5px solid #cbd5e1;
   margin-top: 3px;
 }
 
 /* Grade Node with Branch Connector */
 .tree-grade-node {
   position: relative;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .tree-grade-node::before {
   content: "";
   position: absolute;
-  right: -10.5px;
-  top: 14px;
-  width: 9px;
+  right: -8.5px;
+  top: 13px;
+  width: 7px;
   height: 1.5px;
-  background: rgba(59, 130, 246, 0.28);
+  background: #cbd5e1;
 }
 
 .tree-grade-header {
-  padding: 6px 8px;
+  padding: 5px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: 5px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
   transition: all 0.16s ease;
   user-select: none;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #0f172a;
 }
 
 .tree-grade-header:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #60a5fa;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
 }
 
 .tree-grade-title {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .grade-badge {
-  font-size: 0.64rem;
-  padding: 1px 5px;
-  border-radius: 8px;
-  background: rgba(30, 58, 138, 0.7);
-  color: #93c5fd;
+  font-size: 0.6rem;
+  padding: 1px 4px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
   white-space: nowrap;
 }
 
 .node-arrow {
-  font-size: 0.65rem;
-  color: #94a3b8;
+  font-size: 0.62rem;
+  color: #64748b;
   transition: transform 0.2s ease;
   display: inline-block;
 }
@@ -667,33 +677,33 @@ body {
 /* Grade Children Container with Vertical Stem */
 .tree-grade-children {
   position: relative;
-  margin-right: 10px;
-  padding-right: 8px;
-  border-right: 1.5px solid rgba(59, 130, 246, 0.22);
+  margin-right: 8px;
+  padding-right: 6px;
+  border-right: 1.5px solid #cbd5e1;
   margin-top: 2px;
 }
 
 /* Term Node with Branch Connector */
 .tree-term-node {
   position: relative;
-  margin: 3px 0;
+  margin: 2px 0;
 }
 
 .tree-term-node::before {
   content: "";
   position: absolute;
-  right: -9.5px;
-  top: 13px;
-  width: 8px;
+  right: -7.5px;
+  top: 12px;
+  width: 6px;
   height: 1.5px;
-  background: rgba(59, 130, 246, 0.22);
+  background: #cbd5e1;
 }
 
 .tree-term-header {
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   font-weight: 700;
-  color: #cbd5e1;
-  padding: 4px 6px;
+  color: #334155;
+  padding: 4px 5px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -704,16 +714,16 @@ body {
 }
 
 .tree-term-header:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #93c5fd;
+  background: #f1f5f9;
+  color: #2563eb;
 }
 
 /* Term Children Container with Vertical Stem */
 .tree-term-children {
   position: relative;
-  margin-right: 8px;
-  padding-right: 6px;
-  border-right: 1.5px solid rgba(100, 116, 139, 0.25);
+  margin-right: 7px;
+  padding-right: 5px;
+  border-right: 1.5px solid #e2e8f0;
   margin-top: 2px;
 }
 
@@ -726,18 +736,18 @@ body {
 .tree-chapter-node::before {
   content: "";
   position: absolute;
-  right: -7.5px;
-  top: 12px;
-  width: 6px;
+  right: -6.5px;
+  top: 11px;
+  width: 5px;
   height: 1.5px;
-  background: rgba(100, 116, 139, 0.25);
+  background: #e2e8f0;
 }
 
 .tree-chapter-header {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: #94a3b8;
-  padding: 4px 6px;
+  color: #475569;
+  padding: 3px 5px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -748,77 +758,116 @@ body {
 }
 
 .tree-chapter-header:hover {
-  color: #e2e8f0;
-  background: rgba(255, 255, 255, 0.04);
+  color: #1e293b;
+  background: #f1f5f9;
 }
 
 /* Chapter Children Container with Vertical Stem */
 .tree-chapter-children {
   position: relative;
-  margin-right: 7px;
-  padding-right: 5px;
-  border-right: 1.5px solid rgba(148, 163, 184, 0.2);
+  margin-right: 6px;
+  padding-right: 4px;
+  border-right: 1.5px solid #e2e8f0;
   margin-top: 2px;
 }
 
 /* Lesson Node Item with Branch Connector */
 .tree-lesson-item {
   position: relative;
-  padding: 5px 7px;
+  padding: 4px 6px;
   margin: 2px 0;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  color: #cbd5e1;
-  border-radius: 5px;
+  color: #475569;
+  border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 5px;
-  transition: all 0.16s ease;
-  line-height: 1.3;
+  gap: 4px;
+  transition: all 0.15s ease;
+  line-height: 1.25;
 }
 
 .tree-lesson-item::before {
   content: "";
   position: absolute;
-  right: -6.5px;
-  top: 11px;
-  width: 5px;
+  right: -5.5px;
+  top: 10px;
+  width: 4px;
   height: 1.5px;
-  background: rgba(148, 163, 184, 0.2);
+  background: #e2e8f0;
 }
 
 .tree-lesson-item:hover {
-  background: rgba(59, 130, 246, 0.18);
-  color: #ffffff;
+  background: #eff6ff;
+  color: #1d4ed8;
   transform: translateX(-2px);
 }
 
 .tree-lesson-item.active {
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+  background: #2563eb !important;
   color: #ffffff !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.45);
-  border-right: 2.5px solid #60a5fa;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+  border-right: 3px solid #1d4ed8;
 }
 
 .lesson-status-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   display: inline-block;
-  margin-left: 5px;
+  margin-left: 4px;
   flex-shrink: 0;
 }
 
 .lesson-status-dot.completed {
-  background: #22c55e;
-  box-shadow: 0 0 5px #22c55e;
+  background: #16a34a;
 }
 
 .lesson-status-dot.roadmap {
   background: #f59e0b;
+}
+
+/* Dark Theme overrides for sidebar */
+[data-theme="dark"] .app-sidebar {
+  background-color: #0f172a;
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .sidebar-header {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .sidebar-title {
+  color: #f8fafc;
+}
+[data-theme="dark"] .sidebar-tool-btn {
+  background: #334155;
+  border-color: #475569;
+  color: #cbd5e1;
+}
+[data-theme="dark"] .tree-stage-header {
+  background: #1e293b;
+  color: #93c5fd;
+}
+[data-theme="dark"] .tree-grade-header {
+  background: rgba(255, 255, 255, 0.04);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .tree-term-header,
+[data-theme="dark"] .tree-chapter-header,
+[data-theme="dark"] .tree-lesson-item {
+  color: #cbd5e1;
+}
+[data-theme="dark"] .tree-lesson-item:hover {
+  background: rgba(59, 130, 246, 0.18);
+  color: #ffffff;
+}
+[data-theme="dark"] .sidebar-scrollable {
+  background: #0f172a;
 }
 
 /* ================= Viewport & Content Area ================= */
@@ -3284,7 +3333,7 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
   text-align: center;
 }
 
-/* 2. الأيقونات المتعامدة رأسياً (القوائم، خطوات 5E، الشجرة، بطاقات الحوار) */
+/* 2. الأيقونات المتعامدة رأسياً (القوائم، خطوات 5E، الدليل الهيكلي، بطاقات الحوار) */
 .plan-5e-header, .dialogue-turn, .probing-item, .objective-item, .socratic-card-header {
   display: flex;
   align-items: center;

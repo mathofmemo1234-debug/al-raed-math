@@ -74,6 +74,70 @@
     }
   ];
 
+  // Live Firebase Integration Handles
+  let firebaseApp = null;
+  let authService = null;
+  let firestoreService = null;
+  let isLiveFirebase = false;
+  let firestoreUnsubscribe = null;
+
+  function initFirebaseIfAvailable() {
+    if (typeof window !== 'undefined' && window.firebase && window.FIREBASE_CONFIG) {
+      const cfg = window.FIREBASE_CONFIG;
+      if (cfg.apiKey && typeof cfg.apiKey === 'string' && !cfg.apiKey.startsWith('ضع_')) {
+        try {
+          if (!window.firebase.apps || !window.firebase.apps.length) {
+            firebaseApp = window.firebase.initializeApp(cfg);
+          } else {
+            firebaseApp = window.firebase.app();
+          }
+          authService = window.firebase.auth();
+          firestoreService = window.firebase.firestore();
+          isLiveFirebase = true;
+          console.log('✓ Firebase Live Cloud Connected successfully!');
+          setupLiveSessionSync();
+        } catch (e) {
+          console.warn('Firebase init warning:', e);
+        }
+      }
+    }
+  }
+
+  function setupLiveSessionSync() {
+    if (!isLiveFirebase || !authService) return;
+    authService.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const ref = firestoreService.collection('users').doc(user.uid);
+          const doc = await ref.get();
+          if (doc.exists) {
+            const u = doc.data();
+            const localSess = safeStorage.getItem(LOCAL_SESSION_KEY);
+            if (u.activeSessionId && localSess && u.activeSessionId !== localSess) {
+              forceLogoutDueToSessionKick(`تم رصد تسجيل دخول جديد لحسابك من (${u.lastLoginDevice || 'جهاز جديد'}).\n\nحفاظاً على أمان الحساب ومنع المشاركة، يُسمح بجلسة نشطة واحدة فقط.`);
+              return;
+            }
+            currentUser = u;
+            saveCurrentUser(currentUser);
+            notifyChange();
+          }
+
+          if (firestoreUnsubscribe) firestoreUnsubscribe();
+          firestoreUnsubscribe = ref.onSnapshot((snap) => {
+            if (!snap.exists) return;
+            const fresh = snap.data();
+            const localSess = safeStorage.getItem(LOCAL_SESSION_KEY);
+            if (fresh.activeSessionId && localSess && fresh.activeSessionId !== localSess) {
+              forceLogoutDueToSessionKick(`تم رصد تسجيل دخول جديد لحسابك من (${fresh.lastLoginDevice || 'جهاز جديد'}).\n\nحفاظاً على أمان الحساب ومنع مشاركة الحسابات، يُسمح بجلسة نشطة واحدة فقط. تم تسجيل الخروج تلقائياً من هذا الجهاز.`);
+            }
+          });
+        } catch (err) {
+          console.warn('Live session sync error:', err);
+        }
+      }
+    });
+  }
+
   const memStorage = {};
   const safeStorage = {
     getItem(k) {
@@ -365,13 +429,50 @@
       // Save local session token
       safeStorage.setItem(LOCAL_SESSION_KEY, newSessionId);
 
+      // Async sync to Live Firestore if connected
+      if (isLiveFirebase && firestoreService && userObj.uid) {
+        firestoreService.collection('users').doc(userObj.uid).set(userObj, { merge: true }).catch(err => {
+          console.warn('Firestore live sync warning:', err);
+        });
+      }
+
       currentUser = userObj;
       saveCurrentUser(currentUser);
       notifyChange();
     },
 
     // Sign-in flows
-    signInWithGoogle() {
+    async signInWithGoogle() {
+      if (isLiveFirebase && authService) {
+        try {
+          const provider = new window.firebase.auth.GoogleAuthProvider();
+          const result = await authService.signInWithPopup(provider);
+          const u = result.user;
+          const today = new Date().toLocaleDateString('ar-SA');
+          const isDirector = u.email && u.email.toLowerCase() === 'mohamed.gomaa@al-raed.edu.sa';
+
+          const userObj = {
+            uid: u.uid,
+            displayName: u.displayName || 'مستخدم Google',
+            email: u.email,
+            phoneNumber: u.phoneNumber,
+            role: isDirector ? 'admin' : 'pending',
+            provider: 'google',
+            registeredAt: today,
+            approvedAt: isDirector ? today : null,
+            notes: isDirector ? 'المدير العام للمنصة (وصول كامل)' : 'بانتظار اعتماد المدير العام'
+          };
+          this._bindSessionForUser(userObj);
+          this.showToast(isDirector ? '👑 مرحباً بك يا أ. محمد عبدالله جمعة! تم تسجيل الدخول بحساب Google بصلاحيات المدير العام.' : '✓ تم تسجيل الدخول بحساب Google بنجاح!', 'success');
+          this.closeAllModals();
+          return true;
+        } catch (e) {
+          if (e.code !== 'auth/popup-closed-by-user') {
+            console.warn('Firebase Google Auth error:', e);
+          }
+        }
+      }
+
       const email = prompt('أدخل بريد Google الإلكتروني للتسجيل (مثال: teacher@gmail.com):', 'user@gmail.com');
       if (!email || !email.trim()) return false;
 
@@ -849,6 +950,7 @@
     },
 
     init() {
+      initFirebaseIfAvailable();
       renderAuthNavbarWidget();
       verifyActiveSession(false);
     },

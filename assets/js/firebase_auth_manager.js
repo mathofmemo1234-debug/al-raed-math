@@ -174,6 +174,11 @@
     cloudUsers.forEach(cloudU => {
       const idx = current.findIndex(x => x.uid === cloudU.uid || (x.email && cloudU.email && x.email.toLowerCase() === cloudU.email.toLowerCase()));
       if (idx !== -1) {
+        // If user is already approved locally on this device, preserve approval unless explicitly revoked
+        if (current[idx].role === 'approved' && cloudU.role === 'pending') {
+          cloudU.role = 'approved';
+          if (!cloudU.approvedAt) cloudU.approvedAt = current[idx].approvedAt || new Date().toLocaleDateString('ar-SA');
+        }
         current[idx] = Object.assign({}, current[idx], cloudU);
       } else {
         current.push(cloudU);
@@ -699,7 +704,7 @@
       return usersDirectory;
     },
 
-    approveUser(uid) {
+    async approveUser(uid) {
       if (!this.isAdmin()) return false;
       usersDirectory = loadUsersDirectory();
       const u = usersDirectory.find(x => x.uid === uid);
@@ -716,12 +721,20 @@
 
         // Real-Time Cloud Firestore Sync
         if (isLiveFirebase && firestoreService) {
-          firestoreService.collection('users').doc(uid).set({
-            role: 'approved',
-            approvedAt: today
-          }, { merge: true }).catch(err => {
-            console.warn('Firestore live approve warning:', err);
-          });
+          try {
+            await firestoreService.collection('users').doc(uid).set({
+              role: 'approved',
+              approvedAt: today
+            }, { merge: true });
+            console.log('✓ Firestore approve succeeded in cloud for:', uid);
+          } catch (err) {
+            console.error('Firestore live approve error:', err);
+            if (err.code === 'permission-denied' || String(err).includes('permission')) {
+              alert('⚠️ تنبيه لمدير المنصة:\n\nتعذر إرسال الاعتماد إلى سحابة Firebase بسبب قيود قواعد الأمان في وحدة تحكم Firebase (Missing or insufficient permissions).\n\nلتفعيل الاعتماد السحابي الفوري، يرجى إجراء هذه الخطوة لمرة واحدة في لوحة Firebase:\n1. افتح Firebase Console -> Build -> Firestore Database.\n2. ادخل على تبويب Rules (القواعد).\n3. ضع القاعدة التالية واضغط Publish (نشر):\n\nmatch /users/{userId} {\n  allow read, write: if true;\n}\n\n(تم حفظ الاعتماد محلياً على هذا الجهاز بنجاح).');
+            } else {
+              this.showToast('تعذر المزامنة السحابية: ' + (err.message || err), 'error');
+            }
+          }
         }
 
         this.showToast(`✓ تم اعتماد المستخدم (${u.displayName}) ومنحه الوصول الكامل بنجاح!`, 'success');
@@ -732,7 +745,7 @@
       return false;
     },
 
-    revokeUser(uid) {
+    async revokeUser(uid) {
       if (!this.isAdmin()) return false;
       usersDirectory = loadUsersDirectory();
       const u = usersDirectory.find(x => x.uid === uid);
@@ -749,13 +762,15 @@
 
         // Real-Time Cloud Firestore Sync
         if (isLiveFirebase && firestoreService) {
-          firestoreService.collection('users').doc(uid).set({
-            role: 'pending',
-            approvedAt: null,
-            activeSessionId: null
-          }, { merge: true }).catch(err => {
+          try {
+            await firestoreService.collection('users').doc(uid).set({
+              role: 'pending',
+              approvedAt: null,
+              activeSessionId: null
+            }, { merge: true });
+          } catch (err) {
             console.warn('Firestore live revoke warning:', err);
-          });
+          }
         }
 
         this.showToast(`تم تعليق اعتماد المستخدم (${u.displayName}).`, 'warning');
@@ -767,7 +782,7 @@
     },
 
     // Force terminate active session of any user (Single Session Enforcement)
-    terminateUserSession(uid) {
+    async terminateUserSession(uid) {
       if (!this.isAdmin()) return false;
       usersDirectory = loadUsersDirectory();
       const u = usersDirectory.find(x => x.uid === uid);
@@ -777,11 +792,17 @@
 
         // Real-Time Cloud Firestore Sync
         if (isLiveFirebase && firestoreService) {
-          firestoreService.collection('users').doc(uid).set({
-            activeSessionId: null
-          }, { merge: true }).catch(err => {
-            console.warn('Firestore live terminate session warning:', err);
-          });
+          try {
+            await firestoreService.collection('users').doc(uid).set({
+              activeSessionId: null
+            }, { merge: true });
+            console.log('✓ Firestore session terminated for:', uid);
+          } catch (err) {
+            console.error('Firestore live terminate session error:', err);
+            if (err.code === 'permission-denied' || String(err).includes('permission')) {
+              alert('⚠️ تنبيه لمدير المنصة:\n\nتعذر إنهاء الجلسة في سحابة Firebase بسبب قيود قواعد الأمان في وحدة تحكم Firebase (Missing or insufficient permissions).\n\nلتفعيل أوامر المدير السحابية، يرجى نشر قواعد الأمان في:\nFirebase Console -> Build -> Firestore Database -> تبويب Rules\nوالضغط على Publish (نشر).');
+            }
+          }
         }
 
         this.showToast(`🔴 تم إنهاء الجلسة النشطة للمستخدم (${u.displayName}) فوراً! سيخرج جهازه تلقائياً.`, 'info');
@@ -791,7 +812,7 @@
       return false;
     },
 
-    deleteUser(uid) {
+    async deleteUser(uid) {
       if (!this.isAdmin()) return false;
       usersDirectory = loadUsersDirectory();
       const target = usersDirectory.find(x => x.uid === uid);
@@ -806,9 +827,11 @@
 
       // Real-Time Cloud Firestore Sync
       if (isLiveFirebase && firestoreService) {
-        firestoreService.collection('users').doc(uid).delete().catch(err => {
+        try {
+          await firestoreService.collection('users').doc(uid).delete();
+        } catch (err) {
           console.warn('Firestore live delete warning:', err);
-        });
+        }
       }
 
       this.showToast('تم حذف المستخدم من الدليل بنجاح.', 'info');

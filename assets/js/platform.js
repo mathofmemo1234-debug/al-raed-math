@@ -401,11 +401,49 @@
   function toggleSidebar() {
     const sidebar = document.getElementById('app-sidebar');
     const openPill = document.getElementById('sidebar-open-pill');
+    const backdrop = document.getElementById('sidebar-backdrop');
     if (!sidebar) return;
+
+    // Check if mobile viewport
+    if (typeof window !== 'undefined' && window.innerWidth <= 860) {
+      const isMobileOpen = sidebar.classList.contains('mobile-open');
+      if (isMobileOpen) {
+        sidebar.classList.remove('mobile-open');
+        if (backdrop) backdrop.classList.remove('show');
+      } else {
+        sidebar.classList.add('mobile-open');
+        if (backdrop) backdrop.classList.add('show');
+      }
+      return;
+    }
+
     sidebar.classList.toggle('collapsed');
     const isCollapsed = sidebar.classList.contains('collapsed');
     if (openPill) {
       openPill.style.display = isCollapsed ? 'inline-flex' : 'none';
+    }
+  }
+
+  function closeSidebarMobile() {
+    const sidebar = document.getElementById('app-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('show');
+  }
+
+  function toggleMobileNav() {
+    const drawer = document.getElementById('mobile-nav-drawer');
+    if (drawer) drawer.classList.toggle('open');
+  }
+
+  function closeMobileNav() {
+    const drawer = document.getElementById('mobile-nav-drawer');
+    if (drawer) drawer.classList.remove('open');
+  }
+
+  function openCurrentLessonHtmlGenerator() {
+    if (window.InteractiveHtmlGenerator) {
+      window.InteractiveHtmlGenerator.showGeneratorModal(state.currentLessonId);
     }
   }
 
@@ -606,6 +644,7 @@
 
     // Scroll viewport to top smoothly
     if (viewportArea) viewportArea.scrollTo({ top: 0, behavior: 'smooth' });
+    closeSidebarMobile();
   }
 
   // ================= View Switcher Handler =================
@@ -1053,10 +1092,12 @@
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('socratic')" style="cursor:pointer;" title="الانتقال إلى منصة سقراط التوليدية">🏛️ منصة سقراط الحوارية</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('tools')" style="cursor:pointer;" title="الانتقال إلى الأدوات والمختبر التفاعلي">🛠️ ${(lesson.lesson_tools && lesson.lesson_tools.title) ? lesson.lesson_tools.title.split('(')[0].trim() : 'أدوات الدرس الذكية'}</span>
               <span class="meta-badge orange">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
+              <span class="meta-badge" onclick="window.Platform.openCurrentLessonHtmlGenerator()" style="cursor:pointer; background:#ecfdf5; color:#065f46; border-color:#a7f3d0;" title="توليد صفحة تفاعلية مستقلة بصيغة HTML">🌐 مولد HTML التفاعلي</span>
               <span class="meta-badge">💡 إشراف: أ. محمد عبدالله جمعة</span>
             </div>
           </div>
           <div class="lesson-header-actions">
+            <button class="nav-btn success" onclick="window.Platform.openCurrentLessonHtmlGenerator()" title="توليد وتصدير صفحة تفاعلية مستقلة بصيغة HTML للدرس تعمل دون إنترنت">🌐 صفحة تفاعلية (HTML)</button>
             ${isG6 ? `<button class="nav-btn" onclick="window.Platform.addAllLessonQuestionsToExam('${lesson.id}')">➕ أضف أسئلة الدرس للاختبار</button>` : ''}
             <button class="nav-btn primary" onclick="window.print()">🖨️ طباعة كامل الدرس</button>
           </div>
@@ -1475,6 +1516,9 @@
             <div class="socratic-share-btns">
               <button type="button" class="nav-btn primary" onclick="window.Platform.copySocraticStudentLink('${lesson.id}')">
                 📋 <span>نسخ رابط الطالب للمشاركة</span>
+              </button>
+              <button type="button" class="nav-btn success" onclick="window.Platform.openCurrentLessonHtmlGenerator()">
+                🌐 <span>مولد صفحة HTML التفاعلية</span>
               </button>
               <a href="socratic_session.html?lesson=${encodeURIComponent(lesson.id)}" target="_blank" class="nav-btn" style="background:#ffffff; border:1.5px solid #cbd5e1; color:#0f172a; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
                 🔗 <span>فتح الجلسة التفاعلية ↗</span>
@@ -1896,6 +1940,11 @@
     selectLesson(newId);
   }
 
+  function toggleTheme() {
+    const themeBtn = document.getElementById('btn-theme-toggle');
+    if (themeBtn) themeBtn.click();
+  }
+
   // Export Platform API
   window.Platform = {
     selectLesson,
@@ -1903,6 +1952,11 @@
     expandAll,
     collapseAll,
     toggleSidebar,
+    closeSidebarMobile,
+    toggleMobileNav,
+    closeMobileNav,
+    openCurrentLessonHtmlGenerator,
+    toggleTheme,
     goToPrevLesson,
     goToNextLesson,
     toggleCrumbDropdown,

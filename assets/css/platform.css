@@ -221,8 +221,13 @@ body {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   flex-shrink: 0;
+}
+
+/* Mobile Hamburger Toggle (hidden by default on desktop) */
+.mobile-menu-toggle {
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -320,6 +325,143 @@ body {
 .nav-chip-label {
   line-height: 1;
   letter-spacing: -0.2px;
+}
+
+/* ==========================================================================
+   Full Responsive Layout Engine Across All Viewports (ضبط الرؤية الكاملة)
+   ========================================================================== */
+
+/* Breakpoint 1: Standard Laptops & Desktops (1200px - 1420px) */
+@media (max-width: 1420px) {
+  .platform-navbar {
+    padding: 0 12px;
+  }
+  .nav-center-search {
+    min-width: 150px;
+    max-width: 280px;
+    margin: 0 8px;
+  }
+  .nav-chip-btn {
+    padding: 0 9px;
+    font-size: 0.77rem;
+    gap: 5px;
+    height: 34px;
+  }
+  .nav-actions {
+    gap: 4px;
+  }
+}
+
+/* Breakpoint 2: Medium Laptops (1040px - 1240px) */
+@media (max-width: 1240px) {
+  .nav-teacher-tag {
+    display: none;
+  }
+  .nav-center-search {
+    min-width: 130px;
+    max-width: 220px;
+    margin: 0 6px;
+  }
+  .nav-center-search .nav-search-kbd {
+    display: none;
+  }
+  .nav-search-input {
+    padding-left: 12px;
+  }
+  /* Collapse secondary chips to icon-only buttons with clean tooltips */
+  #btn-theme-toggle .nav-chip-label,
+  button[onclick*="'suites'"] .nav-chip-label,
+  button[onclick*="'vault'"] .nav-chip-label,
+  button[onclick*="'builder'"] .nav-chip-label {
+    display: none;
+  }
+  #btn-theme-toggle,
+  button[onclick*="'suites'"],
+  button[onclick*="'vault'"],
+  button[onclick*="'builder'"] {
+    padding: 0 10px;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+}
+
+/* Breakpoint 3: Small Laptops / Tablets Landscape (860px - 1039px) */
+@media (max-width: 1040px) {
+  .nav-brand .nav-title-text {
+    font-size: 0.95rem;
+  }
+  .nav-brand .nav-badge-pill {
+    display: none;
+  }
+  .nav-center-search {
+    min-width: 110px;
+    max-width: 160px;
+  }
+  /* Also collapse question-bank to icon only */
+  button[onclick*="'question-bank'"] .nav-chip-label {
+    display: none;
+  }
+  button[onclick*="'question-bank'"] {
+    padding: 0 10px;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+  .nav-auth-chip .auth-chip-text {
+    display: none;
+  }
+  .nav-auth-chip {
+    padding: 4px 8px;
+    border-radius: 18px;
+  }
+}
+
+/* Breakpoint 4: Tablets Portrait & Mobile (< 860px) */
+@media (max-width: 860px) {
+  .nav-chip-btn:not(.mobile-menu-toggle) {
+    display: none !important;
+  }
+  .mobile-menu-toggle {
+    display: inline-flex !important;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+  }
+  .nav-center-search {
+    max-width: 140px;
+    min-width: 90px;
+    margin: 0 4px;
+  }
+  .nav-search-input::placeholder {
+    font-size: 0.72rem;
+  }
+}
+
+/* Breakpoint 5: Mobile Phones (< 600px) */
+@media (max-width: 600px) {
+  .platform-navbar {
+    height: 52px;
+    padding: 0 8px;
+  }
+  .nav-brand .nav-logo {
+    width: 32px;
+    height: 32px;
+  }
+  .nav-brand .nav-title-text {
+    font-size: 0.88rem;
+  }
+  .nav-center-search {
+    display: none; /* Accessible in mobile drawer */
+  }
 }
 
 /* ==========================================================================
@@ -4623,6 +4765,347 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 
 .tree-lesson-item.locked-lesson:hover {
   opacity: 1;
+}
+
+/* ==========================================================================
+   Smooth Touch Horizontal Scrolling (Tabs & Toolbars)
+   ========================================================================== */
+.lesson-nav-tabs,
+.viewport-top-tabs,
+.term-filter-tabs,
+.view-switcher-group {
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+  flex-wrap: nowrap !important;
+}
+
+.lesson-nav-tabs::-webkit-scrollbar,
+.viewport-top-tabs::-webkit-scrollbar,
+.term-filter-tabs::-webkit-scrollbar,
+.view-switcher-group::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Mobile Off-Canvas Navigation Sidebar & Backdrop
+   ========================================================================== */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1400;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+.sidebar-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 860px) {
+  .app-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    right: -100% !important;
+    width: 85% !important;
+    max-width: 320px !important;
+    height: 100vh !important;
+    z-index: 1500 !important;
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.4) !important;
+    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .app-sidebar.mobile-open {
+    right: 0 !important;
+  }
+
+  .sidebar-open-pill {
+    display: inline-flex !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    padding: 6px 12px !important;
+    border-radius: 16px !important;
+    font-size: 0.8rem !important;
+    font-weight: 800 !important;
+    border: none !important;
+    cursor: pointer !important;
+    margin-left: 8px !important;
+  }
+
+  .lesson-header-main {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .lesson-header-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .lesson-header-actions .nav-btn {
+    flex: 1 !important;
+    justify-content: center !important;
+  }
+
+  .prep-strategies-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .prep-header-table-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ==========================================================================
+   Slide-out Mobile Navigation Drawer (قائمة الجوال الذكية)
+   ========================================================================== */
+.mobile-nav-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.mobile-nav-drawer.open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.mobile-nav-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.mobile-nav-content {
+  position: absolute;
+  top: 0;
+  right: -100%;
+  bottom: 0;
+  width: 85%;
+  max-width: 320px;
+  background: #0f172a;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.mobile-nav-drawer.open .mobile-nav-content {
+  right: 0;
+}
+
+.mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 16px;
+}
+
+.mobile-nav-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-nav-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  padding: 2px;
+}
+
+.mobile-nav-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #cbd5e1;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobile-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: right;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-nav-item:hover, .mobile-nav-item.active {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: #ffffff;
+}
+
+.mobile-nav-item .m-icon {
+  font-size: 1.25rem;
+  width: 24px;
+  text-align: center;
+}
+
+.mobile-nav-item .m-label {
+  flex: 1;
+}
+
+/* ==========================================================================
+   Interactive HTML Generator Modal Window Styling
+   ========================================================================== */
+.interactive-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 3500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.25s ease;
+}
+
+.interactive-modal-window {
+  background: #ffffff;
+  color: #0f172a;
+  width: 100%;
+  max-width: 1100px;
+  height: 90vh;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+[data-theme="dark"] .interactive-modal-window {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #374151;
+}
+
+.interactive-modal-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: #ffffff;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.modal-header-titles {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-icon-badge {
+  font-size: 1.8rem;
+}
+
+.modal-close-x {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close-x:hover {
+  background: rgba(239, 68, 68, 0.85);
+  transform: rotate(90deg);
+}
+
+.interactive-modal-toolbar {
+  background: #f8fafc;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="dark"] .interactive-modal-toolbar {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.modal-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.interactive-modal-body {
+  flex: 1;
+  background: #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .interactive-modal-body {
+  background: #0b0f19;
+}
+
+.html-preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 
 

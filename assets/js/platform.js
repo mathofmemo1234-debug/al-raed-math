@@ -126,21 +126,29 @@
     viewportArea = document.getElementById('app-viewport');
     searchInput = document.getElementById('nav-search');
 
-    mergeBookData();
-    if (window.ExamBuilder && window.ExamBuilder.updateBadge) {
-      window.ExamBuilder.updateBadge();
+    function startPlatform() {
+      if (!window.CURRICULUM_DATA) {
+        setTimeout(startPlatform, 50);
+        return;
+      }
+      mergeBookData();
+      if (window.ExamBuilder && window.ExamBuilder.updateBadge) {
+        window.ExamBuilder.updateBadge();
+      }
+
+      if (window.FirebaseAuthManager) {
+        window.FirebaseAuthManager.onAuthStateChanged(() => {
+          renderTree();
+          renderCurrentView();
+        });
+      }
+
+      setupEventListeners();
+      renderTree();
+      renderCurrentView();
     }
 
-    if (window.FirebaseAuthManager) {
-      window.FirebaseAuthManager.onAuthStateChanged(() => {
-        renderTree();
-        renderCurrentView();
-      });
-    }
-
-    setupEventListeners();
-    renderTree();
-    renderCurrentView();
+    startPlatform();
   });
 
   // Event Listeners
@@ -463,9 +471,22 @@
 
   // ================= Hierarchical Navigation Rendering =================
   function renderTree() {
-    if (!sidebarTreeContainer || !window.CURRICULUM_DATA) return;
-    const stages = window.CURRICULUM_DATA.stages || [];
-    let html = '';
+    try {
+      if (!sidebarTreeContainer) sidebarTreeContainer = document.getElementById('sidebar-tree');
+      if (!sidebarTreeContainer) return;
+      if (!window.CURRICULUM_DATA) {
+        sidebarTreeContainer.innerHTML = `
+          <div style="padding:20px 14px; text-align:center; color:#94a3b8; font-size:0.85rem;">
+            ⏳ جاري تحميل دليل المناهج...
+          </div>
+        `;
+        setTimeout(() => {
+          if (window.CURRICULUM_DATA) renderTree();
+        }, 200);
+        return;
+      }
+      const stages = window.CURRICULUM_DATA.stages || [];
+      let html = '';
 
     const isApproved = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isApproved === 'function' && window.FirebaseAuthManager.isApproved();
     const isAdmin = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isAdmin === 'function' && window.FirebaseAuthManager.isAdmin();
@@ -653,6 +674,9 @@
     });
 
     sidebarTreeContainer.innerHTML = html || '<div style="padding:20px; color:#94a3b8; text-align:center;">لا توجد نتائج مطابقة لبحثك</div>';
+    } catch (err) {
+      console.error('Critical error in renderTree:', err);
+    }
   }
 
   // Toggle tree node collapse/expand
@@ -1105,11 +1129,27 @@
 
   // ================= Render Lesson Cockpit =================
   function renderLessonCockpit() {
-    const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
-    if (!lesson) {
-      renderUnfinishedLessonPlaceholder(state.currentLessonId);
-      return;
-    }
+    try {
+      if (!viewportArea) viewportArea = document.getElementById('app-viewport');
+      if (!viewportArea) return;
+      if (!window.CURRICULUM_DATA || !window.CURRICULUM_DATA.lessons) {
+        viewportArea.innerHTML = `
+          <div style="padding:40px 20px; text-align:center; background:#ffffff; border-radius:16px; margin:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+            <div style="font-size:2.5rem; margin-bottom:12px;">⏳</div>
+            <h3 style="font-weight:800; color:#1e3a8a; margin-bottom:8px;">جاري تحميل محتوى الدرس وبيانات المنهج...</h3>
+            <p style="color:#64748b; font-size:0.9rem;">يُرجى الانتظار بضع ثوانٍ بينما تكتمل مزامنة الدروس السحابية.</p>
+          </div>
+        `;
+        setTimeout(() => {
+          if (window.CURRICULUM_DATA && window.CURRICULUM_DATA.lessons) renderLessonCockpit();
+        }, 200);
+        return;
+      }
+      const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
+      if (!lesson) {
+        renderUnfinishedLessonPlaceholder(state.currentLessonId);
+        return;
+      }
 
     const pathInfo = findLessonPath(lesson.id);
     let isLessonUnlocked = true;
@@ -1286,156 +1326,206 @@
       <!-- Tab 6: STANDARDIZED QUIZ (10 MCQs + 5 TF + Essay) -->
       <div class="tab-pane-content ${state.activeLessonTab === 'quiz' ? 'active' : ''}" id="tab-quiz">
         <div class="quiz-cockpit">
-          <div class="quiz-header-banner">
-            <div>
-              <h3 style="font-size:1.25rem; font-weight:800; margin-bottom:4px;">📝 الاختبار المقنن والتقييم الإلكتروني الفوري</h3>
-              <p style="font-size:0.88rem; opacity:0.9;">مكون من ${fmtNum(quiz.mcq.length, true)} فقرات اختيار من متعدد بأربع خيارات أفقية + ${fmtNum(quiz.tf.length, true)} فقرات صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مسائل مقالية') : ''}</p>
-            </div>
-            <div class="quiz-score-badge" id="quiz-live-score">
-              الدرجة: ${fmtNum(quizStats.correctCount, true)} / ${fmtNum(totalAutoQ, true)}
-            </div>
-          </div>
+          ${(() => {
+            const isUserFullyAuthorized = isApproved || isAdmin;
+            const displayedMcqs = isUserFullyAuthorized ? quiz.mcq : (quiz.mcq || []).slice(0, 5);
+            const hasLockedMcqs = !isUserFullyAuthorized && (quiz.mcq || []).length > 5;
+            const displayedTfs = isUserFullyAuthorized ? quiz.tf : (quiz.tf || []).slice(0, 5);
+            const hasLockedTfs = !isUserFullyAuthorized && (quiz.tf || []).length > 5;
+            const displayedEssays = isUserFullyAuthorized ? essays : (essays || []).slice(0, 5);
+            const hasLockedEssays = !isUserFullyAuthorized && (essays || []).length > 5;
+            const totalPreviewCount = displayedMcqs.length + displayedTfs.length;
 
-          <!-- Part 1: 10 MCQs with 4 Horizontal Options -->
-          <div class="quiz-part-title">
-            <span>🔹 القسم الأول: أسئلة الاختيار من متعدد (${fmtNum(quiz.mcq.length, true)} فقرات - ٤ خيارات أفقية)</span>
-            <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(لكل فقرة خيار واحد فقط صحيح)</span>
-          </div>
+            return `
+              <div class="quiz-header-banner">
+                <div>
+                  <h3 style="font-size:1.25rem; font-weight:800; margin-bottom:4px;">📝 الاختبار المقنن والتقييم الإلكتروني الفوري</h3>
+                  <p style="font-size:0.88rem; opacity:0.9;">مكون من ${fmtNum(quiz.mcq.length, true)} فقرات اختيار من متعدد بأربع خيارات أفقية + ${fmtNum(quiz.tf.length, true)} فقرات صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مسائل مقالية') : ''}</p>
+                </div>
+                <div class="quiz-score-badge" id="quiz-live-score">
+                  ${isUserFullyAuthorized 
+                    ? `الدرجة: ${fmtNum(quizStats.correctCount, true)} / ${fmtNum(totalAutoQ, true)}`
+                    : `الدرجة: ${fmtNum(quizStats.correctCount, true)} / ${fmtNum(totalPreviewCount, true)} (معاينة ٥ أسئلة)`
+                  }
+                </div>
+              </div>
 
-          <div class="mcq-list">
-            ${quiz.mcq.map((mcq, qIdx) => {
-              const userAns = quizStats.userAnswers['mcq-' + qIdx];
-              const isAnswered = userAns !== undefined;
-              const uid = lesson.id + '-mcq-' + (qIdx + 1);
-              const inExam = examApi && examApi.hasQuestion(uid);
-              return `
-                <div class="question-card" id="card-mcq-${qIdx}">
-                  <div class="question-header" style="justify-content:space-between; width:100%;">
-                    <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
-                      <span class="q-badge">س ${fmtNum(qIdx + 1, true)}</span>
-                      <span class="q-text">${fmtNum(mcq.q, isG6)}</span>
+              <!-- Part 1: 10 MCQs with 4 Horizontal Options -->
+              <div class="quiz-part-title">
+                <span>🔹 القسم الأول: أسئلة الاختيار من متعدد (${fmtNum(quiz.mcq.length, true)} فقرات - ٤ خيارات أفقية)${!isUserFullyAuthorized ? ' [معاينة ٥ أسئلة]' : ''}</span>
+                <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(لكل فقرة خيار واحد فقط صحيح)</span>
+              </div>
+
+              <div class="mcq-list">
+                ${displayedMcqs.map((mcq, qIdx) => {
+                  const userAns = quizStats.userAnswers['mcq-' + qIdx];
+                  const isAnswered = userAns !== undefined;
+                  const uid = lesson.id + '-mcq-' + (qIdx + 1);
+                  const inExam = examApi && examApi.hasQuestion(uid);
+                  return `
+                    <div class="question-card" id="card-mcq-${qIdx}">
+                      <div class="question-header" style="justify-content:space-between; width:100%;">
+                        <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
+                          <span class="q-badge">س ${fmtNum(qIdx + 1, true)}</span>
+                          <span class="q-text">${fmtNum(mcq.q, isG6)}</span>
+                        </div>
+                        <div class="q-inline-tools">
+                          ${mcq.difficulty ? `<span class="qb-pill">${mcq.difficulty}</span>` : ''}
+                          <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'mcq', ${qIdx})">📋 نسخ لـ Word</button>
+                          <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'mcq', ${qIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
+                        </div>
+                      </div>
+                      ${renderQuestionFigure(mcq)}
+                      <div class="mcq-options-horizontal">
+                        ${mcq.options.map((opt, optIdx) => {
+                          const letters = ['أ', 'ب', 'ج', 'د'];
+                          let btnClass = 'opt-btn';
+                          if (isAnswered) {
+                            if (optIdx === mcq.correct) btnClass += ' correct';
+                            else if (optIdx === userAns) btnClass += ' wrong';
+                          }
+                          return `
+                            <button class="${btnClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerMCQ(${qIdx}, ${optIdx})">
+                              <span class="opt-letter">${letters[optIdx]}</span>
+                              <span class="opt-text">${fmtNum(opt, isG6)}</span>
+                            </button>
+                          `;
+                        }).join('')}
+                      </div>
+                      <div class="q-explanation-box ${isAnswered ? 'show' : ''}" id="exp-mcq-${qIdx}">
+                        <strong>💡 التفسير الرياضي:</strong> ${fmtNum(mcq.explanation, isG6)}
+                      </div>
                     </div>
-                    <div class="q-inline-tools">
-                      ${mcq.difficulty ? `<span class="qb-pill">${mcq.difficulty}</span>` : ''}
-                      <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'mcq', ${qIdx})">📋 نسخ لـ Word</button>
-                      <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'mcq', ${qIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
+                  `;
+                }).join('')}
+                ${hasLockedMcqs ? `
+                  <div class="quiz-locked-gate">
+                    <div class="qlg-shield-icon">🔒</div>
+                    <div class="qlg-info">
+                      <div class="qlg-title">الأسئلة المقننة المتبقية (من س ٦ إلى س ١٠) مخصصة للأعضاء المعتمدين والمدير العام</div>
+                      <div class="qlg-desc">
+                        وفق ضوابط المنصة، يُسمح لغير الأعضاء المعتمدين بمعاينة ٥ أسئلة فقط لكل نوع. سجّل دخولك واطلب اعتماد العضوية فوراً لفتح كافة أسئلة الاختبار المقنن بالكامل (١٠ اختيار من متعدد + ٥ صواب وخطأ + ٣ مقالي) مع التفسيرات الرياضية، وإتاحة تصديرها لـ Word وبنك الأسئلة الشامل.
+                      </div>
                     </div>
+                    <button type="button" class="qlg-action-btn" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()">
+                      🔑 تسجيل الدخول / طلب اعتماد العضوية ↗
+                    </button>
                   </div>
-                  ${renderQuestionFigure(mcq)}
-                  <div class="mcq-options-horizontal">
-                    ${mcq.options.map((opt, optIdx) => {
-                      const letters = ['أ', 'ب', 'ج', 'د'];
-                      let btnClass = 'opt-btn';
-                      if (isAnswered) {
-                        if (optIdx === mcq.correct) btnClass += ' correct';
-                        else if (optIdx === userAns) btnClass += ' wrong';
-                      }
-                      return `
-                        <button class="${btnClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerMCQ(${qIdx}, ${optIdx})">
-                          <span class="opt-letter">${letters[optIdx]}</span>
-                          <span class="opt-text">${fmtNum(opt, isG6)}</span>
+                ` : ''}
+              </div>
+
+              <!-- Part 2: 5 True / False Questions -->
+              <div class="quiz-part-title">
+                <span>🔹 القسم الثاني: أسئلة الصواب والخطأ (${fmtNum(quiz.tf.length, true)} فقرات)${!isUserFullyAuthorized && hasLockedTfs ? ' [معاينة ٥ أسئلة]' : ''}</span>
+                <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(حدد صواب أو خطأ مع التبرير)</span>
+              </div>
+
+              <div class="tf-list">
+                ${displayedTfs.map((tf, qIdx) => {
+                  const userAns = quizStats.userAnswers['tf-' + qIdx];
+                  const isAnswered = userAns !== undefined;
+                  const uid = lesson.id + '-tf-' + (qIdx + 1);
+                  const inExam = examApi && examApi.hasQuestion(uid);
+                  let trueClass = 'tf-btn opt-true';
+                  let falseClass = 'tf-btn opt-false';
+
+                  if (isAnswered) {
+                    if (tf.is_true) {
+                      trueClass += ' correct';
+                      if (userAns === false) falseClass += ' wrong';
+                    } else {
+                      falseClass += ' correct';
+                      if (userAns === true) trueClass += ' wrong';
+                    }
+                  }
+
+                  return `
+                    <div class="question-card" id="card-tf-${qIdx}">
+                      <div class="question-header" style="justify-content:space-between; width:100%;">
+                        <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
+                          <span class="q-badge" style="background:#059669;">س ${fmtNum(qIdx + quiz.mcq.length + 1, true)}</span>
+                          <span class="q-text">${fmtNum(tf.statement, isG6)}</span>
+                        </div>
+                        <div class="q-inline-tools">
+                          ${tf.difficulty ? `<span class="qb-pill">${tf.difficulty}</span>` : ''}
+                          <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'tf', ${qIdx})">📋 نسخ لـ Word</button>
+                          <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'tf', ${qIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
+                        </div>
+                      </div>
+                      ${renderQuestionFigure(tf)}
+                      <div class="tf-options-horizontal">
+                        <button class="${trueClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerTF(${qIdx}, true)">
+                          <span>✓ صواب</span>
                         </button>
-                      `;
-                    }).join('')}
-                  </div>
-                  <div class="q-explanation-box ${isAnswered ? 'show' : ''}" id="exp-mcq-${qIdx}">
-                    <strong>💡 التفسير الرياضي:</strong> ${fmtNum(mcq.explanation, isG6)}
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-
-          <!-- Part 2: 5 True / False Questions -->
-          <div class="quiz-part-title">
-            <span>🔹 القسم الثاني: أسئلة الصواب والخطأ (${fmtNum(quiz.tf.length, true)} فقرات)</span>
-            <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(حدد صواب أو خطأ مع التبرير)</span>
-          </div>
-
-          <div class="tf-list">
-            ${quiz.tf.map((tf, qIdx) => {
-              const userAns = quizStats.userAnswers['tf-' + qIdx];
-              const isAnswered = userAns !== undefined;
-              const uid = lesson.id + '-tf-' + (qIdx + 1);
-              const inExam = examApi && examApi.hasQuestion(uid);
-              let trueClass = 'tf-btn opt-true';
-              let falseClass = 'tf-btn opt-false';
-
-              if (isAnswered) {
-                if (tf.is_true) {
-                  trueClass += ' correct';
-                  if (userAns === false) falseClass += ' wrong';
-                } else {
-                  falseClass += ' correct';
-                  if (userAns === true) trueClass += ' wrong';
-                }
-              }
-
-              return `
-                <div class="question-card" id="card-tf-${qIdx}">
-                  <div class="question-header" style="justify-content:space-between; width:100%;">
-                    <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
-                      <span class="q-badge" style="background:#059669;">س ${fmtNum(qIdx + quiz.mcq.length + 1, true)}</span>
-                      <span class="q-text">${fmtNum(tf.statement, isG6)}</span>
-                    </div>
-                    <div class="q-inline-tools">
-                      ${tf.difficulty ? `<span class="qb-pill">${tf.difficulty}</span>` : ''}
-                      <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'tf', ${qIdx})">📋 نسخ لـ Word</button>
-                      <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'tf', ${qIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
-                    </div>
-                  </div>
-                  ${renderQuestionFigure(tf)}
-                  <div class="tf-options-horizontal">
-                    <button class="${trueClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerTF(${qIdx}, true)">
-                      <span>✓ صواب</span>
-                    </button>
-                    <button class="${falseClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerTF(${qIdx}, false)">
-                      <span>✗ خطأ</span>
-                    </button>
-                  </div>
-                  <div class="q-explanation-box ${isAnswered ? 'show' : ''}" id="exp-tf-${qIdx}">
-                    <strong>💡 التفسير الرياضي:</strong> ${fmtNum(tf.explanation, isG6)}
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-
-          ${essays.length ? `
-            <!-- Part 3: Essay & Application Problems -->
-            <div class="quiz-part-title">
-              <span>🔹 القسم الثالث: المسائل المقالية والتطبيقية (${fmtNum(essays.length, true)} مسائل)</span>
-              <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(تُستخدم في الاختبارات الكتابية والنسخ لـ Word)</span>
-            </div>
-            <div class="tf-list">
-              ${essays.map((es, eIdx) => {
-                const uid = lesson.id + '-essay-' + (eIdx + 1);
-                const inExam = examApi && examApi.hasQuestion(uid);
-                return `
-                  <div class="question-card" id="card-essay-${eIdx}">
-                    <div class="question-header" style="justify-content:space-between; width:100%;">
-                      <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
-                        <span class="q-badge" style="background:#7c3aed;">س ${fmtNum(eIdx + quiz.mcq.length + quiz.tf.length + 1, true)}</span>
-                        <span class="q-text">${fmtNum(es.q, isG6)}</span>
+                        <button class="${falseClass}" ${isAnswered ? 'disabled' : ''} onclick="window.Platform.answerTF(${qIdx}, false)">
+                          <span>✗ خطأ</span>
+                        </button>
                       </div>
-                      <div class="q-inline-tools">
-                        <span class="qb-pill marks-pill">${window.ArabicUtils ? window.ArabicUtils.formatMark(es.marks || 2) : 'درجتان'}</span>
-                        <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'essay', ${eIdx})">📋 نسخ لـ Word</button>
-                        <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'essay', ${eIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
+                      <div class="q-explanation-box ${isAnswered ? 'show' : ''}" id="exp-tf-${qIdx}">
+                        <strong>💡 التفسير الرياضي:</strong> ${fmtNum(tf.explanation, isG6)}
                       </div>
                     </div>
-                    ${renderQuestionFigure(es)}
-                    <div style="display:flex; gap:8px; margin-top:8px;">
-                      <button type="button" class="ws-toggle-btn" onclick="window.Platform.toggleWsSolution('essay-sol-${eIdx}')">💡 إظهار الحل النموذجي</button>
+                  `;
+                }).join('')}
+                ${hasLockedTfs ? `
+                  <div class="quiz-locked-gate">
+                    <div class="qlg-shield-icon">🔒</div>
+                    <div class="qlg-info">
+                      <div class="qlg-title">بقية أسئلة الصواب والخطأ مخصصة للأعضاء المعتمدين</div>
+                      <div class="qlg-desc">سجّل دخولك واطلب الاعتماد لفتح كامل الأسئلة.</div>
                     </div>
-                    <div class="ws-solution-box" id="essay-sol-${eIdx}">
-                      <strong>الحل النموذجي:</strong> ${fmtNum(es.ans, isG6)}
-                    </div>
+                    <button type="button" class="qlg-action-btn" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()">🔑 طلب الاعتماد ↗</button>
                   </div>
-                `;
-              }).join('')}
-            </div>
-          ` : ''}
+                ` : ''}
+              </div>
+
+              ${displayedEssays.length ? `
+                <!-- Part 3: Essay & Application Problems -->
+                <div class="quiz-part-title">
+                  <span>🔹 القسم الثالث: المسائل المقالية والتطبيقية (${fmtNum(essays.length, true)} مسائل)${!isUserFullyAuthorized && hasLockedEssays ? ' [معاينة ٥ مسائل]' : ''}</span>
+                  <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">(تُستخدم في الاختبارات الكتابية والنسخ لـ Word)</span>
+                </div>
+                <div class="tf-list">
+                  ${displayedEssays.map((es, eIdx) => {
+                    const uid = lesson.id + '-essay-' + (eIdx + 1);
+                    const inExam = examApi && examApi.hasQuestion(uid);
+                    return `
+                      <div class="question-card" id="card-essay-${eIdx}">
+                        <div class="question-header" style="justify-content:space-between; width:100%;">
+                          <div style="display:flex; align-items:flex-start; gap:10px; flex:1;">
+                            <span class="q-badge" style="background:#7c3aed;">س ${fmtNum(eIdx + quiz.mcq.length + quiz.tf.length + 1, true)}</span>
+                            <span class="q-text">${fmtNum(es.q, isG6)}</span>
+                          </div>
+                          <div class="q-inline-tools">
+                            <span class="qb-pill marks-pill">${window.ArabicUtils ? window.ArabicUtils.formatMark(es.marks || 2) : 'درجتان'}</span>
+                            <button type="button" class="qb-act-btn copy-word-btn" onclick="window.Platform.copyLessonQuestionToWord('${lesson.id}', 'essay', ${eIdx})">📋 نسخ لـ Word</button>
+                            <button type="button" class="qb-act-btn add-exam-btn ${inExam ? 'added' : ''}" onclick="window.Platform.toggleLessonQuestionInExam('${lesson.id}', 'essay', ${eIdx})">${inExam ? '✓ مضاف' : '➕ للاختبار'}</button>
+                          </div>
+                        </div>
+                        ${renderQuestionFigure(es)}
+                        <div style="display:flex; gap:8px; margin-top:8px;">
+                          <button type="button" class="ws-toggle-btn" onclick="window.Platform.toggleWsSolution('essay-sol-${eIdx}')">💡 إظهار الحل النموذجي</button>
+                        </div>
+                        <div class="ws-solution-box" id="essay-sol-${eIdx}">
+                          <strong>الحل النموذجي:</strong> ${fmtNum(es.ans, isG6)}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                  ${hasLockedEssays ? `
+                    <div class="quiz-locked-gate">
+                      <div class="qlg-shield-icon">🔒</div>
+                      <div class="qlg-info">
+                        <div class="qlg-title">بقية المسائل المقالية مخصصة للأعضاء المعتمدين</div>
+                        <div class="qlg-desc">سجّل دخولك واطلب الاعتماد للوصول غير المحدود.</div>
+                      </div>
+                      <button type="button" class="qlg-action-btn" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()">🔑 طلب الاعتماد ↗</button>
+                    </div>
+                  ` : ''}
+                </div>
+              ` : ''}
+            `;
+          })()}
 
           <!-- Bottom Actions & Reset -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid var(--border-light); flex-wrap:wrap; gap:10px;">
@@ -1450,6 +1540,19 @@
     `;
 
     viewportArea.innerHTML = html;
+    } catch (err) {
+      console.error('Critical error in renderLessonCockpit:', err);
+      if (viewportArea) {
+        viewportArea.innerHTML = `
+          <div style="padding:40px 20px; text-align:center; background:#ffffff; border-radius:16px; margin:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+            <div style="font-size:2.5rem; margin-bottom:12px;">⚠️</div>
+            <h3 style="font-weight:800; color:#dc2626; margin-bottom:8px;">تنبيه: حدث تعذر في تحميل الدرس</h3>
+            <p style="color:#64748b; font-size:0.9rem; margin-bottom:16px;">يرجى النقر على زر إعادة التهيئة لتحديث العرض فوراً.</p>
+            <button type="button" class="nav-btn primary" onclick="window.Platform.selectLesson('g6-t1-c1-l1')">🔄 إعادة تحميل الدرس</button>
+          </div>
+        `;
+      }
+    }
   }
 
   // Fallback for roadmap lessons
@@ -1679,6 +1782,15 @@
 
   // ================= Quiz Logic =================
   function answerMCQ(qIdx, optIdx) {
+    const isApproved = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isApproved === 'function' && window.FirebaseAuthManager.isApproved();
+    const isAdmin = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isAdmin === 'function' && window.FirebaseAuthManager.isAdmin();
+    if (!isApproved && !isAdmin && qIdx >= 5) {
+      if (window.FirebaseAuthManager && window.FirebaseAuthManager.showToast) {
+        window.FirebaseAuthManager.showToast('عفواً، الأسئلة من س ٦ إلى س ١٠ وبقية الاختبار المقنن متاحة حصرياً للأعضاء المعتمدين والمدير العام.', 'warning');
+      }
+      return;
+    }
+
     const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
     if (!lesson) return;
     const mcq = lesson.quiz.mcq[qIdx];
@@ -1700,6 +1812,15 @@
   }
 
   function answerTF(qIdx, boolAns) {
+    const isApproved = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isApproved === 'function' && window.FirebaseAuthManager.isApproved();
+    const isAdmin = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isAdmin === 'function' && window.FirebaseAuthManager.isAdmin();
+    if (!isApproved && !isAdmin && qIdx >= 5) {
+      if (window.FirebaseAuthManager && window.FirebaseAuthManager.showToast) {
+        window.FirebaseAuthManager.showToast('عفواً، الأسئلة بعد السؤال الخامس متاحة حصرياً للأعضاء المعتمدين والمدير العام.', 'warning');
+      }
+      return;
+    }
+
     const lesson = window.CURRICULUM_DATA.lessons[state.currentLessonId];
     if (!lesson) return;
     const tf = lesson.quiz.tf[qIdx];

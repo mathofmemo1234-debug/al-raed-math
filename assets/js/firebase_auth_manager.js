@@ -335,7 +335,7 @@
     const container = document.getElementById('nav-auth-container');
     if (!container) return;
 
-    if (currentUser.role === 'admin') {
+    if (currentUser && currentUser.role === 'admin') {
       container.innerHTML = `
         <div class="nav-auth-chip admin" title="حساب المدير العام - أ. محمد عبدالله جمعة">
           <span class="auth-chip-avatar">👑</span>
@@ -351,7 +351,7 @@
           </button>
         </div>
       `;
-    } else if (currentUser.role === 'approved') {
+    } else if (currentUser && (currentUser.role === 'approved' || currentUser.status === 'approved')) {
       container.innerHTML = `
         <div class="nav-auth-chip approved" title="حساب معتمد">
           <span class="auth-chip-avatar">👨‍🏫</span>
@@ -364,7 +364,7 @@
           </button>
         </div>
       `;
-    } else if (currentUser.role === 'pending') {
+    } else if (currentUser && (currentUser.role === 'pending' || currentUser.status === 'pending')) {
       container.innerHTML = `
         <div class="nav-auth-chip pending" title="الحساب بانتظار اعتماد المدير العام">
           <span class="auth-chip-avatar">⏳</span>
@@ -380,14 +380,14 @@
     } else {
       // Visitor
       container.innerHTML = `
-        <button type="button" class="nav-chip-btn auth-login-trigger" onclick="window.FirebaseAuthManager.openAuthModal()" title="تسجيل الدخول أو طلب اعتماد الحساب">
+        <button type="button" class="nav-chip-btn auth-login-trigger" onclick="window.FirebaseAuthManager.openAuthModal()" title="تسجيل الدخول أو طلب اعتماد الحساب" style="flex-shrink: 0; white-space: nowrap; min-width: max-content;">
           <span class="nav-chip-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </span>
-          <span class="nav-chip-label">دخول / اعتماد</span>
+          <span class="nav-chip-label" style="white-space: nowrap; flex-shrink: 0;">دخول / اعتماد</span>
         </button>
       `;
     }
@@ -492,11 +492,11 @@
     },
 
     isApproved() {
-      return currentUser && (currentUser.role === 'approved' || currentUser.role === 'admin');
+      return !!(currentUser && (currentUser.role === 'approved' || currentUser.role === 'admin' || currentUser.status === 'approved'));
     },
 
     isPending() {
-      return currentUser && currentUser.role === 'pending';
+      return !!(currentUser && (currentUser.role === 'pending' || currentUser.status === 'pending') && currentUser.role !== 'admin' && currentUser.role !== 'approved' && currentUser.status !== 'approved');
     },
 
     isVisitor() {
@@ -1142,9 +1142,16 @@
     },
 
     init() {
+      currentUser = loadCurrentUser();
       initFirebaseIfAvailable();
       renderAuthNavbarWidget();
       verifyActiveSession(false);
+    },
+
+    setCurrentUser(user) {
+      currentUser = user;
+      saveCurrentUser(currentUser);
+      notifyChange();
     },
 
     showToast(msg, type) {

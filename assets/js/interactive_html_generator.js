@@ -807,6 +807,7 @@
         <span class="meta-chip">المنهج السعودي المعتمد</span>
         <span class="meta-chip">منصة سقراط التوليدية</span>
         <span class="meta-chip">تقويم ذاتي تفاعلي فوري</span>
+        <span class="meta-chip verified-member" style="background:rgba(16,185,129,0.12); color:#059669; border-color:rgba(16,185,129,0.3); font-weight:800;">🌟 نسخة العضوية المعتمدة (كامل الصلاحيات) ✓</span>
       </div>
 
       <!-- Quick Step Navigation -->
@@ -978,7 +979,7 @@
     <section class="section-card" id="sec-quiz">
       <div class="section-header">
         <div class="section-title">
-          <span>📝 ٥. التقييم الذاتي التفاعلي الفوري (الاختبار المقنن)</span>
+          <span>📝 ٥. التقييم الذاتي التفاعلي الفوري (الاختبار المقنن: ١٠ اختيار + ٥ صواب وخطأ + ٣ مقالي)</span>
         </div>
         <span class="section-time-badge">تصحيح إلكتروني لحظي</span>
       </div>
@@ -986,7 +987,7 @@
       <div class="quiz-score-banner" id="quiz-score-banner">
         <div>
           <div style="font-weight:900; font-size:1.1rem;">لوحة التقييم الفوري للطالب</div>
-          <div style="font-size:0.85rem; opacity:0.9;">أجب عن الأسئلة التالية وتعرف على درجتك وشرح الحل فوراً</div>
+          <div style="font-size:0.85rem; opacity:0.9;">أجب عن الأسئلة الموضوعية وتعرف على درجتك فوراً، ثم أنجز المسائل المقالية التحليلية</div>
         </div>
         <div style="text-align:left;">
           <span style="font-size:1.6rem; font-weight:900;" id="user-score-display">${numFmt(0)} / ${numFmt(quizItems.length)}</span>
@@ -1015,6 +1016,49 @@
           </div>
         `).join('')}
       </div>
+
+      <!-- Part 3: Essay & Application Problems (المسائل المقالية التحليلية) -->
+      ${essays.length ? `
+        <div style="margin-top:28px; padding-top:20px; border-top:1px dashed var(--border-color);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+            <div style="font-weight:900; font-size:1.05rem; color:var(--primary);">
+              <span>✍️ القسم الثاني: المسائل المقالية والتحليلية (${numFmt(essays.length)} مسائل)</span>
+            </div>
+            <span style="font-size:0.8rem; background:rgba(124,58,237,0.1); color:#7c3aed; padding:3px 10px; border-radius:12px; font-weight:700;">
+              حل كتابي ونموذج إجابة
+            </span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            ${essays.map((es, eIdx) => `
+              <div class="quiz-item-card" style="border-right:4px solid #7c3aed;">
+                <div class="quiz-q-title">
+                  <span style="color:#7c3aed; font-weight:900;">مسألة ${numFmt(eIdx + 1)}:</span>
+                  ${formatMathDisplay(es.q || es.question || '', isArabicNum)}
+                </div>
+
+                <div style="margin:12px 0 8px;">
+                  <textarea class="socratic-student-input" style="width:100%; min-height:70px; resize:vertical; font-family:inherit; padding:10px 14px; border:1px solid var(--border-color); border-radius:8px; background:var(--bg-card); color:var(--text-main);" placeholder="اكتب خطوات الحل أو الناتج هنا للتفكير الذاتي..."></textarea>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                  <button type="button" class="solution-toggle-btn" onclick="toggleEssaySolution(${eIdx})">
+                    <span>👁️ إظهار نموذج الحل والتفسير الرياضي</span>
+                  </button>
+                  <span style="font-size:0.8rem; color:var(--text-muted); font-weight:700;">درجة السؤال: ${numFmt(es.marks || 2)} درجات</span>
+                </div>
+
+                <div class="socratic-feedback-reveal" id="essay-sol-${eIdx}">
+                  <div class="socratic-feedback-title" style="color:#7c3aed;">
+                    <span>✓ نموذج الحل والخطوات المعتمدة:</span>
+                  </div>
+                  <p style="font-size:0.92rem; line-height:1.7; margin-top:4px;">${formatMathDisplay(es.ans || es.answer || 'الحل مبني على تطبيق الخطوات الأربع وقواعد الدرس بدقة.', isArabicNum)}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
     </section>
 
     <!-- Section 6: Closure & Graduated Homework -->
@@ -1085,6 +1129,14 @@
     // Example solution toggle
     function toggleExampleSolution(idx) {
       const box = document.getElementById('ex-sol-' + idx);
+      if (box) {
+        box.classList.toggle('show');
+      }
+    }
+
+    // Essay solution toggle
+    function toggleEssaySolution(idx) {
+      const box = document.getElementById('essay-sol-' + idx);
       if (box) {
         box.classList.toggle('show');
       }

@@ -467,6 +467,60 @@
     const stages = window.CURRICULUM_DATA.stages || [];
     let html = '';
 
+    const isApproved = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isApproved === 'function' && window.FirebaseAuthManager.isApproved();
+    const isAdmin = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isAdmin === 'function' && window.FirebaseAuthManager.isAdmin();
+    const isPending = window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isPending === 'function' && window.FirebaseAuthManager.isPending();
+    const currentUser = window.FirebaseAuthManager && window.FirebaseAuthManager.getUser();
+
+    let membershipCardHtml = '';
+    if (isAdmin) {
+      membershipCardHtml = `
+        <div class="sidebar-member-card admin">
+          <div class="smc-header">
+            <span class="smc-icon">👑</span>
+            <div class="smc-title">المدير العام والمسؤول</div>
+            <span class="smc-badge admin">إدارة عليا ✓</span>
+          </div>
+          <div class="smc-desc">أ. محمد عبدالله جمعة • كامل الصلاحيات وإدارة الحسابات النشطة.</div>
+        </div>
+      `;
+    } else if (isApproved) {
+      membershipCardHtml = `
+        <div class="sidebar-member-card approved">
+          <div class="smc-header">
+            <span class="smc-icon">🌟</span>
+            <div class="smc-title">عضوية معتمدة رسمياً</div>
+            <span class="smc-badge approved">وصول كامل ✓</span>
+          </div>
+          <div class="smc-desc">مرحباً بك (${escHtml((currentUser && currentUser.displayName) || 'أستاذ')}) • كافة الدروس والتحضيرات وبنك الأسئلة وتصدير Word متاحة بالكامل.</div>
+        </div>
+      `;
+    } else if (isPending) {
+      membershipCardHtml = `
+        <div class="sidebar-member-card pending">
+          <div class="smc-header">
+            <span class="smc-icon">⏳</span>
+            <div class="smc-title">حساب قيد المراجعة</div>
+            <span class="smc-badge pending">بانتظار الاعتماد</span>
+          </div>
+          <div class="smc-desc">طلبك قيد المراجعة لدى المدير العام. متاح لك أول درسين من كل فصل كمعاينة وتوليد حتى ٥ أسئلة لكل نوع.</div>
+        </div>
+      `;
+    } else {
+      membershipCardHtml = `
+        <div class="sidebar-member-card visitor" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()" title="انقر لتسجيل الدخول وطلب الاعتماد">
+          <div class="smc-header">
+            <span class="smc-icon">🔒</span>
+            <div class="smc-title">نسخة المعاينة المجانية</div>
+            <span class="smc-badge visitor">طلب اعتماد ↗</span>
+          </div>
+          <div class="smc-desc">متاح أول درسين من كل فصل كمعاينة وتوليد حتى ٥ أسئلة للنوع. سجّل واطلب الاعتماد لفتح كامل فصول المنهج وبنك الأسئلة.</div>
+        </div>
+      `;
+    }
+
+    html += membershipCardHtml;
+
     stages.forEach(stage => {
       let stageMatches = false;
       let gradesHtml = '';
@@ -510,7 +564,7 @@
                       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</span>
                     </span>
                     <span style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-                      ${!isUnlocked ? '<span class="tree-lock-badge" title="هذا الدرس متاح للأعضاء المعتمدين والمدير">🔒</span>' : ''}
+                      ${isUnlocked ? (isApproved ? '<span class="tree-unlocked-star" title="عضو معتمد: وصول كامل ومفتوح">🌟</span>' : '') : '<span class="tree-lock-badge" title="هذا الدرس متاح للأعضاء المعتمدين والمدير">🔒</span>'}
                       <span style="font-size:0.62rem; color:${isActive ? '#ffffff' : (isCompleted ? '#86efac' : '#fcd34d')};">
                         ${isCompleted ? '✓' : 'قيد الإدراج'}
                       </span>
@@ -1087,6 +1141,15 @@
             <h2>الدرس ${fmtNum(lesson.number, isG6)}: ${lesson.title}</h2>
             <div class="lesson-subtitle">${lesson.english_title ? (lesson.english_title + ' • ') : ''}صفحات الكتاب المدرسي: ${fmtNum(lesson.pages, isG6)}</div>
             <div class="lesson-meta-badges">
+              ${isAdmin ? `
+                <span class="meta-badge admin-member" title="حساب المدير العام">👑 الحساب: المدير العام (أ. محمد عبدالله جمعة)</span>
+              ` : (isApproved ? `
+                <span class="meta-badge verified-member" title="عضوية معتمدة رسمياً">🌟 العضوية: معتمد رسمي (وصول كامل للمحتوى، التحضير، الطباعة، وبنك الأسئلة) ✓</span>
+              ` : (isPending ? `
+                <span class="meta-badge pending-member" title="الحساب قيد مراجعة واعتماد المدير العام">⏳ العضوية: قيد المراجعة (معاينة أول درسين • الحد الأقصى ٥ أسئلة للنوع)</span>
+              ` : `
+                <span class="meta-badge visitor-member" onclick="window.FirebaseAuthManager.openAuthModal()" style="cursor:pointer;" title="انقر لتسجيل الدخول وطلب الاعتماد">🔒 العضوية: نسخة تجريبية (الحد الأقصى ٥ أسئلة للنوع • اطلب الاعتماد) ↗</span>
+              `))}
               <span class="meta-badge green">✓ ${lesson.badge || 'مكتمل وشامل'}</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('prep')" style="cursor:pointer;" title="الانتقال إلى التحضير الميداني الشامل">📋 التحضير الميداني المعتمد</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('socratic')" style="cursor:pointer;" title="الانتقال إلى منصة سقراط التوليدية">🏛️ منصة سقراط الحوارية</span>

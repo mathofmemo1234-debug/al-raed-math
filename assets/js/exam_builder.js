@@ -170,7 +170,7 @@
     autoGen: {
       chapters: getPreset(initialBookId).periodChapters.slice(),
       mcqCount: 10,
-      tfCount: 4,
+      tfCount: 5,
       essayCount: 3
     },
     questions: [],
@@ -207,17 +207,37 @@
     return state.bookId;
   }
 
+  function isUserApproved() {
+    return !!(window.FirebaseAuthManager && typeof window.FirebaseAuthManager.isApproved === 'function' && window.FirebaseAuthManager.isApproved());
+  }
+
+  function getQuestionTypeName(type) {
+    if (type === 'mcq') return 'الاختيار من متعدد';
+    if (type === 'tf') return 'الصواب والخطأ';
+    if (type === 'essay') return 'المسائل والمقالي';
+    return 'الأسئلة';
+  }
+
   function applyBookDefaults(bookId, examType) {
     const preset = getPreset(bookId);
     const mode = examType || state.examType || 'period';
+    const approved = isUserApproved();
     state.bookId = preset.id;
     state.examType = mode;
     state.header = makeDefaultHeader(preset.id, mode);
+    let mcq = mode === 'final' ? 20 : 10;
+    let tf = mode === 'final' ? 10 : 5;
+    let essay = mode === 'final' ? 5 : 3;
+    if (!approved) {
+      mcq = Math.min(5, mcq);
+      tf = Math.min(5, tf);
+      essay = Math.min(5, essay);
+    }
     state.autoGen = {
       chapters: (mode === 'final' ? preset.finalChapters : preset.periodChapters).slice(),
-      mcqCount: mode === 'final' ? 20 : 10,
-      tfCount: mode === 'final' ? 10 : 4,
-      essayCount: mode === 'final' ? 5 : 3
+      mcqCount: mcq,
+      tfCount: tf,
+      essayCount: essay
     };
   }
 
@@ -316,6 +336,20 @@
   function addQuestion(q, silent) {
     if (!q) return false;
     const utils = getUtils();
+    const approved = isUserApproved();
+
+    // قيد الأعضاء غير المعتمدين: ٥ أسئلة كحد أقصى من كل نوع
+    if (!approved) {
+      const qType = q.type || 'mcq';
+      const countOfType = state.questions.filter(function (item) { return (item.type || 'mcq') === qType; }).length;
+      if (countOfType >= 5) {
+        if (!silent) {
+          utils.showToast('🔒 لغير الأعضاء المعتمدين: تم بلوغ الحد الأقصى (٥ أسئلة) من نوع (' + getQuestionTypeName(qType) + '). اطلب الاعتماد لإضافة غير محدودة.', 'warning');
+        }
+        return false;
+      }
+    }
+
     const targetBook = inferQuestionBookId(q);
     if (targetBook && BOOK_PRESETS[targetBook] && targetBook !== state.bookId && state.questions.length === 0) {
       saveDraft();
@@ -334,12 +368,30 @@
 
   function addQuestions(qs) {
     const utils = getUtils();
+    const approved = isUserApproved();
     let added = 0;
+    let hitCapCount = 0;
+
     (qs || []).forEach(function (q) {
+      const qType = (q && q.type) || 'mcq';
+      if (!approved) {
+        const countOfType = state.questions.filter(function (item) { return (item.type || 'mcq') === qType; }).length;
+        if (countOfType >= 5) {
+          hitCapCount++;
+          return;
+        }
+      }
       if (addQuestion(q, true)) added++;
     });
+
     if (added > 0) {
-      utils.showToast('✓ تمت إضافة ' + utils.toEasternDigits(added) + ' أسئلة إلى منشئ الاختبارات.', 'success');
+      if (hitCapCount > 0) {
+        utils.showToast('✓ تمت إضافة ' + utils.toEasternDigits(added) + ' أسئلة. تم إيقاف البقية لبلوغ الحد الأقصى (٥ أسئلة لكل نوع لغير المعتمدين).', 'warning');
+      } else {
+        utils.showToast('✓ تمت إضافة ' + utils.toEasternDigits(added) + ' أسئلة إلى منشئ الاختبارات.', 'success');
+      }
+    } else if (hitCapCount > 0) {
+      utils.showToast('🔒 تعذر إضافة الأسئلة: تم الوصول للحد الأقصى المسموح لغير المعتمدين (٥ أسئلة من كل نوع). اطلب الاعتماد للفتح الكامل.', 'warning');
     } else {
       utils.showToast('جميع الأسئلة المحددة مضافة مسبقاً في الاختبار.', 'info');
     }
@@ -364,22 +416,23 @@
     const utils = getUtils();
     const preset = getPreset(state.bookId);
     const defaults = makeDefaultHeader(state.bookId, mode);
+    const approved = isUserApproved();
     state.examType = mode;
     state.header.examTitle = defaults.examTitle;
     state.header.duration = defaults.duration;
     state.header.grade = defaults.grade;
     if (mode === 'period') {
       state.autoGen.chapters = preset.periodChapters.slice();
-      state.autoGen.mcqCount = 10;
-      state.autoGen.tfCount = 4;
-      state.autoGen.essayCount = 3;
-      utils.showToast('تم ضبط إعدادات «اختبار الفترة» (٢٠ درجة افتراضياً).', 'info');
+      state.autoGen.mcqCount = approved ? 10 : 5;
+      state.autoGen.tfCount = approved ? 5 : 5;
+      state.autoGen.essayCount = approved ? 3 : 3;
+      utils.showToast('تم ضبط إعدادات «اختبار الفترة»' + (!approved ? ' (معاينة: ٥ أسئلة للنوع)' : ' (١٠ اختيار + ٥ صواب/خطأ + ٣ مقالي)') + '.', 'info');
     } else {
       state.autoGen.chapters = preset.finalChapters.slice();
-      state.autoGen.mcqCount = 20;
-      state.autoGen.tfCount = 10;
-      state.autoGen.essayCount = 5;
-      utils.showToast('تم ضبط إعدادات «الاختبار النهائي» الشامل (٤٠ درجة افتراضياً).', 'info');
+      state.autoGen.mcqCount = approved ? 20 : 5;
+      state.autoGen.tfCount = approved ? 10 : 5;
+      state.autoGen.essayCount = approved ? 5 : 5;
+      utils.showToast('تم ضبط إعدادات «الاختبار النهائي» الشامل' + (!approved ? ' (معاينة: ٥ أسئلة لكل نوع)' : ' (٤٠ درجة افتراضياً)') + '.', 'info');
     }
     saveDraft();
     render();
@@ -395,7 +448,12 @@
 
   function setAutoCount(key, val) {
     const utils = getUtils();
-    const num = Math.max(0, Math.min(50, Math.round(utils.toWesternNumber(val, 0))));
+    const approved = isUserApproved();
+    let num = Math.max(0, Math.min(50, Math.round(utils.toWesternNumber(val, 0))));
+    if (!approved && num > 5) {
+      num = 5;
+      utils.showToast('🔒 لغير الأعضاء المعتمدين: الحد الأقصى هو ٥ أسئلة من كل نوع. يرجى تسجيل الدخول واعتماد الحساب للتوليد غير المحدود.', 'warning');
+    }
     state.autoGen[key] = num;
     saveDraft();
   }
@@ -446,6 +504,7 @@
 
   function generateBalancedExam() {
     const utils = getUtils();
+    const approved = isUserApproved();
     const chapters = state.autoGen.chapters || [];
     if (!chapters.length) {
       utils.showToast('يرجى تحديد فصل واحد على الأقل للتوليد التلقائي.', 'warning');
@@ -457,9 +516,26 @@
     const tfPool = bank.filter(function (q) { return q.type === 'tf' && chapters.indexOf(q.chapterId) !== -1; });
     const essayPool = bank.filter(function (q) { return q.type === 'essay' && chapters.indexOf(q.chapterId) !== -1; });
 
-    const mcqs = pickBalancedQuestions(mcqPool, state.autoGen.mcqCount, chapters);
-    const tfs = pickBalancedQuestions(tfPool, state.autoGen.tfCount, chapters);
-    const essays = pickBalancedQuestions(essayPool, state.autoGen.essayCount, chapters);
+    let targetMcq = state.autoGen.mcqCount;
+    let targetTf = state.autoGen.tfCount;
+    let targetEssay = state.autoGen.essayCount;
+
+    if (!approved) {
+      let clamped = false;
+      if (targetMcq > 5) { targetMcq = 5; clamped = true; }
+      if (targetTf > 5) { targetTf = 5; clamped = true; }
+      if (targetEssay > 5) { targetEssay = 5; clamped = true; }
+      if (clamped) {
+        state.autoGen.mcqCount = targetMcq;
+        state.autoGen.tfCount = targetTf;
+        state.autoGen.essayCount = targetEssay;
+        utils.showToast('🔒 تم ضبط الأعداد إلى ٥ أسئلة لكل نوع (الحد الأقصى لغير الأعضاء المعتمدين).', 'warning');
+      }
+    }
+
+    const mcqs = pickBalancedQuestions(mcqPool, targetMcq, chapters);
+    const tfs = pickBalancedQuestions(tfPool, targetTf, chapters);
+    const essays = pickBalancedQuestions(essayPool, targetEssay, chapters);
 
     state.questions = mcqs.concat(tfs, essays);
     state.editingIndex = -1;
@@ -467,7 +543,8 @@
     render();
     utils.showToast(
       '⚡ تم توليد اختبار متوازن من ' + utils.toEasternDigits(state.questions.length) +
-      ' سؤالاً بمجموع ' + utils.formatMark(getTotalMarks()) + '!',
+      ' سؤالاً بمجموع ' + utils.formatMark(getTotalMarks()) + '!' +
+      (!approved ? ' (معاينة: ٥ أسئلة لكل نوع)' : ' (عضو معتمد: توليد كامل غير محدود ✓)'),
       'success'
     );
   }
@@ -851,6 +928,29 @@
           </div>
         </div>
 
+        <!-- شريط حالة العضوية وترخيص الاختبارات -->
+        ${isUserApproved() ? `
+          <div class="eb-tier-banner approved">
+            <div class="eb-tier-icon">🌟</div>
+            <div class="eb-tier-content">
+              <div class="eb-tier-title">ترخيص العضوية المعتمدة (كامل الصلاحيات) ✓</div>
+              <div class="eb-tier-desc">متاح لك توليد عدد غير محدود من الأسئلة من كافة الفصول والمراحل وتصدير Word ونماذج الإجابة كاملة دون أي قيود.</div>
+            </div>
+            <span class="eb-tier-badge approved">توليد غير محدود ∞</span>
+          </div>
+        ` : `
+          <div class="eb-tier-banner preview">
+            <div class="eb-tier-icon">🔒</div>
+            <div class="eb-tier-content">
+              <div class="eb-tier-title">نسخة المعاينة المجانية (محدد بـ ٥ أسئلة كحد أقصى لكل نوع)</div>
+              <div class="eb-tier-desc">يُسمح بتوليد وإضافة حتى ٥ أسئلة فقط من كل نوع (اختيار، صواب وخطأ، مقالي). لرفع كافة القيود والتوليد الشامل، يُرجى طلب الاعتماد من المدير العام.</div>
+            </div>
+            <button type="button" class="eb-tier-btn" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()">
+              طلب الاعتماد الكامل ↗
+            </button>
+          </div>
+        `}
+
         <!-- المولد الذكي المتوازن للاختبار -->
         <div class="eb-card">
           <div class="eb-card-header">
@@ -879,16 +979,19 @@
                 <label>اختيار من متعدد (١ درجة):</label>
                 <input type="text" value="${utils.toEasternDigits(state.autoGen.mcqCount)}"
                   onchange="window.ExamBuilder.setAutoCount('mcqCount', this.value); this.value = window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))">
+                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ٥ أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
               </div>
               <div class="eb-count-box">
                 <label>صواب وخطأ (١ درجة):</label>
                 <input type="text" value="${utils.toEasternDigits(state.autoGen.tfCount)}"
                   onchange="window.ExamBuilder.setAutoCount('tfCount', this.value); this.value = window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))">
+                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ٥ أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
               </div>
               <div class="eb-count-box">
                 <label>مسائل مقالية (درجتان):</label>
                 <input type="text" value="${utils.toEasternDigits(state.autoGen.essayCount)}"
                   onchange="window.ExamBuilder.setAutoCount('essayCount', this.value); this.value = window.ArabicUtils.toEasternDigits(Math.max(0, window.ArabicUtils.toWesternNumber(this.value, 0)))">
+                ${!isUserApproved() ? '<span class="eb-cap-hint">🔒 حد المعاينة: ٥ أسئلة</span>' : '<span class="eb-unlimited-hint">🌟 غير محدود</span>'}
               </div>
               <button type="button" class="nav-btn primary eb-gen-btn" onclick="window.ExamBuilder.generateBalancedExam()">
                 ⚡ توليد الاختبار تلقائياً

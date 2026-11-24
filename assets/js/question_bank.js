@@ -178,6 +178,29 @@
           </div>
         </div>
 
+        <!-- شريط تمييز حالة العضوية في بنك الأسئلة -->
+        ${(window.FirebaseAuthManager && window.FirebaseAuthManager.isApproved()) ? `
+          <div class="qb-tier-banner approved">
+            <div class="qb-tier-icon">🌟</div>
+            <div class="qb-tier-info">
+              <strong>عضوية معتمدة رسمياً (كامل الصلاحيات) ✓</strong>
+              <span>وصول كامل وتصفح شامل لبنك الأسئلة مع إمكانية إضافة وتوليد الأسئلة وتصديرها بصيغة Word بلا أي قيود.</span>
+            </div>
+            <span class="qb-tier-tag approved">وصول غير محدود ∞</span>
+          </div>
+        ` : `
+          <div class="qb-tier-banner preview">
+            <div class="qb-tier-icon">🔒</div>
+            <div class="qb-tier-info">
+              <strong>نسخة المعاينة المجانية (محدد بـ ٥ أسئلة كحد أقصى لكل نوع)</strong>
+              <span>يمكنك استعراض الأسئلة وإضافة حتى ٥ أسئلة فقط من كل نوع لمنشئ الاختبارات. لفتح البنك بالكامل، يُرجى طلب الاعتماد.</span>
+            </div>
+            <button type="button" class="qb-tier-btn" onclick="window.FirebaseAuthManager && window.FirebaseAuthManager.openAuthModal()">
+              طلب الاعتماد الكامل ↗
+            </button>
+          </div>
+        `}
+
         <!-- شريط التصفية والبحث -->
         <div class="qb-filter-card">
           <div class="qb-filter-grid">

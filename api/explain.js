@@ -112,70 +112,83 @@ module.exports = async function handler(req, res) {
     }
   };
 
+  const cleanKey = String(apiKey).trim();
   const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+  const buildVertexUrl = (model) =>
+    'https://aiplatform.googleapis.com/v1/publishers/google/models/' + model + ':generateContent?key=' + encodeURIComponent(cleanKey);
+  const buildAiStudioUrl = (model) =>
+    'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(cleanKey);
+
+  // Route AQ.* keys to Vertex AI Express Mode first, and AIza* keys to AI Studio first, with cross-fallback
+  const urlBuilders = cleanKey.startsWith('AQ.')
+    ? [buildVertexUrl, buildAiStudioUrl]
+    : [buildAiStudioUrl, buildVertexUrl];
+
   let lastErrMsg = 'تعذر الاتصال بخدمة التوليد الذكي.';
 
-  for (let i = 0; i < models.length; i++) {
-    const model = models[i];
-    try {
-      const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
-      const upstream = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!upstream.ok) {
-        lastErrMsg = 'HTTP ' + upstream.status + ' from ' + model;
-        continue;
-      }
-      const rawJson = await upstream.json();
-      const textOut =
-        rawJson &&
-        rawJson.candidates &&
-        rawJson.candidates[0] &&
-        rawJson.candidates[0].content &&
-        rawJson.candidates[0].content.parts &&
-        rawJson.candidates[0].content.parts[0] &&
-        rawJson.candidates[0].content.parts[0].text;
-
-      if (!textOut) {
-        lastErrMsg = 'Empty candidate from ' + model;
-        continue;
-      }
-
-      const cleaned = String(textOut)
-        .replace(/^```json\s*/i, '')
-        .replace(/^```\s*/i, '')
-        .replace(/\s*```$/i, '')
-        .trim();
-
-      const parsed = JSON.parse(cleaned);
-      if (!parsed || typeof parsed !== 'object' || !parsed.summary || !parsed.workedExample) {
-        lastErrMsg = 'Invalid JSON structure from ' + model;
-        continue;
-      }
-
-      const normalized = {
-        title: String(parsed.title || topic).trim(),
-        summary: String(parsed.summary || '').trim(),
-        steps: Array.isArray(parsed.steps) ? parsed.steps.map(s => String(s || '').trim()).filter(Boolean) : [],
-        workedExample: {
-          problem: String((parsed.workedExample && parsed.workedExample.problem) || '').trim(),
-          steps: Array.isArray(parsed.workedExample && parsed.workedExample.steps)
-            ? parsed.workedExample.steps.map(s => String(s || '').trim()).filter(Boolean)
-            : [],
-          finalAnswer: String((parsed.workedExample && parsed.workedExample.finalAnswer) || '').trim()
-        },
-        commonMistake: String(parsed.commonMistake || '').trim(),
-        quickCheck: {
-          question: String((parsed.quickCheck && parsed.quickCheck.question) || '').trim(),
-          answer: String((parsed.quickCheck && parsed.quickCheck.answer) || '').trim()
+  for (let b = 0; b < urlBuilders.length; b++) {
+    for (let i = 0; i < models.length; i++) {
+      const model = models[i];
+      try {
+        const url = urlBuilders[b](model);
+        const upstream = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!upstream.ok) {
+          lastErrMsg = 'HTTP ' + upstream.status + ' from ' + model;
+          continue;
         }
-      };
+        const rawJson = await upstream.json();
+        const textOut =
+          rawJson &&
+          rawJson.candidates &&
+          rawJson.candidates[0] &&
+          rawJson.candidates[0].content &&
+          rawJson.candidates[0].content.parts &&
+          rawJson.candidates[0].content.parts[0] &&
+          rawJson.candidates[0].content.parts[0].text;
 
-      return res.status(200).json({ ok: true, source: 'ai', model: model, data: normalized });
-    } catch (err) {
-      lastErrMsg = (err && err.message) || lastErrMsg;
+        if (!textOut) {
+          lastErrMsg = 'Empty candidate from ' + model;
+          continue;
+        }
+
+        const cleaned = String(textOut)
+          .replace(/^```json\s*/i, '')
+          .replace(/^```\s*/i, '')
+          .replace(/\s*```$/i, '')
+          .trim();
+
+        const parsed = JSON.parse(cleaned);
+        if (!parsed || typeof parsed !== 'object' || !parsed.summary || !parsed.workedExample) {
+          lastErrMsg = 'Invalid JSON structure from ' + model;
+          continue;
+        }
+
+        const normalized = {
+          title: String(parsed.title || topic).trim(),
+          summary: String(parsed.summary || '').trim(),
+          steps: Array.isArray(parsed.steps) ? parsed.steps.map(s => String(s || '').trim()).filter(Boolean) : [],
+          workedExample: {
+            problem: String((parsed.workedExample && parsed.workedExample.problem) || '').trim(),
+            steps: Array.isArray(parsed.workedExample && parsed.workedExample.steps)
+              ? parsed.workedExample.steps.map(s => String(s || '').trim()).filter(Boolean)
+              : [],
+            finalAnswer: String((parsed.workedExample && parsed.workedExample.finalAnswer) || '').trim()
+          },
+          commonMistake: String(parsed.commonMistake || '').trim(),
+          quickCheck: {
+            question: String((parsed.quickCheck && parsed.quickCheck.question) || '').trim(),
+            answer: String((parsed.quickCheck && parsed.quickCheck.answer) || '').trim()
+          }
+        };
+
+        return res.status(200).json({ ok: true, source: 'ai', model: model, data: normalized });
+      } catch (err) {
+        lastErrMsg = (err && err.message) || lastErrMsg;
+      }
     }
   }
 

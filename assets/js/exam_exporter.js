@@ -430,15 +430,39 @@
     margin-left: 1px !important;
     color: inherit !important;
   }
-  .sec-math, .ltr-math, .sec-pow {
+  .sec-math, .ltr-math {
     direction: ltr !important;
     unicode-bidi: isolate !important;
     display: inline-block;
-    font-family: 'Times New Roman', serif;
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    font-style: italic;
+  }
+  .sec-pow {
+    display: inline-block !important;
+    direction: ltr !important;
+    unicode-bidi: isolate !important;
+    vertical-align: baseline !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+  .sec-pow .sec-base {
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    font-size: 1em;
   }
   .sec-pow .sec-exp {
+    font-family: 'Cambria Math', 'Times New Roman', serif;
     font-size: 0.72em;
+    font-weight: 700;
+    font-style: normal;
     vertical-align: super;
+    line-height: 0;
+    margin-left: 1px;
+  }
+  .sec-sub {
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    font-size: 0.72em;
+    font-style: normal;
+    vertical-align: sub;
     line-height: 0;
   }
 </style>
@@ -563,20 +587,27 @@
   function wRun(text, opts) {
     const utils = getUtils();
     const o = Object.assign({ sizePt: 14, bold: false, color: '0F172A', sup: false, isSecondary: false, ltr: false }, opts || {});
-    const textStr = String(text || '');
+    let textStr = String(text || '');
+    if (utils && utils.formatMathExponents) {
+      textStr = utils.formatMathExponents(textStr, !!o.isSecondary);
+    }
 
-    function _buildSingleRunXml(t, isSup, isLtr) {
+    function _buildSingleRunXml(t, vAlignMode, isLtr) {
       const cleanText = String(t || '').replace(/<[^>]+>/g, '');
       const digitsNorm = o.isSecondary
         ? (utils && utils.toWesternDigits ? utils.toWesternDigits(cleanText) : cleanText)
         : utils.toEasternDigits(cleanText);
       const clean = escXml(digitsNorm);
-      const sizeVal = isSup ? Math.max(6.5, Math.round(o.sizePt * 0.62)) : o.sizePt;
+      const isScript = (vAlignMode === 'sup' || vAlignMode === 'sub' || vAlignMode === true);
+      const sizeVal = isScript ? Math.max(6.5, Math.round(o.sizePt * 0.68)) : o.sizePt;
       const sz = String(Math.round(sizeVal * 2));
       const useLtr = !!(isLtr || o.ltr);
       const fontXml = useLtr
         ? '<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Traditional Arabic"/>'
         : '<w:rFonts w:ascii="Traditional Arabic" w:hAnsi="Traditional Arabic" w:cs="Traditional Arabic"/>';
+      const vAlignXml = (vAlignMode === 'sup' || vAlignMode === true)
+        ? '<w:vertAlign w:val="superscript"/>'
+        : (vAlignMode === 'sub' ? '<w:vertAlign w:val="subscript"/>' : '');
       return (
         '<w:r>' +
         '<w:rPr>' +
@@ -584,7 +615,7 @@
         (o.bold ? '<w:b/><w:bCs/>' : '') +
         '<w:color w:val="' + o.color + '"/>' +
         '<w:sz w:val="' + sz + '"/><w:szCs w:val="' + sz + '"/>' +
-        (isSup ? '<w:vertAlign w:val="superscript"/>' : '') +
+        vAlignXml +
         (useLtr ? '' : '<w:rtl/>') +
         '</w:rPr>' +
         '<w:t xml:space="preserve">' + clean + '</w:t>' +
@@ -592,30 +623,84 @@
       );
     }
 
-    if (textStr.indexOf('ar-pow') === -1 && textStr.indexOf('sec-pow') === -1 && textStr.indexOf('sec-math') === -1 && textStr.indexOf('ltr-math') === -1) {
-      return _buildSingleRunXml(textStr, o.sup, false);
+    function _emitInlineScripts(segText, baseLtr) {
+      if (segText.indexOf('ar-pow') === -1 && segText.indexOf('sec-pow') === -1 && segText.indexOf('<sub') === -1) {
+        return _buildSingleRunXml(segText, o.sup ? 'sup' : '', baseLtr);
+      }
+      const scriptPat = /<span\s+class=["'][^"']*(?:ar-pow|sec-pow)[^"']*["'][^>]*>\s*<span\s+class=["'][^"']*(?:ar-base|sec-base)[^"']*["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["'][^"']*(?:ar-exp|sec-exp)[^"']*["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>|<sub\b[^>]*>([\s\S]*?)<\/sub>/gi;
+      let xml = '';
+      let idx = 0;
+      let m;
+      while ((m = scriptPat.exec(segText)) !== null) {
+        if (m.index > idx) {
+          xml += _emitInlineScripts(segText.substring(idx, m.index), baseLtr);
+        }
+        if (m[1] !== undefined) {
+          const innerLtr = !!(baseLtr || o.isSecondary || m[0].indexOf('sec-pow') !== -1);
+          xml += _emitInlineScripts(m[1], innerLtr);
+          xml += _buildSingleRunXml(m[2], 'sup', innerLtr);
+        } else if (m[3] !== undefined) {
+          xml += _buildSingleRunXml(m[3], 'sub', !!(baseLtr || o.isSecondary));
+        }
+        idx = scriptPat.lastIndex;
+      }
+      if (idx < segText.length) {
+        const tail = segText.substring(idx);
+        if (tail) xml += _buildSingleRunXml(tail, o.sup ? 'sup' : '', baseLtr);
+      }
+      return xml;
     }
 
-    const pat = /<span\s+class=["'](?:ar-pow|sec-pow)["']\s*>\s*<span\s+class=["'](?:ar-base|sec-base)["']>([\s\S]*?)<\/span>\s*<sup\s+class=["'](?:ar-exp|sec-exp)["']>([\s\S]*?)<\/sup>\s*<\/span>|<span\s+class=["'](?:sec-math|ltr-math)["'][^>]*>([\s\S]*?)<\/span>/gi;
-    let outXml = '';
-    let lastEnd = 0;
-    let match;
-    while ((match = pat.exec(textStr)) !== null) {
-      if (match.index > lastEnd) {
-        const seg = textStr.substring(lastEnd, match.index);
-        if (seg) outXml += _buildSingleRunXml(seg, false, false);
-      }
-      if (match[1] !== undefined) {
-        outXml += _buildSingleRunXml(match[1], false, o.isSecondary);
-        outXml += _buildSingleRunXml(match[2], true, o.isSecondary);
-      } else if (match[3] !== undefined) {
-        outXml += _buildSingleRunXml(match[3], false, true);
-      }
-      lastEnd = pat.lastIndex;
+    if (textStr.indexOf('ar-pow') === -1 && textStr.indexOf('sec-pow') === -1 && textStr.indexOf('sec-math') === -1 && textStr.indexOf('ltr-math') === -1 && textStr.indexOf('<sub') === -1) {
+      return _buildSingleRunXml(textStr, o.sup ? 'sup' : '', false);
     }
-    if (lastEnd < textStr.length) {
-      const seg = textStr.substring(lastEnd);
-      if (seg) outXml += _buildSingleRunXml(seg, false, false);
+
+    // Unwrap outer sec-math/ltr-math containers cleanly while keeping nested sec-pow/sub intact
+    const outerPat = /<span\s+class=["'][^"']*(?:sec-math|ltr-math)[^"']*["'][^>]*>/gi;
+    if (textStr.indexOf('sec-math') === -1 && textStr.indexOf('ltr-math') === -1) {
+      return _emitInlineScripts(textStr, false);
+    }
+
+    let outXml = '';
+    let cursor = 0;
+    let openMatch;
+    while ((openMatch = outerPat.exec(textStr)) !== null) {
+      if (openMatch.index < cursor) continue;
+      if (openMatch.index > cursor) {
+        outXml += _emitInlineScripts(textStr.substring(cursor, openMatch.index), false);
+      }
+      let depth = 1;
+      let pos = outerPat.lastIndex;
+      const tagScan = /<\/?span\b[^>]*>/gi;
+      tagScan.lastIndex = pos;
+      let tMatch;
+      let closeStart = -1;
+      let closeEnd = pos;
+      while ((tMatch = tagScan.exec(textStr)) !== null) {
+        if (tMatch[0].charAt(1) === '/') {
+          depth--;
+          if (depth === 0) {
+            closeStart = tMatch.index;
+            closeEnd = tagScan.lastIndex;
+            break;
+          }
+        } else {
+          depth++;
+        }
+      }
+      if (closeStart !== -1) {
+        const innerContent = textStr.substring(pos, closeStart);
+        outXml += _emitInlineScripts(innerContent, true);
+        cursor = closeEnd;
+        outerPat.lastIndex = cursor;
+      } else {
+        outXml += _emitInlineScripts(textStr.substring(openMatch.index), true);
+        cursor = textStr.length;
+        break;
+      }
+    }
+    if (cursor < textStr.length) {
+      outXml += _emitInlineScripts(textStr.substring(cursor), false);
     }
     return outXml;
   }

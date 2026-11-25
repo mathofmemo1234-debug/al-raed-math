@@ -331,14 +331,14 @@ window.GRADE1S_BOOK_DATA = {
             ],
             "correct": 2,
             "difficulty": "متوسط",
-            "explanation": "الأعداد تمثل أعداداً مربعة: <span class=\"sec-math ltr-math\" dir=\"ltr\">1, 4, 9, 16, 25</span>، فالشكل الخامس يحتوي <span class=\"sec-math ltr-math\" dir=\"ltr\">5^2 = 25</span> مثلثاً.",
+            "explanation": "الأعداد تمثل أعداداً مربعة: <span class=\"sec-math ltr-math\" dir=\"ltr\">1, 4, 9, 16, 25</span>، فالشكل الخامس يحتوي <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">5</span><sup class=\"sec-exp\">2</sup></span> = 25</span> مثلثاً.",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)",
             "image": "assets/img/1s/fig_1_1_inductive_pat.png",
             "imageCaption": "النمط الهندسي للمثلثات (ص 12)"
           },
           {
-            "q": "أي مما يأتي يعد مثالاً مضاداً للتخمين: «إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">n</span> عدداً حقيقياً، فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">n^2 > n</span>» ؟",
+            "q": "أي مما يأتي يعد مثالاً مضاداً للتخمين: «إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">n</span> عدداً حقيقياً، فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">n</span><sup class=\"sec-exp\">2</sup></span> > n</span>» ؟",
             "options": [
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">n = 3</span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">n = -2</span>",
@@ -347,7 +347,7 @@ window.GRADE1S_BOOK_DATA = {
             ],
             "correct": 2,
             "difficulty": "متوسط",
-            "explanation": "عندما <span class=\"sec-math ltr-math\" dir=\"ltr\">n = 0.5</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">n^2 = 0.25</span> وهو ليس أكبر من <span class=\"sec-math ltr-math\" dir=\"ltr\">0.5</span>، لذا <span class=\"sec-math ltr-math\" dir=\"ltr\">n = 0.5</span> مثال مضاد.",
+            "explanation": "عندما <span class=\"sec-math ltr-math\" dir=\"ltr\">n = 0.5</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">n</span><sup class=\"sec-exp\">2</sup></span> = 0.25</span> وهو ليس أكبر من <span class=\"sec-math ltr-math\" dir=\"ltr\">0.5</span>، لذا <span class=\"sec-math ltr-math\" dir=\"ltr\">n = 0.5</span> مثال مضاد.",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
@@ -476,10 +476,10 @@ window.GRADE1S_BOOK_DATA = {
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
           {
-            "statement": "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 25</span> فإن التخمين <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 5</span> صحيح دائماً دون مثال مضاد.",
+            "statement": "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 25</span> فإن التخمين <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 5</span> صحيح دائماً دون مثال مضاد.",
             "is_true": false,
             "difficulty": "متوسط",
-            "explanation": "يوجد مثال مضاد هو <span class=\"sec-math ltr-math\" dir=\"ltr\">x = -5</span> لأن <span class=\"sec-math ltr-math\" dir=\"ltr\">(-5)^2 = 25</span>.",
+            "explanation": "يوجد مثال مضاد هو <span class=\"sec-math ltr-math\" dir=\"ltr\">x = -5</span> لأن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(-5)</span><sup class=\"sec-exp\">2</sup></span> = 25</span>.",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
@@ -760,7 +760,7 @@ window.GRADE1S_BOOK_DATA = {
             ],
             "correct": 2,
             "difficulty": "سهل",
-            "explanation": "عدد الصفوف يحسب بالقانون: <span class=\"sec-math ltr-math\" dir=\"ltr\">2^n = 2^3 = 8</span> صفوف.",
+            "explanation": "عدد الصفوف يحسب بالقانون: <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">2</span><sup class=\"sec-exp\">n</sup></span> = <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">2</span><sup class=\"sec-exp\">3</sup></span> = 8</span> صفوف.",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
@@ -1136,16 +1136,16 @@ window.GRADE1S_BOOK_DATA = {
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
           {
-            "q": "المعاكس الإيجابي للعبارة: «إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 16</span>» هو:",
+            "q": "المعاكس الإيجابي للعبارة: «إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 16</span>» هو:",
             "options": [
-              "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 16</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 4</span>",
-              "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 ≠ 16</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x ≠ 4</span>",
-              "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x ≠ 4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 ≠ 16</span>",
-              "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x = -4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 16</span>"
+              "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 16</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 4</span>",
+              "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> ≠ 16</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x ≠ 4</span>",
+              "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x ≠ 4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> ≠ 16</span>",
+              "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x = -4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 16</span>"
             ],
             "correct": 1,
             "difficulty": "متوسط",
-            "explanation": "المعاكس الإيجابي: ننفي النتيجة ونجعلها فرضاً، وننفي الفرض ونجعله نتيجة: <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 ≠ 16 → x ≠ 4</span>.",
+            "explanation": "المعاكس الإيجابي: ننفي النتيجة ونجعلها فرضاً، وننفي الفرض ونجعله نتيجة: <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> ≠ 16 → x ≠ 4</span>.",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
@@ -1489,7 +1489,7 @@ window.GRADE1S_BOOK_DATA = {
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
           {
-            "q": "«إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x > 2</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 > 4</span>». لدينا <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 3</span> وهو أكبر من <span class=\"sec-math ltr-math\" dir=\"ltr\">2</span>. النتيجة <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 9 > 4</span> جاءت تطبيقاً لـ:",
+            "q": "«إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x > 2</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> > 4</span>». لدينا <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 3</span> وهو أكبر من <span class=\"sec-math ltr-math\" dir=\"ltr\">2</span>. النتيجة <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 9 > 4</span> جاءت تطبيقاً لـ:",
             "options": [
               "قانون الفصل المنطقي",
               "قانون القياس المنطقي",
@@ -4247,7 +4247,7 @@ window.GRADE1S_BOOK_DATA = {
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = (y₂ - y₁) / (x₂ - x₁)</span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = (x₂ - x₁) / (y₂ - y₁)</span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = (y₂ + y₁) / (x₂ + x₁)</span>",
-              "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = √((x₂ - x₁)² + (y₂ - y₁)²)</span>"
+              "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(x₂ - x₁)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(y₂ - y₁)</span><sup class=\"sec-exp\">2</sup></span>)</span>"
             ],
             "correct": 0,
             "difficulty": "سهل",
@@ -4942,7 +4942,7 @@ window.GRADE1S_BOOK_DATA = {
           "البعد = طول العمود الساقط من النقطة على المستقيم",
           "مسلمة التعامد: مستقيم عمودي وحيد يمر بالنقطة",
           "البعد بين مستقيمين متوازيين ثابت على امتدادهما",
-          "صيغة البعد بين y = mx + c1 و y = mx + c2: d = |c1 - c2| / √(1 + m²)"
+          "صيغة البعد بين y = mx + c1 و y = mx + c2: d = |c₁ - c₂| / √(1 + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">m</span><sup class=\"sec-exp\">2</sup></span>)"
         ],
         "golden_rule": "المسافة دائماً موجبة، وأقصر مسار هو العمودي وليس المائل.",
         "solved_example": "البعد بين المستقيمين الأفقيين y = 5 و y = -1 هو |5 - (-1)| = 6 وحدات."
@@ -5069,14 +5069,14 @@ window.GRADE1S_BOOK_DATA = {
           {
             "q": "لإيجاد البعد بين النقطة <span class=\"sec-math ltr-math\" dir=\"ltr\">P(x₁, y₁)</span> والمستقيم <span class=\"sec-math ltr-math\" dir=\"ltr\">Ax + By + C = 0</span> نستخدم الصيغة:",
             "options": [
-              "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = |Ax₁ + By₁ + C| / √(A² + B²)</span>",
+              "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = |Ax₁ + By₁ + C| / √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">A</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">B</span><sup class=\"sec-exp\">2</sup></span>)</span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = (Ax₁ + By₁) / (A + B)</span>",
-              "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = √((x₁ - A)² + (y₁ - B)²)</span>",
+              "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(x₁ - A)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(y₁ - B)</span><sup class=\"sec-exp\">2</sup></span>)</span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = |Ax₁ - By₁| / C</span>"
             ],
             "correct": 0,
             "difficulty": "صعب",
-            "explanation": "صيغة بعد نقطة عن مستقيم القياسية هي d = |Ax₁ + By₁ + C| / √(A² + B²).",
+            "explanation": "صيغة بعد نقطة عن مستقيم القياسية هي d = |Ax₁ + By₁ + C| / √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">A</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">B</span><sup class=\"sec-exp\">2</sup></span>).",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
@@ -5090,7 +5090,7 @@ window.GRADE1S_BOOK_DATA = {
             ],
             "correct": 2,
             "difficulty": "صعب",
-            "explanation": "d = |c1 - c2| / √(1 + m²) = |1 - 6| / √(1 + 4) = 5 / √5 = √5 وحدات.",
+            "explanation": "d = |c₁ - c₂| / √(1 + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">m</span><sup class=\"sec-exp\">2</sup></span>) = |1 - 6| / √(1 + 4) = 5 / √5 = √5 وحدات.",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
@@ -5155,7 +5155,7 @@ window.GRADE1S_BOOK_DATA = {
           {
             "q": "اشرح الخطوات الرياضية المتبعة لحساب البعد بين نقطة P(x₁, y₁) ومستقيم معلوم معادلته y = mx + b.",
             "lines": 3,
-            "ans": "1) إيجاد ميل المستقيم المعلوم m. 2) إيجاد ميل العمودي عليه m_perp = -1/m. 3) كتابة معادلة المستقيم العمودي المار بالنقطة P. 4) حل المعادلتين جبرياً بنظام خطي لإيجاد نقطة التقاطع Q (مسقط العمود). 5) تطبيق قانون المسافة بين النقطتين P و Q: d = √[(x₂ - x₁)² + (y₂ - y₁)²].",
+            "ans": "1) إيجاد ميل المستقيم المعلوم m. 2) إيجاد ميل العمودي عليه m⊥ = -1/m. 3) كتابة معادلة المستقيم العمودي المار بالنقطة P. 4) حل المعادلتين جبرياً بنظام خطي لإيجاد نقطة التقاطع Q (مسقط العمود). 5) تطبيق قانون المسافة بين النقطتين P و Q: d = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(x₂ - x₁)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(y₂ - y₁)</span><sup class=\"sec-exp\">2</sup></span>].",
             "difficulty": "متوسط",
             "marks": 2,
             "source": "مسائل وتطبيقات كتاب الرياضيات 1-1 (الأول الثانوي)"
@@ -5163,7 +5163,7 @@ window.GRADE1S_BOOK_DATA = {
           {
             "q": "أوجد البعد بين المستقيمين المتوازيين y = x + 2 و y = x - 4 موضحاً خطوات الحل كاملة.",
             "lines": 3,
-            "ans": "نختار نقطة ملائمة على المستقيم الأول، مثلاً عندما x = 0 تكون y = 2، فالنقطة هي (0, 2). نكتب معادلة المستقيم الثاني بالصورة العامة: x - y - 4 = 0 حيث A = 1, B = -1, C = -4. نطبق قانون بعد نقطة عن مستقيم: d = |1(0) + (-1)(2) - 4| / √(1² + (-1)²) = |-6| / √2 = 6 / √2 = 3√2 وحدة طول (حوالي 4.24 وحدة).",
+            "ans": "نختار نقطة ملائمة على المستقيم الأول، مثلاً عندما x = 0 تكون y = 2، فالنقطة هي (0, 2). نكتب معادلة المستقيم الثاني بالصورة العامة: x - y - 4 = 0 حيث A = 1, B = -1, C = -4. نطبق قانون بعد نقطة عن مستقيم: d = |1(0) + (-1)(2) - 4| / √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">1</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(-1)</span><sup class=\"sec-exp\">2</sup></span>) = |-6| / √2 = 6 / √2 = 3√2 وحدة طول (حوالي 4.24 وحدة).",
             "difficulty": "متوسط",
             "marks": 2,
             "source": "مسائل وتطبيقات كتاب الرياضيات 1-1 (الأول الثانوي)"
@@ -5525,7 +5525,7 @@ window.GRADE1S_BOOK_DATA = {
           {
             "q": "إذا كانت إحداثيات رؤوس مثلث هي A(0, 0), B(4, 0), C(2, 2√3)، فأوجد أطوال أضلاعه وصنفه وفق أضلاعه.",
             "lines": 3,
-            "ans": "نحسب الأطوال بقانون المسافة: AB = √[(4-0)² + (0-0)²] = √16 = 4. BC = √[(2-4)² + (2√3-0)²] = √[4 + 12] = √16 = 4. AC = √[(2-0)² + (2√3-0)²] = √[4 + 12] = √16 = 4. بما أن AB = BC = AC = 4، فإن المثلث متطابق الأضلاع.",
+            "ans": "نحسب الأطوال بقانون المسافة: AB = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(4-0)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(0-0)</span><sup class=\"sec-exp\">2</sup></span>] = √16 = 4. BC = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(2-4)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(2√3-0)</span><sup class=\"sec-exp\">2</sup></span>] = √[4 + 12] = √16 = 4. AC = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(2-0)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(2√3-0)</span><sup class=\"sec-exp\">2</sup></span>] = √[4 + 12] = √16 = 4. بما أن AB = BC = AC = 4، فإن المثلث متطابق الأضلاع.",
             "difficulty": "متوسط",
             "marks": 2,
             "source": "مسائل وتطبيقات كتاب الرياضيات 1-1 (الأول الثانوي)"
@@ -6839,7 +6839,7 @@ window.GRADE1S_BOOK_DATA = {
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">PQ</span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">QR</span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">PR</span>",
-              "<span class=\"sec-math ltr-math\" dir=\"ltr\">P^2</span>"
+              "<span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">P</span><sup class=\"sec-exp\">2</sup></span></span>"
             ],
             "correct": 0,
             "difficulty": "سهل",
@@ -7012,7 +7012,7 @@ window.GRADE1S_BOOK_DATA = {
           {
             "q": "اشرح نص نظرية الوتر والساق (HL) للمثلثات القائمة، وبيّن لماذا تُعد استثناءً مقبولاً لحالة SSA التي لا تصح في المثلثات العامة.",
             "lines": 3,
-            "ans": "نص نظرية HL: إذا تطابق وتر وساق في مثلث قائم الزاوية مع وتر وساق في مثلث قائم آخر، فإن المثلثين متطابقان. تعتبر استثناءً مقبولاً لحالة SSA لأن نظرية فيثاغورس (a² + b² = c²) في المثلث القائم تحدد طول الساق الثالثة بطريقة وحيدة جبرياً: b = √(c² - a²)، وبذلك تتطابق الأضلاع الثلاثة حتماً (SSS) وينتفي أي احتمال لوجود شكل ثانٍ مبهم.",
+            "ans": "نص نظرية HL: إذا تطابق وتر وساق في مثلث قائم الزاوية مع وتر وساق في مثلث قائم آخر، فإن المثلثين متطابقان. تعتبر استثناءً مقبولاً لحالة SSA لأن نظرية فيثاغورس (<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">b</span><sup class=\"sec-exp\">2</sup></span> = <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">c</span><sup class=\"sec-exp\">2</sup></span>) في المثلث القائم تحدد طول الساق الثالثة بطريقة وحيدة جبرياً: b = √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">c</span><sup class=\"sec-exp\">2</sup></span> - <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span>)، وبذلك تتطابق الأضلاع الثلاثة حتماً (SSS) وينتفي أي احتمال لوجود شكل ثانٍ مبهم.",
             "difficulty": "متوسط",
             "marks": 2,
             "source": "مسائل وتطبيقات كتاب الرياضيات 1-1 (الأول الثانوي)"
@@ -7629,7 +7629,7 @@ window.GRADE1S_BOOK_DATA = {
             ],
             "correct": 1,
             "difficulty": "متوسط",
-            "explanation": "نقطة المنتصف: x_M = (x_A + x_B) / 2 ⟹ 2 = x_B / 2 ⟹ x_B = 4. وبالمثل y_B = 6. إذن B(4, 6).",
+            "explanation": "نقطة المنتصف: x<sub class=\"sec-sub\">M</sub> = (x<sub class=\"sec-sub\">A</sub> + x<sub class=\"sec-sub\">B</sub>) / 2 ⟹ 2 = x<sub class=\"sec-sub\">B</sub> / 2 ⟹ x<sub class=\"sec-sub\">B</sub> = 4. وبالمثل y<sub class=\"sec-sub\">B</sub> = 6. إذن B(4, 6).",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
@@ -7638,12 +7638,12 @@ window.GRADE1S_BOOK_DATA = {
             "options": [
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">5a</span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">7a</span>",
-              "<span class=\"sec-math ltr-math\" dir=\"ltr\">25a^2</span>",
+              "<span class=\"sec-math ltr-math\" dir=\"ltr\">25<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span></span>",
               "<span class=\"sec-math ltr-math\" dir=\"ltr\">a</span>"
             ],
             "correct": 0,
             "difficulty": "متوسط",
-            "explanation": "d = √[(3a - 0)² + (4a - 0)²] = √[9a² + 16a²] = √[25a²] = 5a.",
+            "explanation": "d = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(3a - 0)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(4a - 0)</span><sup class=\"sec-exp\">2</sup></span>] = √[9<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span> + 16<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span>] = √[25<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span>] = 5a.",
             "marks": 1,
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
@@ -7746,7 +7746,7 @@ window.GRADE1S_BOOK_DATA = {
           {
             "q": "اكتب برهاناً إحداثياً يثبت أن القطعة المستقيمة الواصلة بين منتصفي ضلعي مثلث توازي الضلع الثالث وطولها يساوي نصف طوله.",
             "lines": 3,
-            "ans": "نضع رؤوس المثلث: A(0, 0), B(2a, 0), C(2b, 2c). الضلع الثالث هو AB الواقع على محور x وميله = 0 وطوله = 2a. نقطة منتصف AC هي M = (b, c). نقطة منتصف BC هي N = (a + b, c). 1) ميل القطعة MN = (c - c) / ((a + b) - b) = 0 / a = 0. بما أن ميل MN = ميل AB = 0، إذن MN ∥ AB. 2) طول القطعة MN = √[((a + b) - b)² + (c - c)²] = √[a²] = a. بما أن AB = 2a، فإن MN = (1/2)AB. وبذلك تم إثبات التوازي وأن طولها نصف طول الضلع الثالث.",
+            "ans": "نضع رؤوس المثلث: A(0, 0), B(2a, 0), C(2b, 2c). الضلع الثالث هو AB الواقع على محور x وميله = 0 وطوله = 2a. نقطة منتصف AC هي M = (b, c). نقطة منتصف BC هي N = (a + b, c). 1) ميل القطعة MN = (c - c) / ((a + b) - b) = 0 / a = 0. بما أن ميل MN = ميل AB = 0، إذن MN ∥ AB. 2) طول القطعة MN = √[((a + b) - b)² + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(c - c)</span><sup class=\"sec-exp\">2</sup></span>] = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span>] = a. بما أن AB = 2a، فإن MN = (1/2)AB. وبذلك تم إثبات التوازي وأن طولها نصف طول الضلع الثالث.",
             "difficulty": "متوسط",
             "marks": 2,
             "source": "مسائل وتطبيقات كتاب الرياضيات 1-1 (الأول الثانوي)"
@@ -8494,7 +8494,7 @@ window.GRADE1S_BOOK_DATA = {
           {
             "q": "إذا كانت إحداثيات رؤوس المثلث هي A(1, 2), B(5, 4), C(3, 9)، فأوجد إحداثيات مركز هذا المثلث (Centroid) جبرياً مبيناً القانون المستخدم.",
             "lines": 3,
-            "ans": "إحداثيات مركز المثلث هي المتوسط الحسابي لإحداثيات رؤوسه الثلاثة: x_G = (x_A + x_B + x_C) / 3 = (1 + 5 + 3) / 3 = 9 / 3 = 3. y_G = (y_A + y_B + y_C) / 3 = (2 + 4 + 9) / 3 = 15 / 3 = 5. إذن إحداثيات مركز المثلث هي النقطة G(3, 5).",
+            "ans": "إحداثيات مركز المثلث هي المتوسط الحسابي لإحداثيات رؤوسه الثلاثة: x<sub class=\"sec-sub\">G</sub> = (x<sub class=\"sec-sub\">A</sub> + x<sub class=\"sec-sub\">B</sub> + x<sub class=\"sec-sub\">C</sub>) / 3 = (1 + 5 + 3) / 3 = 9 / 3 = 3. y<sub class=\"sec-sub\">G</sub> = (y<sub class=\"sec-sub\">A</sub> + y<sub class=\"sec-sub\">B</sub> + y<sub class=\"sec-sub\">C</sub>) / 3 = (2 + 4 + 9) / 3 = 15 / 3 = 5. إذن إحداثيات مركز المثلث هي النقطة G(3, 5).",
             "difficulty": "متوسط",
             "marks": 2,
             "source": "مسائل وتطبيقات كتاب الرياضيات 1-1 (الأول الثانوي)"
@@ -9130,7 +9130,7 @@ window.GRADE1S_BOOK_DATA = {
             "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
           },
           {
-            "q": "إذا أدى افتراض أن 'n عدد فردي' إلى أن 'n² عدد فردي' بينما المعطى أن 'n² زوجي'، فهذا يدل على:",
+            "q": "إذا أدى افتراض أن 'n عدد فردي' إلى أن '<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">n</span><sup class=\"sec-exp\">2</sup></span> عدد فردي' بينما المعطى أن '<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">n</span><sup class=\"sec-exp\">2</sup></span> زوجي'، فهذا يدل على:",
             "options": [
               "حدوث تناقض، وبالتالي فإن n زوجي حتماً",
               "صحة الافتراض",
@@ -10088,7 +10088,7 @@ window.GRADE1S_BOOK_DATA = {
       ],
       "correct": 2,
       "difficulty": "متوسط",
-      "explanation": "الأعداد تمثل أعداداً مربعة: <span class=\"sec-math ltr-math\" dir=\"ltr\">1, 4, 9, 16, 25</span>، فالشكل الخامس يحتوي <span class=\"sec-math ltr-math\" dir=\"ltr\">5^2 = 25</span> مثلثاً.",
+      "explanation": "الأعداد تمثل أعداداً مربعة: <span class=\"sec-math ltr-math\" dir=\"ltr\">1, 4, 9, 16, 25</span>، فالشكل الخامس يحتوي <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">5</span><sup class=\"sec-exp\">2</sup></span> = 25</span> مثلثاً.",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)",
       "image": "assets/img/1s/fig_1_1_inductive_pat.png",
@@ -10105,7 +10105,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonId": "g1s-t1-c1-l1",
       "lessonNumber": "1-1",
       "lessonTitle": "التبرير الاستقرائي والتخمين",
-      "q": "أي مما يأتي يعد مثالاً مضاداً للتخمين: «إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">n</span> عدداً حقيقياً، فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">n^2 > n</span>» ؟",
+      "q": "أي مما يأتي يعد مثالاً مضاداً للتخمين: «إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">n</span> عدداً حقيقياً، فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">n</span><sup class=\"sec-exp\">2</sup></span> > n</span>» ؟",
       "options": [
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">n = 3</span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">n = -2</span>",
@@ -10114,7 +10114,7 @@ window.GRADE1S_BOOK_DATA = {
       ],
       "correct": 2,
       "difficulty": "متوسط",
-      "explanation": "عندما <span class=\"sec-math ltr-math\" dir=\"ltr\">n = 0.5</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">n^2 = 0.25</span> وهو ليس أكبر من <span class=\"sec-math ltr-math\" dir=\"ltr\">0.5</span>، لذا <span class=\"sec-math ltr-math\" dir=\"ltr\">n = 0.5</span> مثال مضاد.",
+      "explanation": "عندما <span class=\"sec-math ltr-math\" dir=\"ltr\">n = 0.5</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">n</span><sup class=\"sec-exp\">2</sup></span> = 0.25</span> وهو ليس أكبر من <span class=\"sec-math ltr-math\" dir=\"ltr\">0.5</span>، لذا <span class=\"sec-math ltr-math\" dir=\"ltr\">n = 0.5</span> مثال مضاد.",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
     },
@@ -10351,10 +10351,10 @@ window.GRADE1S_BOOK_DATA = {
       "lessonId": "g1s-t1-c1-l1",
       "lessonNumber": "1-1",
       "lessonTitle": "التبرير الاستقرائي والتخمين",
-      "statement": "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 25</span> فإن التخمين <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 5</span> صحيح دائماً دون مثال مضاد.",
+      "statement": "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 25</span> فإن التخمين <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 5</span> صحيح دائماً دون مثال مضاد.",
       "is_true": false,
       "difficulty": "متوسط",
-      "explanation": "يوجد مثال مضاد هو <span class=\"sec-math ltr-math\" dir=\"ltr\">x = -5</span> لأن <span class=\"sec-math ltr-math\" dir=\"ltr\">(-5)^2 = 25</span>.",
+      "explanation": "يوجد مثال مضاد هو <span class=\"sec-math ltr-math\" dir=\"ltr\">x = -5</span> لأن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(-5)</span><sup class=\"sec-exp\">2</sup></span> = 25</span>.",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
     },
@@ -10596,7 +10596,7 @@ window.GRADE1S_BOOK_DATA = {
       ],
       "correct": 2,
       "difficulty": "سهل",
-      "explanation": "عدد الصفوف يحسب بالقانون: <span class=\"sec-math ltr-math\" dir=\"ltr\">2^n = 2^3 = 8</span> صفوف.",
+      "explanation": "عدد الصفوف يحسب بالقانون: <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">2</span><sup class=\"sec-exp\">n</sup></span> = <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">2</span><sup class=\"sec-exp\">3</sup></span> = 8</span> صفوف.",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
     },
@@ -11021,16 +11021,16 @@ window.GRADE1S_BOOK_DATA = {
       "lessonId": "g1s-t1-c1-l3",
       "lessonNumber": "1-3",
       "lessonTitle": "العبارات الشرطية",
-      "q": "المعاكس الإيجابي للعبارة: «إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 16</span>» هو:",
+      "q": "المعاكس الإيجابي للعبارة: «إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 16</span>» هو:",
       "options": [
-        "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 16</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 4</span>",
-        "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 ≠ 16</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x ≠ 4</span>",
-        "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x ≠ 4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 ≠ 16</span>",
-        "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x = -4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 16</span>"
+        "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 16</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 4</span>",
+        "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> ≠ 16</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x ≠ 4</span>",
+        "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x ≠ 4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> ≠ 16</span>",
+        "إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x = -4</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 16</span>"
       ],
       "correct": 1,
       "difficulty": "متوسط",
-      "explanation": "المعاكس الإيجابي: ننفي النتيجة ونجعلها فرضاً، وننفي الفرض ونجعله نتيجة: <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 ≠ 16 → x ≠ 4</span>.",
+      "explanation": "المعاكس الإيجابي: ننفي النتيجة ونجعلها فرضاً، وننفي الفرض ونجعله نتيجة: <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> ≠ 16 → x ≠ 4</span>.",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
     },
@@ -11405,7 +11405,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonId": "g1s-t1-c1-l4",
       "lessonNumber": "1-4",
       "lessonTitle": "التبرير الاستنتاجي",
-      "q": "«إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x > 2</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 > 4</span>». لدينا <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 3</span> وهو أكبر من <span class=\"sec-math ltr-math\" dir=\"ltr\">2</span>. النتيجة <span class=\"sec-math ltr-math\" dir=\"ltr\">x^2 = 9 > 4</span> جاءت تطبيقاً لـ:",
+      "q": "«إذا كان <span class=\"sec-math ltr-math\" dir=\"ltr\">x > 2</span> فإن <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> > 4</span>». لدينا <span class=\"sec-math ltr-math\" dir=\"ltr\">x = 3</span> وهو أكبر من <span class=\"sec-math ltr-math\" dir=\"ltr\">2</span>. النتيجة <span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">x</span><sup class=\"sec-exp\">2</sup></span> = 9 > 4</span> جاءت تطبيقاً لـ:",
       "options": [
         "قانون الفصل المنطقي",
         "قانون القياس المنطقي",
@@ -14302,7 +14302,7 @@ window.GRADE1S_BOOK_DATA = {
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = (y₂ - y₁) / (x₂ - x₁)</span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = (x₂ - x₁) / (y₂ - y₁)</span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = (y₂ + y₁) / (x₂ + x₁)</span>",
-        "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = √((x₂ - x₁)² + (y₂ - y₁)²)</span>"
+        "<span class=\"sec-math ltr-math\" dir=\"ltr\">m = √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(x₂ - x₁)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(y₂ - y₁)</span><sup class=\"sec-exp\">2</sup></span>)</span>"
       ],
       "correct": 0,
       "difficulty": "سهل",
@@ -15241,14 +15241,14 @@ window.GRADE1S_BOOK_DATA = {
       "lessonTitle": "الأعمدة والمسافة",
       "q": "لإيجاد البعد بين النقطة <span class=\"sec-math ltr-math\" dir=\"ltr\">P(x₁, y₁)</span> والمستقيم <span class=\"sec-math ltr-math\" dir=\"ltr\">Ax + By + C = 0</span> نستخدم الصيغة:",
       "options": [
-        "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = |Ax₁ + By₁ + C| / √(A² + B²)</span>",
+        "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = |Ax₁ + By₁ + C| / √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">A</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">B</span><sup class=\"sec-exp\">2</sup></span>)</span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = (Ax₁ + By₁) / (A + B)</span>",
-        "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = √((x₁ - A)² + (y₁ - B)²)</span>",
+        "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(x₁ - A)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(y₁ - B)</span><sup class=\"sec-exp\">2</sup></span>)</span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">d = |Ax₁ - By₁| / C</span>"
       ],
       "correct": 0,
       "difficulty": "صعب",
-      "explanation": "صيغة بعد نقطة عن مستقيم القياسية هي d = |Ax₁ + By₁ + C| / √(A² + B²).",
+      "explanation": "صيغة بعد نقطة عن مستقيم القياسية هي d = |Ax₁ + By₁ + C| / √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">A</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">B</span><sup class=\"sec-exp\">2</sup></span>).",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
     },
@@ -15272,7 +15272,7 @@ window.GRADE1S_BOOK_DATA = {
       ],
       "correct": 2,
       "difficulty": "صعب",
-      "explanation": "d = |c1 - c2| / √(1 + m²) = |1 - 6| / √(1 + 4) = 5 / √5 = √5 وحدات.",
+      "explanation": "d = |c₁ - c₂| / √(1 + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">m</span><sup class=\"sec-exp\">2</sup></span>) = |1 - 6| / √(1 + 4) = 5 / √5 = √5 وحدات.",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
     },
@@ -15402,7 +15402,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonNumber": "2-6",
       "lessonTitle": "الأعمدة والمسافة",
       "q": "اشرح الخطوات الرياضية المتبعة لحساب البعد بين نقطة P(x₁, y₁) ومستقيم معلوم معادلته y = mx + b.",
-      "ans": "1) إيجاد ميل المستقيم المعلوم m. 2) إيجاد ميل العمودي عليه m_perp = -1/m. 3) كتابة معادلة المستقيم العمودي المار بالنقطة P. 4) حل المعادلتين جبرياً بنظام خطي لإيجاد نقطة التقاطع Q (مسقط العمود). 5) تطبيق قانون المسافة بين النقطتين P و Q: d = √[(x₂ - x₁)² + (y₂ - y₁)²].",
+      "ans": "1) إيجاد ميل المستقيم المعلوم m. 2) إيجاد ميل العمودي عليه m⊥ = -1/m. 3) كتابة معادلة المستقيم العمودي المار بالنقطة P. 4) حل المعادلتين جبرياً بنظام خطي لإيجاد نقطة التقاطع Q (مسقط العمود). 5) تطبيق قانون المسافة بين النقطتين P و Q: d = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(x₂ - x₁)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(y₂ - y₁)</span><sup class=\"sec-exp\">2</sup></span>].",
       "lines": 3,
       "difficulty": "متوسط",
       "marks": 2,
@@ -15420,7 +15420,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonNumber": "2-6",
       "lessonTitle": "الأعمدة والمسافة",
       "q": "أوجد البعد بين المستقيمين المتوازيين y = x + 2 و y = x - 4 موضحاً خطوات الحل كاملة.",
-      "ans": "نختار نقطة ملائمة على المستقيم الأول، مثلاً عندما x = 0 تكون y = 2، فالنقطة هي (0, 2). نكتب معادلة المستقيم الثاني بالصورة العامة: x - y - 4 = 0 حيث A = 1, B = -1, C = -4. نطبق قانون بعد نقطة عن مستقيم: d = |1(0) + (-1)(2) - 4| / √(1² + (-1)²) = |-6| / √2 = 6 / √2 = 3√2 وحدة طول (حوالي 4.24 وحدة).",
+      "ans": "نختار نقطة ملائمة على المستقيم الأول، مثلاً عندما x = 0 تكون y = 2، فالنقطة هي (0, 2). نكتب معادلة المستقيم الثاني بالصورة العامة: x - y - 4 = 0 حيث A = 1, B = -1, C = -4. نطبق قانون بعد نقطة عن مستقيم: d = |1(0) + (-1)(2) - 4| / √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">1</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(-1)</span><sup class=\"sec-exp\">2</sup></span>) = |-6| / √2 = 6 / √2 = 3√2 وحدة طول (حوالي 4.24 وحدة).",
       "lines": 3,
       "difficulty": "متوسط",
       "marks": 2,
@@ -15808,7 +15808,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonNumber": "3-1",
       "lessonTitle": "تصنيف المثلثات",
       "q": "إذا كانت إحداثيات رؤوس مثلث هي A(0, 0), B(4, 0), C(2, 2√3)، فأوجد أطوال أضلاعه وصنفه وفق أضلاعه.",
-      "ans": "نحسب الأطوال بقانون المسافة: AB = √[(4-0)² + (0-0)²] = √16 = 4. BC = √[(2-4)² + (2√3-0)²] = √[4 + 12] = √16 = 4. AC = √[(2-0)² + (2√3-0)²] = √[4 + 12] = √16 = 4. بما أن AB = BC = AC = 4، فإن المثلث متطابق الأضلاع.",
+      "ans": "نحسب الأطوال بقانون المسافة: AB = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(4-0)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(0-0)</span><sup class=\"sec-exp\">2</sup></span>] = √16 = 4. BC = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(2-4)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(2√3-0)</span><sup class=\"sec-exp\">2</sup></span>] = √[4 + 12] = √16 = 4. AC = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(2-0)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(2√3-0)</span><sup class=\"sec-exp\">2</sup></span>] = √[4 + 12] = √16 = 4. بما أن AB = BC = AC = 4، فإن المثلث متطابق الأضلاع.",
       "lines": 3,
       "difficulty": "متوسط",
       "marks": 2,
@@ -17064,7 +17064,7 @@ window.GRADE1S_BOOK_DATA = {
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">PQ</span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">QR</span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">PR</span>",
-        "<span class=\"sec-math ltr-math\" dir=\"ltr\">P^2</span>"
+        "<span class=\"sec-math ltr-math\" dir=\"ltr\"><span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">P</span><sup class=\"sec-exp\">2</sup></span></span>"
       ],
       "correct": 0,
       "difficulty": "سهل",
@@ -17382,7 +17382,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonNumber": "3-5",
       "lessonTitle": "إثبات تطابق المثلثات ASA, AAS",
       "q": "اشرح نص نظرية الوتر والساق (HL) للمثلثات القائمة، وبيّن لماذا تُعد استثناءً مقبولاً لحالة SSA التي لا تصح في المثلثات العامة.",
-      "ans": "نص نظرية HL: إذا تطابق وتر وساق في مثلث قائم الزاوية مع وتر وساق في مثلث قائم آخر، فإن المثلثين متطابقان. تعتبر استثناءً مقبولاً لحالة SSA لأن نظرية فيثاغورس (a² + b² = c²) في المثلث القائم تحدد طول الساق الثالثة بطريقة وحيدة جبرياً: b = √(c² - a²)، وبذلك تتطابق الأضلاع الثلاثة حتماً (SSS) وينتفي أي احتمال لوجود شكل ثانٍ مبهم.",
+      "ans": "نص نظرية HL: إذا تطابق وتر وساق في مثلث قائم الزاوية مع وتر وساق في مثلث قائم آخر، فإن المثلثين متطابقان. تعتبر استثناءً مقبولاً لحالة SSA لأن نظرية فيثاغورس (<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">b</span><sup class=\"sec-exp\">2</sup></span> = <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">c</span><sup class=\"sec-exp\">2</sup></span>) في المثلث القائم تحدد طول الساق الثالثة بطريقة وحيدة جبرياً: b = √(<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">c</span><sup class=\"sec-exp\">2</sup></span> - <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span>)، وبذلك تتطابق الأضلاع الثلاثة حتماً (SSS) وينتفي أي احتمال لوجود شكل ثانٍ مبهم.",
       "lines": 3,
       "difficulty": "متوسط",
       "marks": 2,
@@ -17920,7 +17920,7 @@ window.GRADE1S_BOOK_DATA = {
       ],
       "correct": 1,
       "difficulty": "متوسط",
-      "explanation": "نقطة المنتصف: x_M = (x_A + x_B) / 2 ⟹ 2 = x_B / 2 ⟹ x_B = 4. وبالمثل y_B = 6. إذن B(4, 6).",
+      "explanation": "نقطة المنتصف: x<sub class=\"sec-sub\">M</sub> = (x<sub class=\"sec-sub\">A</sub> + x<sub class=\"sec-sub\">B</sub>) / 2 ⟹ 2 = x<sub class=\"sec-sub\">B</sub> / 2 ⟹ x<sub class=\"sec-sub\">B</sub> = 4. وبالمثل y<sub class=\"sec-sub\">B</sub> = 6. إذن B(4, 6).",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
     },
@@ -17939,12 +17939,12 @@ window.GRADE1S_BOOK_DATA = {
       "options": [
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">5a</span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">7a</span>",
-        "<span class=\"sec-math ltr-math\" dir=\"ltr\">25a^2</span>",
+        "<span class=\"sec-math ltr-math\" dir=\"ltr\">25<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span></span>",
         "<span class=\"sec-math ltr-math\" dir=\"ltr\">a</span>"
       ],
       "correct": 0,
       "difficulty": "متوسط",
-      "explanation": "d = √[(3a - 0)² + (4a - 0)²] = √[9a² + 16a²] = √[25a²] = 5a.",
+      "explanation": "d = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(3a - 0)</span><sup class=\"sec-exp\">2</sup></span> + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(4a - 0)</span><sup class=\"sec-exp\">2</sup></span>] = √[9<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span> + 16<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span>] = √[25<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span>] = 5a.",
       "marks": 1,
       "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
     },
@@ -18142,7 +18142,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonNumber": "3-7",
       "lessonTitle": "المثلثات والبرهان الإحداثي",
       "q": "اكتب برهاناً إحداثياً يثبت أن القطعة المستقيمة الواصلة بين منتصفي ضلعي مثلث توازي الضلع الثالث وطولها يساوي نصف طوله.",
-      "ans": "نضع رؤوس المثلث: A(0, 0), B(2a, 0), C(2b, 2c). الضلع الثالث هو AB الواقع على محور x وميله = 0 وطوله = 2a. نقطة منتصف AC هي M = (b, c). نقطة منتصف BC هي N = (a + b, c). 1) ميل القطعة MN = (c - c) / ((a + b) - b) = 0 / a = 0. بما أن ميل MN = ميل AB = 0، إذن MN ∥ AB. 2) طول القطعة MN = √[((a + b) - b)² + (c - c)²] = √[a²] = a. بما أن AB = 2a، فإن MN = (1/2)AB. وبذلك تم إثبات التوازي وأن طولها نصف طول الضلع الثالث.",
+      "ans": "نضع رؤوس المثلث: A(0, 0), B(2a, 0), C(2b, 2c). الضلع الثالث هو AB الواقع على محور x وميله = 0 وطوله = 2a. نقطة منتصف AC هي M = (b, c). نقطة منتصف BC هي N = (a + b, c). 1) ميل القطعة MN = (c - c) / ((a + b) - b) = 0 / a = 0. بما أن ميل MN = ميل AB = 0، إذن MN ∥ AB. 2) طول القطعة MN = √[((a + b) - b)² + <span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">(c - c)</span><sup class=\"sec-exp\">2</sup></span>] = √[<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">a</span><sup class=\"sec-exp\">2</sup></span>] = a. بما أن AB = 2a، فإن MN = (1/2)AB. وبذلك تم إثبات التوازي وأن طولها نصف طول الضلع الثالث.",
       "lines": 3,
       "difficulty": "متوسط",
       "marks": 2,
@@ -18936,7 +18936,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonNumber": "4-2",
       "lessonTitle": "القطع المتوسطة والارتفاعات في المثلث",
       "q": "إذا كانت إحداثيات رؤوس المثلث هي A(1, 2), B(5, 4), C(3, 9)، فأوجد إحداثيات مركز هذا المثلث (Centroid) جبرياً مبيناً القانون المستخدم.",
-      "ans": "إحداثيات مركز المثلث هي المتوسط الحسابي لإحداثيات رؤوسه الثلاثة: x_G = (x_A + x_B + x_C) / 3 = (1 + 5 + 3) / 3 = 9 / 3 = 3. y_G = (y_A + y_B + y_C) / 3 = (2 + 4 + 9) / 3 = 15 / 3 = 5. إذن إحداثيات مركز المثلث هي النقطة G(3, 5).",
+      "ans": "إحداثيات مركز المثلث هي المتوسط الحسابي لإحداثيات رؤوسه الثلاثة: x<sub class=\"sec-sub\">G</sub> = (x<sub class=\"sec-sub\">A</sub> + x<sub class=\"sec-sub\">B</sub> + x<sub class=\"sec-sub\">C</sub>) / 3 = (1 + 5 + 3) / 3 = 9 / 3 = 3. y<sub class=\"sec-sub\">G</sub> = (y<sub class=\"sec-sub\">A</sub> + y<sub class=\"sec-sub\">B</sub> + y<sub class=\"sec-sub\">C</sub>) / 3 = (2 + 4 + 9) / 3 = 15 / 3 = 5. إذن إحداثيات مركز المثلث هي النقطة G(3, 5).",
       "lines": 3,
       "difficulty": "متوسط",
       "marks": 2,
@@ -19531,7 +19531,7 @@ window.GRADE1S_BOOK_DATA = {
       "lessonId": "g1s-t1-c4-l4",
       "lessonNumber": "4-4",
       "lessonTitle": "البرهان غير المباشر",
-      "q": "إذا أدى افتراض أن 'n عدد فردي' إلى أن 'n² عدد فردي' بينما المعطى أن 'n² زوجي'، فهذا يدل على:",
+      "q": "إذا أدى افتراض أن 'n عدد فردي' إلى أن '<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">n</span><sup class=\"sec-exp\">2</sup></span> عدد فردي' بينما المعطى أن '<span class=\"sec-pow\" dir=\"ltr\"><span class=\"sec-base\">n</span><sup class=\"sec-exp\">2</sup></span> زوجي'، فهذا يدل على:",
       "options": [
         "حدوث تناقض، وبالتالي فإن n زوجي حتماً",
         "صحة الافتراض",

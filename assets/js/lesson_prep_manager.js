@@ -893,7 +893,12 @@
             .sub-header-cell { background-color: #dbeafe; color: #1e3a8a; font-weight: bold; }
             .station-title { background-color: #1e3a8a; color: #ffffff; font-weight: bold; font-size: 12pt; }
             .badge { background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-            .sec-math, .ltr-math, .sec-pow { direction: ltr; unicode-bidi: isolate; display: inline-block; font-family: 'Times New Roman', serif; font-weight: bold; }
+            .sec-math, .ltr-math { direction: ltr; unicode-bidi: isolate; display: inline-block; font-family: 'Cambria Math', 'Times New Roman', serif; font-style: italic; font-weight: bold; }
+            .sec-pow { display: inline-block; direction: ltr; unicode-bidi: isolate; vertical-align: baseline; margin: 0; line-height: 1; }
+            .sec-pow .sec-base { font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 1em; }
+            .sec-pow .sec-exp { font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 0.72em; font-weight: 700; font-style: normal; vertical-align: super; line-height: 0; margin-left: 1px; }
+            .sec-sub { font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 0.72em; font-style: normal; vertical-align: sub; line-height: 0; }
+            .ar-pow .ar-exp { font-size: 0.68em; vertical-align: super; }
           </style>
         </head>
         <body>

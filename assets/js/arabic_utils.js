@@ -79,8 +79,61 @@
     '⁵': '٥', '⁶': '٦', '⁷': '٧', '⁸': '٨', '⁹': '٩',
     '⁺': '+', '⁻': '-'
   };
-  const PAT_BASE_SUP_JS = /(\(-?[٠-٩0-9\w\s\+\-\*×÷\.]+\)|[٠-٩0-9]+|[أ-ي]+)\s*([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+)/g;
-  const PAT_CARET_JS = /(\(-?[٠-٩0-9\w\s\+\-\*×÷\.]+\)|[٠-٩0-9]+|[أ-ي]+)\s*\^\s*([٠-٩0-9]+)/g;
+  const UNICODE_SUP_TO_WESTERN_MAP = {
+    '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
+    '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+    '⁺': '+', '⁻': '-'
+  };
+  const PAT_BASE_SUP_JS = /(\((?:[^()<>]|\([^()<>]*\))+\)|[٠-٩0-9]+|[أ-ي]+)\s*([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+)/g;
+  const PAT_CARET_JS = /(\((?:[^()<>]|\([^()<>]*\))+\)|[٠-٩0-9]+|[أ-ي]+)\s*\^\s*([+\-]?[٠-٩0-9]+)/g;
+
+  const WESTERN_TO_SUP_MAP = {
+    '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+    '٠': '⁰', '١': '¹', '٢': '²', '٣': '³', '٤': '⁴', '٥': '⁵', '٦': '⁶', '٧': '⁷', '٨': '⁸', '٩': '⁹',
+    '+': '⁺', '-': '⁻', 'n': 'ⁿ'
+  };
+  const WESTERN_TO_SUBSCRIPT_MAP = {
+    '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉'
+  };
+
+  /** تحويل الأس إلى رموز علوية مألوفة للنص العادي (x² بدلاً من x^2) */
+  function toSuperscriptText(exp) {
+    const e = String(exp || '').trim();
+    const chars = Array.from(e);
+    if (chars.length && chars.every(function (c) { return WESTERN_TO_SUP_MAP[c]; })) {
+      return chars.map(function (c) { return WESTERN_TO_SUP_MAP[c]; }).join('');
+    }
+    return '^(' + e + ')';
+  }
+
+  /** تحويل المؤشر السفلي إلى رموز سفلية مألوفة للنص العادي (x₁ بدلاً من x_1) */
+  function toSubscriptText(sub) {
+    const s = String(sub || '').trim();
+    const chars = Array.from(s);
+    if (chars.length && chars.every(function (c) { return WESTERN_TO_SUBSCRIPT_MAP[c] || (EASTERN_TO_WESTERN_MAP[c] && WESTERN_TO_SUBSCRIPT_MAP[EASTERN_TO_WESTERN_MAP[c]]); })) {
+      return chars.map(function (c) {
+        const w = EASTERN_TO_WESTERN_MAP[c] || c;
+        return WESTERN_TO_SUBSCRIPT_MAP[w] || c;
+      }).join('');
+    }
+    return '_' + s;
+  }
+
+  /**
+   * المؤشرات السفلية في المرحلتين الابتدائية والمتوسطة: (ص٢ - ص١) ÷ (س٢ - س١) ، م١ × م٢ ، م_العمودي
+   * تُكتب الأرقام مصغرة أسفل المتغير كما في الكتاب المدرسي، ولا تُطبق إلا في سياق رياضي
+   */
+  const AR_SUB_CONTEXT = /[=÷×≠]|\(\s*[سص][٠-٩0-9]/;
+  function markArabicSubscripts(s) {
+    if (!s) return s;
+    s = s.replace(/(^|[\s(،,{=\-+×÷])([سصمبعلن])_([\u0621-\u064A]+|[٠-٩0-9]+)/g, function (_, pre, v, sub) {
+      return pre + v + '<sub class="ar-sub">' + toEasternDigits(sub) + '</sub>';
+    });
+    if (!AR_SUB_CONTEXT.test(s)) return s;
+    return s.replace(/(^|[\s(،,{=\-+×÷])([سصمبعلن])([٠-٩0-9])(?=$|[\s)،,}=\-+×÷.:؛])/g, function (_, pre, v, d) {
+      return pre + v + '<sub class="ar-sub">' + toEasternDigits(d) + '</sub>';
+    });
+  }
 
   /**
    * صياغة القوة والأس الرياضي باللغة العربية:
@@ -92,9 +145,89 @@
     return '<span class="ar-pow"><span class="ar-base">' + safeBase + '</span><sup class="ar-exp">' + safeExp + '</sup></span>';
   }
 
-  function formatMathExponents(input) {
+  /**
+   * صياغة القوة والأس للمرحلة الثانوية (LTR بالأرقام الإنجليزية 0-9)
+   */
+  function formatSecondaryExponent(base, exp) {
+    const safeBase = toWesternDigits(String(base || '').trim());
+    const safeExp = toWesternDigits(String(exp || '').trim());
+    return '<span class="sec-pow" dir="ltr"><span class="sec-base">' + safeBase + '</span><sup class="sec-exp">' + safeExp + '</sup></span>';
+  }
+
+  function convertSecInnerMath(fragment) {
+    if (fragment === null || fragment === undefined) return '';
+    let s = toWesternDigits(String(fragment));
+    // المؤشرات المكتوبة بشكل مسطح (x1, y2, m1) أو برموز يونيكود (x₁) تُوحّد إلى صيغة المؤشر السفلي
+    s = s.replace(/([A-Za-z])([₀₁₂₃₄₅₆₇₈₉]+)/g, function (_, v, subs) {
+      return v + '_' + Array.from(subs).map(function (c) { return String(c.charCodeAt(0) - 0x2080); }).join('');
+    });
+    s = s.replace(/(^|[^A-Za-z0-9_\-<\/"'=])([xym])([0-9])(?![A-Za-z0-9])/g, '$1$2_$3');
+    const innerSaved = [];
+    s = s.replace(/<span\s+class=["'][^"']*sec-pow[^"']*["'][^>]*>[\s\S]*?<\/span>|<sub\b[^>]*>[\s\S]*?<\/sub>/gi, function (tag) {
+      const ph = '___SECINNER' + numToAlpha(innerSaved.length) + '___';
+      innerSaved.push(tag);
+      return ph;
+    });
+
+    const escTextOnly = function (t) {
+      return String(t)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    };
+
+    const parts = [];
+    const subAndPowStasher = function (htmlTag) {
+      const ph = '___SECINBUILT' + numToAlpha(parts.length) + '___';
+      parts.push(htmlTag);
+      return ph;
+    };
+
+    s = s.replace(/(\((?:[^()<>]|\([^()<>]*\))+\)|[a-zA-Z₁₂₃₄₅₆₇₈₉₀]+|[0-9]+)\s*\^\s*([+\-]?[0-9a-zA-Z]+)/g, function (_, base, exp) {
+      let b = base;
+      if (/^\(/.test(b)) {
+        b = b.replace(/(?<![A-Za-z_])([A-Za-z])_([A-Za-z0-9]+)(?![A-Za-z0-9_])/g, function (__, v, sub) {
+          return v + subAndPowStasher('<sub class="sec-sub">' + escTextOnly(sub) + '</sub>');
+        });
+      }
+      return subAndPowStasher(formatSecondaryExponent(b, exp));
+    });
+
+    s = s.replace(/(\((?:[^()<>]|\([^()<>]*\))+\)|[a-zA-Z₁₂₃₄₅₆₇₈₉₀]+|[0-9]+)\s*([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+)/g, function (_, base, sups) {
+      const expWestern = Array.from(sups).map(function (c) { return UNICODE_SUP_TO_WESTERN_MAP[c] || c; }).join('');
+      let b = base;
+      if (/^\(/.test(b)) {
+        b = b.replace(/(?<![A-Za-z_])([A-Za-z])_([A-Za-z0-9]+)(?![A-Za-z0-9_])/g, function (__, v, sub) {
+          return v + subAndPowStasher('<sub class="sec-sub">' + escTextOnly(sub) + '</sub>');
+        });
+      }
+      return subAndPowStasher(formatSecondaryExponent(b, expWestern));
+    });
+
+    s = s.replace(/(?<![A-Za-z_])([A-Za-z])_([A-Za-z0-9]+)(?![A-Za-z0-9_])/g, function (_, v, sub) {
+      return v + subAndPowStasher('<sub class="sec-sub">' + escTextOnly(sub) + '</sub>');
+    });
+
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const ph = '___SECINBUILT' + numToAlpha(i) + '___';
+      s = s.split(ph).join(parts[i]);
+    }
+    for (let i = innerSaved.length - 1; i >= 0; i--) {
+      const ph = '___SECINNER' + numToAlpha(i) + '___';
+      s = s.split(ph).join(innerSaved[i]);
+    }
+    return s;
+  }
+
+  function formatMathExponents(input, isSecondary) {
     if (input === null || input === undefined) return '';
     let str = String(input);
+    const sec = (isSecondary === true) || isSecondaryStage(isSecondary) || str.indexOf('sec-math') !== -1 || str.indexOf('ltr-math') !== -1 || str.indexOf('sec-pow') !== -1;
+    if (sec) {
+      return convertSecInnerMath(str);
+    }
     str = str.replace(PAT_CARET_JS, function (_, base, exp) {
       return formatArabicExponent(base, exp);
     });
@@ -126,19 +259,24 @@
 
     if (sec) {
       s = toWesternDigits(s);
+      s = s.replace(/<span\s+class=["'][^"']*(?:sec-math|ltr-math)[^"']*["'][^>]*>([\s\S]*?)<\/span>/gi, function (_, inner) {
+        const formatted = convertSecInnerMath(inner);
+        return '<span dir="ltr" style="direction:ltr; unicode-bidi:isolate; font-family:\'Times New Roman\',serif; font-style:italic; font-weight:bold;">' + formatted + '</span>';
+      });
+      s = convertSecInnerMath(s);
       // الأسس والصيغ الإنجليزية للثانوي في Word
-      s = s.replace(/<span\s+class=["'](?:sec-pow|ar-pow)["']\s*>\s*<span\s+class=["'](?:sec-base|ar-base)["']>([\s\S]*?)<\/span>\s*<sup\s+class=["'](?:sec-exp|ar-exp)["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+      s = s.replace(/<span\s+class=["'][^"']*(?:sec-pow|ar-pow)[^"']*["'][^>]*>\s*<span\s+class=["'][^"']*(?:sec-base|ar-base)[^"']*["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["'][^"']*(?:sec-exp|ar-exp)[^"']*["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
         return '<span dir="ltr" style="direction:ltr; unicode-bidi:isolate; font-weight:bold;">' + base + '<sup style="font-size:75%; vertical-align:super;">' + exp + '</sup></span>';
       });
-      // العبارات المحددة كـ sec-math
-      s = s.replace(/<span\s+class=["'][^"']*sec-math[^"']*["'][^>]*>([\s\S]*?)<\/span>/gi, function (_, inner) {
-        return '<span dir="ltr" style="direction:ltr; unicode-bidi:isolate; font-family:\'Times New Roman\',serif; font-style:italic; font-weight:bold;">' + inner + '</span>';
+      s = s.replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, function (_, subTxt) {
+        return '<sub style="font-size:75%; vertical-align:sub;">' + subTxt + '</sub>';
       });
       return s;
     }
 
     const powers = [];
-    s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+    s = formatMathExponents(s);
+    s = s.replace(/<span\s+class=["']ar-pow["'][^>]*>\s*<span\s+class=["']ar-base["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const ph = '___ARPOW' + numToAlpha(powers.length) + '___';
       powers.push({ base: toEasternDigits(base), exp: toEasternDigits(exp) });
       return ph;
@@ -200,7 +338,7 @@
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     let s = String(str);
-    if (s.indexOf('ar-pow') === -1) {
+    if (s.indexOf('ar-pow') === -1 && s.indexOf('sec-pow') === -1 && s.indexOf('sec-sub') === -1) {
       return s
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -208,10 +346,10 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
     }
-    const powers = [];
-    s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
-      const ph = '___ARPOW' + numToAlpha(powers.length) + '___';
-      powers.push({ base: base, exp: exp });
+    const preserved = [];
+    s = s.replace(/<span\s+class=["'][^"']*(?:ar-pow|sec-pow)[^"']*["'][^>]*>\s*<span\s+class=["'][^"']*(?:ar-base|sec-base)[^"']*["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["'][^"']*(?:ar-exp|sec-exp)[^"']*["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>|<sub\b[^>]*>[\s\S]*?<\/sub>/gi, function (fullTag) {
+      const ph = '___ESCPOW' + numToAlpha(preserved.length) + '___';
+      preserved.push(fullTag);
       return ph;
     });
     s = s
@@ -220,9 +358,9 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
-    powers.forEach(function (p, i) {
-      const ph = '___ARPOW' + numToAlpha(i) + '___';
-      s = s.split(ph).join('<span class="ar-pow"><span class="ar-base">' + p.base + '</span><sup class="ar-exp">' + p.exp + '</sup></span>');
+    preserved.forEach(function (fullTag, i) {
+      const ph = '___ESCPOW' + numToAlpha(i) + '___';
+      s = s.split(ph).join(fullTag);
     });
     return s;
   }
@@ -237,46 +375,106 @@
     let s = String(input);
     const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
 
-    if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('sec-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1)) {
+    if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('sec-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1 || s.indexOf('sub') !== -1)) {
       s = s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
     }
 
     if (sec) {
-      // المرحلة الثانوية: أرقام إنجليزية (0-9) حصراً + اتجاه LTR للمعادلات والرموز الجبرية
+      // المرحلة الثانوية: أرقام إنجليزية (0-9) حصراً + تحويل الأسس والمؤشرات السفلية داخل وسوم LTR وخارجها بأمان تام
       s = toWesternDigits(s);
       const secTags = [];
-      s = s.replace(/<span\s+[^>]*>[\s\S]*?<\/span>/gi, function (fullTag) {
+      const stashTag = function (fullTag) {
         const ph = '___SECTAG' + numToAlpha(secTags.length) + '___';
         secTags.push(fullTag);
         return ph;
-      });
+      };
 
-      // صياغة الأسس الإنجليزية مثل x^2 أو (x+3)^2
-      s = s.replace(/(\(-?[0-9a-zA-Z\s\+\-\*\/=]+\)|[0-9a-zA-Z]+)\s*\^\s*([0-9a-zA-Z]+)/g, function (_, base, exp) {
-        return '<span class="sec-pow" dir="ltr"><span class="sec-base">' + escapeHtml(base) + '</span><sup class="sec-exp">' + escapeHtml(exp) + '</sup></span>';
-      });
-
-      // صياغة العبارات والمعادلات الإنجليزية المباشرة مثل y = 2x + 1 أو DE = 8x - 3 أو m∠A + m∠B = 90° إذا لم تكن مضمنة في وسم
-      s = s.replace(/(?<![\w\>])([A-Z][a-zA-Z0-9_\'\^\*\+\-\/\s\=∠≅△°~><]{2,}[A-Za-z0-9°])(?![\w\<])/g, function (match) {
-        if (match.indexOf('___SECTAG') !== -1 || match.indexOf('sec-pow') !== -1) return match;
-        // إذا كان تعبيراً رياضياً يحتوي على رمز رياضي أو مساواة
-        if (/[=\+\-∠≅△°~><^]/.test(match) && !/[أ-ي]/.test(match)) {
-          return '<span class="sec-math ltr-math" dir="ltr">' + match + '</span>';
+      // استخراج وسوم <span> المتوازنة (مع دعم التداخل) وتحويل الأسس والمؤشرات داخلها
+      let rebuilt = '';
+      let cursor = 0;
+      const openSpanPat = /<span\b([^>]*)>/gi;
+      let om;
+      while ((om = openSpanPat.exec(s)) !== null) {
+        if (om.index < cursor) continue;
+        if (om.index > cursor) {
+          rebuilt += s.substring(cursor, om.index);
         }
-        return match;
-      });
+        let depth = 1;
+        const innerStart = openSpanPat.lastIndex;
+        const tagScanner = /<\/?span\b[^>]*>/gi;
+        tagScanner.lastIndex = innerStart;
+        let tm;
+        let closeStart = -1;
+        let closeEnd = innerStart;
+        while ((tm = tagScanner.exec(s)) !== null) {
+          if (tm[0].charAt(1) === '/') {
+            depth--;
+            if (depth === 0) {
+              closeStart = tm.index;
+              closeEnd = tagScanner.lastIndex;
+              break;
+            }
+          } else {
+            depth++;
+          }
+        }
+        if (closeStart !== -1) {
+          const attrs = om[1] || '';
+          const inner = s.substring(innerStart, closeStart);
+          if (/sec-math|ltr-math/.test(attrs)) {
+            rebuilt += stashTag('<span class="sec-math ltr-math" dir="ltr">' + convertSecInnerMath(inner) + '</span>');
+          } else {
+            rebuilt += stashTag(s.substring(om.index, closeEnd));
+          }
+          cursor = closeEnd;
+          openSpanPat.lastIndex = cursor;
+        } else {
+          rebuilt += s.substring(om.index);
+          cursor = s.length;
+          break;
+        }
+      }
+      if (cursor < s.length) {
+        rebuilt += s.substring(cursor);
+      }
 
-      secTags.forEach(function (tag, i) {
+      // معالجة النصوص خارج الوسوم فقط
+      const segs = rebuilt.split(/(___SECTAG[A-Z]+___)/);
+      s = segs.map(function (seg) {
+        if (!seg || /^___SECTAG[A-Z]+___$/.test(seg)) return seg;
+        let chunk = convertSecInnerMath(seg);
+        // حفظ sec-pow / sec-sub الناتجة عن التحويل حتى لا تمسها تعبيرات المقارنة التالية
+        const innerTags = [];
+        chunk = chunk.replace(/<span\s+class=["']sec-pow["'][^>]*>\s*<span\s+class=["']sec-base["'][^>]*>[\s\S]*?<\/span>\s*<sup\s+class=["']sec-exp["'][^>]*>[\s\S]*?<\/sup>\s*<\/span>|<sub\b[^>]*>[\s\S]*?<\/sub>/gi, function (t) {
+          const ph = '___CHKTAG' + numToAlpha(innerTags.length) + '___';
+          innerTags.push(t);
+          return ph;
+        });
+        chunk = chunk.replace(/(?<![\w\>])([A-Za-z][a-zA-Z0-9_\'\^\*\+\-\/\s\=∠≅△°~><]{2,}[A-Za-z0-9°])(?![\w\<])/g, function (match) {
+          if (match.indexOf('___CHKTAG') !== -1) return match;
+          if (/[=\+\-∠≅△°~><^]/.test(match) && !/[أ-ي]/.test(match)) {
+            return '<span class="sec-math ltr-math" dir="ltr">' + match + '</span>';
+          }
+          return match;
+        });
+        for (let i = innerTags.length - 1; i >= 0; i--) {
+          const ph = '___CHKTAG' + numToAlpha(i) + '___';
+          chunk = chunk.split(ph).join(innerTags[i]);
+        }
+        return chunk;
+      }).join('');
+
+      for (let i = secTags.length - 1; i >= 0; i--) {
         const ph = '___SECTAG' + numToAlpha(i) + '___';
-        s = s.split(ph).join(tag);
-      });
+        s = s.split(ph).join(secTags[i]);
+      }
 
       return s;
     }
 
     // المرحلة الابتدائية والمتوسطة: الأرقام العربية المشرقية والأسس على يسار الأساس
     const powers = [];
-    s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+    s = s.replace(/<span\s+class=["']ar-pow["'][^>]*>\s*<span\s+class=["']ar-base["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const ph = '___ARPOW' + numToAlpha(powers.length) + '___';
       powers.push({
         base: toEasternDigits(String(base || '').replace(/<[^>]+>/g, '').trim()),
@@ -286,7 +484,7 @@
     });
 
     s = formatMathExponents(s);
-    s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+    s = s.replace(/<span\s+class=["']ar-pow["'][^>]*>\s*<span\s+class=["']ar-base["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const ph = '___ARPOW' + numToAlpha(powers.length) + '___';
       powers.push({
         base: toEasternDigits(String(base || '').replace(/<[^>]+>/g, '').trim()),
@@ -313,23 +511,25 @@
     let s = String(input);
     const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
     if (sec) {
-      s = s.replace(/<span\s+class=["'](?:sec-pow|ar-pow)["']\s*>\s*<span\s+class=["'](?:sec-base|ar-base)["']>([\s\S]*?)<\/span>\s*<sup\s+class=["'](?:sec-exp|ar-exp)["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+      s = s.replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, function (_, sub) {
+        const subDigits = toWesternDigits(String(sub || '').replace(/<[^>]+>/g, '').trim());
+        return toSubscriptText(subDigits);
+      });
+      s = s.replace(/<span\s+class=["'][^"']*(?:sec-pow|ar-pow)[^"']*["'][^>]*>\s*<span\s+class=["'][^"']*(?:sec-base|ar-base)[^"']*["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["'][^"']*(?:sec-exp|ar-exp)[^"']*["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
         const b = toWesternDigits(String(base || '').replace(/<[^>]+>/g, '').trim());
         const e = toWesternDigits(String(exp || '').replace(/<[^>]+>/g, '').trim());
-        return b + '^' + e;
+        return b + toSuperscriptText(e);
       });
       return toWesternDigits(s.replace(/<[^>]+>/g, '').trim());
     }
-    s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+    s = s.replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, function (_, sub) {
+      const subClean = toEasternDigits(String(sub || '').replace(/<[^>]+>/g, '').trim());
+      return toSubscriptText(subClean);
+    });
+    s = s.replace(/<span\s+class=["']ar-pow["'][^>]*>\s*<span\s+class=["']ar-base["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const b = toEasternDigits(String(base || '').replace(/<[^>]+>/g, '').trim());
       const e = toEasternDigits(String(exp || '').replace(/<[^>]+>/g, '').trim());
-      if (/^(كلم|سم|م|ملم|دسم)$/.test(b) && e === '٢') {
-        return b + '²';
-      }
-      if (/^(كلم|سم|م|ملم|دسم)$/.test(b) && e === '٣') {
-        return b + '³';
-      }
-      return b + ' (أس ' + e + ')';
+      return b + toSuperscriptText(e);
     });
     return toEasternDigits(s.replace(/<[^>]+>/g, '').trim());
   }
@@ -343,14 +543,17 @@
     let s = String(input);
     const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
     if (sec) {
-      s = s.replace(/<span\s+class=["'](?:sec-pow|ar-pow)["']\s*>\s*<span\s+class=["'](?:sec-base|ar-base)["']>([\s\S]*?)<\/span>\s*<sup\s+class=["'](?:sec-exp|ar-exp)["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+      s = s.replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, function (_, sub) {
+        return '_' + toWesternDigits(String(sub || '').replace(/<[^>]+>/g, '').trim());
+      });
+      s = s.replace(/<span\s+class=["'][^"']*(?:sec-pow|ar-pow)[^"']*["'][^>]*>\s*<span\s+class=["'][^"']*(?:sec-base|ar-base)[^"']*["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["'][^"']*(?:sec-exp|ar-exp)[^"']*["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
         const b = toWesternDigits(String(base || '').replace(/<[^>]+>/g, '').trim());
         const e = toWesternDigits(String(exp || '').replace(/<[^>]+>/g, '').trim());
         return b + '^' + e;
       });
       return toWesternDigits(s.replace(/<[^>]+>/g, '').trim());
     }
-    s = s.replace(/<span\s+class=["']ar-pow["']\s*>\s*<span\s+class=["']ar-base["']>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["']>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
+    s = s.replace(/<span\s+class=["']ar-pow["'][^>]*>\s*<span\s+class=["']ar-base["'][^>]*>([\s\S]*?)<\/span>\s*<sup\s+class=["']ar-exp["'][^>]*>([\s\S]*?)<\/sup>\s*<\/span>/gi, function (_, base, exp) {
       const b = toEasternDigits(String(base || '').replace(/<[^>]+>/g, '').trim());
       const e = toEasternDigits(String(exp || '').replace(/<[^>]+>/g, '').trim());
       return b + '^' + e;

@@ -3473,29 +3473,38 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 }
 
 .sec-pow {
-  display: inline-flex !important;
-  flex-direction: row !important;
+  display: inline-block !important;
   direction: ltr !important;
-  align-items: flex-start !important;
   unicode-bidi: isolate !important;
   vertical-align: baseline !important;
-  margin: 0 2px !important;
+  margin: 0 !important;
+  line-height: 1 !important;
 }
 
 .sec-pow .sec-base {
-  display: inline-block !important;
   font-family: 'Cambria Math', 'Times New Roman', serif !important;
-  font-style: italic !important;
   font-size: 1em !important;
 }
 
 .sec-pow .sec-exp {
-  display: inline-block !important;
-  font-size: 0.68em !important;
-  font-weight: bold !important;
-  line-height: 1 !important;
-  transform: translateY(-0.42em) !important;
+  font-family: 'Cambria Math', 'Times New Roman', serif !important;
+  font-size: 0.72em !important;
+  font-weight: 700 !important;
+  font-style: normal !important;
+  vertical-align: super !important;
+  line-height: 0 !important;
   margin-left: 1px !important;
+  transform: none !important;
+  top: 0 !important;
+  color: inherit !important;
+}
+
+.sec-sub {
+  font-family: 'Cambria Math', 'Times New Roman', serif !important;
+  font-size: 0.72em !important;
+  font-style: normal !important;
+  vertical-align: sub !important;
+  line-height: 0 !important;
   color: inherit !important;
 }
 

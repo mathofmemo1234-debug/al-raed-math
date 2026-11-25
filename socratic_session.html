@@ -622,15 +622,39 @@
       .mastery-cert { border: 2px solid #000; box-shadow: none; page-break-before: always; }
     }
 
-    .sec-math, .ltr-math, .sec-pow {
+    .sec-math, .ltr-math {
       direction: ltr !important;
       unicode-bidi: isolate !important;
       display: inline-block;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-style: italic;
+    }
+    .sec-pow {
+      display: inline-block !important;
+      direction: ltr !important;
+      unicode-bidi: isolate !important;
+      vertical-align: baseline !important;
+      margin: 0 !important;
+      line-height: 1 !important;
+    }
+    .sec-pow .sec-base {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 1em;
     }
     .sec-pow .sec-exp {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
       font-size: 0.72em;
+      font-weight: 700;
+      font-style: normal;
       vertical-align: super;
+      line-height: 0;
+      margin-left: 1px;
+    }
+    .sec-sub {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 0.72em;
+      font-style: normal;
+      vertical-align: sub;
       line-height: 0;
     }
   </style>
@@ -868,12 +892,12 @@
   </div>
 
   <!-- Required Scripts -->
-  <script src="assets/js/arabic_utils.js?v=20261124_v4"></script>
-  <script src="assets/js/grade6_book_data.js?v=20261124_v4"></script>
-  <script src="assets/js/grade1m_book_data.js?v=20261124_v4"></script>
-  <script src="assets/js/grade3m_book_data.js?v=20261124_v4"></script>
-  <script src="assets/js/grade1s_book_data.js?v=20261124_v4"></script>
-  <script src="assets/js/curriculum_tree.js?v=20261124_v4"></script>
+  <script src="assets/js/arabic_utils.js?v=20261125_v1"></script>
+  <script src="assets/js/grade6_book_data.js?v=20261125_v1"></script>
+  <script src="assets/js/grade1m_book_data.js?v=20261125_v1"></script>
+  <script src="assets/js/grade3m_book_data.js?v=20261125_v1"></script>
+  <script src="assets/js/grade1s_book_data.js?v=20261125_v1"></script>
+  <script src="assets/js/curriculum_tree.js?v=20261125_v1"></script>
 
   <script>
     (function () {

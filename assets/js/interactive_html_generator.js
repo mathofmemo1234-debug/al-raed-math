@@ -786,15 +786,39 @@
       .section-card, .header-card { box-shadow: none !important; border: 1px solid #ccc !important; }
     }
 
-    .sec-math, .ltr-math, .sec-pow {
+    .sec-math, .ltr-math {
       direction: ltr !important;
       unicode-bidi: isolate !important;
       display: inline-block;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-style: italic;
+    }
+    .sec-pow {
+      display: inline-block !important;
+      direction: ltr !important;
+      unicode-bidi: isolate !important;
+      vertical-align: baseline !important;
+      margin: 0 !important;
+      line-height: 1 !important;
+    }
+    .sec-pow .sec-base {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 1em;
     }
     .sec-pow .sec-exp, .ar-pow .ar-exp {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
       font-size: 0.72em;
+      font-weight: 700;
+      font-style: normal;
       vertical-align: super;
+      line-height: 0;
+      margin-left: 1px;
+    }
+    .sec-sub {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 0.72em;
+      font-style: normal;
+      vertical-align: sub;
       line-height: 0;
     }
   </style>

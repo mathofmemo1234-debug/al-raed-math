@@ -799,7 +799,7 @@
     const expEl = document.getElementById('eb-edit-exp-' + idx);
     const capEl = document.getElementById('eb-edit-img-cap-' + idx);
 
-    q.q = utils.formatMathExponents(normDigits((textEl && textEl.value) || q.q));
+    q.q = utils.formatMathExponents(normDigits((textEl && textEl.value) || q.q), qIsSec);
     if (q.type === 'tf') q.statement = q.q;
     q.marks = Math.max(0.5, Math.min(20, utils.toWesternNumber(marksEl && marksEl.value, q.marks || 1)));
     if (capEl) q.imageCaption = normDigits(capEl.value.trim());
@@ -807,19 +807,19 @@
     if (q.type === 'mcq') {
       q.options = [0, 1, 2, 3].map(function (i) {
         const el = document.getElementById('eb-edit-opt-' + idx + '-' + i);
-        return utils.formatMathExponents(normDigits((el && el.value) || ''));
+        return utils.formatMathExponents(normDigits((el && el.value) || ''), qIsSec);
       });
       const radio = document.querySelector('input[name="eb-edit-correct-' + idx + '"]:checked');
       if (radio) q.correct = Number(radio.value);
-      q.explanation = utils.formatMathExponents(normDigits((expEl && expEl.value) || ''));
+      q.explanation = utils.formatMathExponents(normDigits((expEl && expEl.value) || ''), qIsSec);
     } else if (q.type === 'tf') {
       const tfRadio = document.querySelector('input[name="eb-edit-tf-' + idx + '"]:checked');
       if (tfRadio) q.is_true = (tfRadio.value === 'true');
-      q.explanation = utils.formatMathExponents(normDigits((expEl && expEl.value) || ''));
+      q.explanation = utils.formatMathExponents(normDigits((expEl && expEl.value) || ''), qIsSec);
     } else {
       const ansEl = document.getElementById('eb-edit-ans-' + idx);
       const linesEl = document.getElementById('eb-edit-lines-' + idx);
-      q.ans = utils.formatMathExponents(normDigits((ansEl && ansEl.value) || ''));
+      q.ans = utils.formatMathExponents(normDigits((ansEl && ansEl.value) || ''), qIsSec);
       q.lines = Math.max(2, Math.min(6, Math.round(utils.toWesternNumber(linesEl && linesEl.value, 3))));
     }
 
@@ -850,7 +850,7 @@
     const normDigits = function (s) { return isSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s); };
     const choiceLetters = (isSec && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : utils.CHOICE_LETTERS;
     const t = state.customType;
-    const text = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-q').value.trim()));
+    const text = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-q').value.trim()), isSec);
     const marks = Math.max(0.5, Math.min(20, utils.toWesternNumber(document.getElementById('eb-cust-marks').value, t === 'essay' ? 2 : 1)));
     const capEl = document.getElementById('eb-cust-img-cap');
     const customCap = capEl ? normDigits(capEl.value.trim()) : '';
@@ -876,18 +876,18 @@
 
     if (t === 'mcq') {
       newQ.options = [0, 1, 2, 3].map(function (i) {
-        return utils.formatMathExponents(normDigits(document.getElementById('eb-cust-opt-' + i).value.trim() || ('خيار ' + choiceLetters[i])));
+        return utils.formatMathExponents(normDigits(document.getElementById('eb-cust-opt-' + i).value.trim() || ('خيار ' + choiceLetters[i])), isSec);
       });
       const r = document.querySelector('input[name="eb-cust-correct"]:checked');
       newQ.correct = r ? Number(r.value) : 0;
-      newQ.explanation = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-exp').value.trim()));
+      newQ.explanation = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-exp').value.trim()), isSec);
     } else if (t === 'tf') {
       newQ.statement = text;
       const r = document.querySelector('input[name="eb-cust-tf"]:checked');
       newQ.is_true = r ? (r.value === 'true') : true;
-      newQ.explanation = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-exp').value.trim()));
+      newQ.explanation = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-exp').value.trim()), isSec);
     } else {
-      newQ.ans = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-ans').value.trim()));
+      newQ.ans = utils.formatMathExponents(normDigits(document.getElementById('eb-cust-ans').value.trim()), isSec);
       newQ.lines = Math.max(2, Math.min(6, Math.round(utils.toWesternNumber(document.getElementById('eb-cust-lines').value, 3))));
     }
 

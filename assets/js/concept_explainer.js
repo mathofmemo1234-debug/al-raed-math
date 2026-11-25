@@ -14,7 +14,7 @@
   'use strict';
 
   const TEACHER_STORE_KEY = 'alraed_teacher_subtopics_v1';
-  const CACHE_STORE_KEY = 'alraed_ce_cache_v1';
+  const CACHE_STORE_KEY = 'alraed_ce_cache_v2';
   const STOP_WORDS = new Set(['في', 'من', 'على', 'إلى', 'عن', 'ما', 'هي', 'هو', 'هذا', 'هذه', 'كيف', 'متى', 'لماذا', 'أو', 'ثم', 'بين', 'مع', 'كل', 'أي', 'لي', 'لـ', 'الدرس', 'جزئية', 'شرح', 'مثال', 'توضيحي', 'تفصيلي', 'اريد', 'أريد', 'اشرح']);
 
   const state = {
@@ -125,7 +125,7 @@
 
   function normalizeExampleObj(ex, isSec) {
     if (!ex || typeof ex !== 'object') {
-      return { problem: '', steps: [], finalAnswer: '', fig: '' };
+      return { problem: '', steps: [], finalAnswer: '', fig: '', isExactUserSolution: false };
     }
     return {
       problem: String(ex.problem || '').trim(),
@@ -133,8 +133,61 @@
       finalAnswer: String(ex.finalAnswer || '').trim(),
       fig: String(ex.fig || ex.image || '').trim(),
       cap: String(ex.cap || ex.imageCaption || '').trim(),
-      isSec: !!isSec
+      isSec: !!isSec,
+      isExactUserSolution: !!ex.isExactUserSolution
     };
+  }
+
+  function normCmpText(s) {
+    return String(s || '')
+      .replace(/[\s.،,:؛$()\[\]{}]/g, '')
+      .toLowerCase();
+  }
+
+  function isRedundantFinalAnswer(steps, finalAnswer) {
+    const fa = String(finalAnswer || '').trim();
+    if (!fa) return true;
+    if (!Array.isArray(steps) || !steps.length) return false;
+    const last = String(steps[steps.length - 1] || '').trim();
+    if (!last) return false;
+    const nFa = normCmpText(fa);
+    const nLast = normCmpText(last);
+    if (!nFa || nFa === nLast) return true;
+    // Also treat as redundant when finalAnswer literally contains the entire multi-step chain of last step
+    if (nFa.length >= 10 && nLast.indexOf(nFa) !== -1 && fa.indexOf('=') !== -1 && fa.split('=').length >= 3) {
+      return true;
+    }
+    return false;
+  }
+
+  function extractConciseFinalAnswer(lastStep) {
+    const s = String(lastStep || '').replace(/[.\s]+$/, '').trim();
+    if (!s) return '';
+    // Look for explicit conclusion markers
+    const arrowParts = s.split(/(?:←|⇐|إذن|ومنه|وبالتالي)/);
+    if (arrowParts.length > 1) {
+      const tail = arrowParts[arrowParts.length - 1].replace(/^[:\s،]+/, '').trim();
+      if (tail && tail.length <= 55 && tail.length < s.length && (tail.match(/\$/g) || []).length % 2 === 0) {
+        return tail;
+      }
+    }
+    // Condense chained equalities like "د(٤) = -٣(٤) + ٧ = -١٢ + ٧ = -٥" -> "د(٤) = -٥"
+    const eqParts = s.split('=');
+    if (eqParts.length >= 3) {
+      let lhs = eqParts[0].trim();
+      const rhs = eqParts[eqParts.length - 1].trim();
+      // Strip verbose Arabic prefix before math expression if there is a colon
+      const colonIdx = lhs.lastIndexOf(':');
+      if (colonIdx !== -1 && (lhs.match(/\$/g) || []).length % 2 === 0) {
+        const afterColon = lhs.slice(colonIdx + 1).trim();
+        if (afterColon) lhs = afterColon;
+      }
+      const combined = lhs + ' = ' + rhs;
+      if (lhs && rhs && lhs.length <= 34 && rhs.length <= 40 && (combined.match(/\$/g) || []).length % 2 === 0 && combined.length < s.length) {
+        return combined;
+      }
+    }
+    return '';
   }
 
   /**
@@ -157,14 +210,17 @@
       if (seen.has(key)) return;
       seen.add(key);
       const solSteps = splitIntoSteps(s);
-      let concl = finalAnswer;
-      if (!concl && solSteps.length > 1) {
-        concl = solSteps[solSteps.length - 1];
+      let concl = String(finalAnswer || '').trim();
+      if (!concl && solSteps.length > 0) {
+        concl = extractConciseFinalAnswer(solSteps[solSteps.length - 1]);
+      }
+      if (isRedundantFinalAnswer(solSteps, concl)) {
+        concl = '';
       }
       pool.push(normalizeExampleObj({
         problem: p,
         steps: solSteps.length ? solSteps : (s ? [s] : []),
-        finalAnswer: concl || '',
+        finalAnswer: concl,
         fig: fig || '',
         cap: cap || ''
       }, isSec));
@@ -469,6 +525,931 @@
   }
 
   /**
+   * محلّل وحلّال رياضي محلي دقيق وآمن (دون eval) يحل المسائل المدخلة خطوة بخطوة
+   */
+  const AR_TO_LAT_VAR = { 'س': 'x', 'ص': 'y', 'ع': 'z', 'ن': 'n', 'م': 'm', 'ك': 'k', 'ت': 't' };
+  const LAT_TO_AR_VAR = { 'x': 'س', 'y': 'ص', 'z': 'ع', 'n': 'ن', 'm': 'م', 'k': 'ك', 't': 'ت' };
+  const MATH_FUNCS = new Set(['sqrt', 'abs', 'sin', 'cos', 'tan', 'log', 'ln']);
+
+  function replaceBraceCommand(str, cmd, replacer) {
+    let out = String(str || '');
+    let guard = 0;
+    while (out.indexOf(cmd + '{') !== -1 && guard++ < 25) {
+      const idx = out.indexOf(cmd + '{');
+      const open1 = idx + cmd.length;
+      let depth = 0;
+      let close1 = -1;
+      for (let i = open1; i < out.length; i++) {
+        if (out[i] === '{') depth++;
+        else if (out[i] === '}') {
+          depth--;
+          if (depth === 0) { close1 = i; break; }
+        }
+      }
+      if (close1 === -1) break;
+      const arg1 = out.slice(open1 + 1, close1);
+      if (replacer.length === 1) {
+        out = out.slice(0, idx) + replacer(arg1) + out.slice(close1 + 1);
+      } else {
+        let pos2 = close1 + 1;
+        while (pos2 < out.length && /\s/.test(out[pos2])) pos2++;
+        if (out[pos2] !== '{') break;
+        let d2 = 0;
+        let close2 = -1;
+        for (let j = pos2; j < out.length; j++) {
+          if (out[j] === '{') d2++;
+          else if (out[j] === '}') {
+            d2--;
+            if (d2 === 0) { close2 = j; break; }
+          }
+        }
+        if (close2 === -1) break;
+        const arg2 = out.slice(pos2 + 1, close2);
+        out = out.slice(0, idx) + replacer(arg1, arg2) + out.slice(close2 + 1);
+      }
+    }
+    return out;
+  }
+
+  function normalizeMathExpr(raw) {
+    if (!raw) return '';
+    let s = String(raw);
+    const utils = getUtils();
+    if (utils && typeof utils.toWesternDigits === 'function') {
+      s = utils.toWesternDigits(s);
+    } else {
+      s = s.replace(/[٠-٩]/g, function (d) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)); });
+    }
+    s = s
+      .replace(/٫/g, '.')
+      .replace(/،/g, ',')
+      .replace(/[−–—]/g, '-')
+      .replace(/[×·∗]/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/\$/g, '')
+      .replace(/\\left\b|\\right\b/g, '')
+      .replace(/\\(?:times|cdot)\b/g, '*')
+      .replace(/\\div\b/g, '/')
+      .replace(/\\pi\b|π/g, 'pi');
+
+    s = replaceBraceCommand(s, '\\dfrac', function (a, b) { return '((' + a + ')/(' + b + '))'; });
+    s = replaceBraceCommand(s, '\\frac', function (a, b) { return '((' + a + ')/(' + b + '))'; });
+    s = replaceBraceCommand(s, '\\sqrt', function (a) { return 'sqrt(' + a + ')'; });
+
+    // Convert ^{exp} -> ^(exp)
+    s = s.replace(/\^\s*\{([^}]+)\}/g, '^($1)');
+
+    // Superscripts like ²³ -> ^23
+    const supMap = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁺': '+', '⁻': '-' };
+    s = s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+/g, function (m) {
+      return '^(' + m.split('').map(function (c) { return supMap[c] || ''; }).join('') + ')';
+    });
+
+    // Arabic / Unicode square root
+    s = s.replace(/(?:جذر|√)\s*\(/g, 'sqrt(');
+    s = s.replace(/(?:جذر|√)\s*([0-9]+(?:\.[0-9]+)?|[a-zA-Zسصعنمكت])/g, 'sqrt($1)');
+
+    // Absolute value bars |...|
+    for (let k = 0; k < 2; k++) {
+      s = s.replace(/\|([^|]+)\|/g, 'abs($1)');
+    }
+
+    // Isolated Arabic math variables -> Latin equivalents (ignore words like حساب / قيمة)
+    s = s.replace(/(^|[^A-Za-z\u0621-\u064A])([سصعنمكت])(?![A-Za-z\u0621-\u064A])/g, function (_, pre, ch) {
+      return pre + (AR_TO_LAT_VAR[ch] || ch);
+    });
+
+    return s.trim();
+  }
+
+  function tokenizeMath(normStr) {
+    const tokens = [];
+    const s = String(normStr || '');
+    let i = 0;
+    while (i < s.length) {
+      const ch = s[i];
+      if (/\s/.test(ch)) { i++; continue; }
+      if (/[0-9.]/.test(ch)) {
+        let j = i;
+        while (j < s.length && /[0-9.]/.test(s[j])) j++;
+        const numStr = s.slice(i, j);
+        if (!/^\d*\.?\d+$/.test(numStr)) return null;
+        tokens.push({ type: 'num', val: parseFloat(numStr) });
+        i = j;
+        continue;
+      }
+      if (/[A-Za-z]/.test(ch)) {
+        // Match multi-char known functions/constants first, else single variable char (so xy -> x * y)
+        const rest = s.slice(i);
+        const fnM = rest.match(/^(sqrt|abs|sin|cos|tan|log|ln|pi)(?![A-Za-z])/i);
+        if (fnM) {
+          tokens.push({ type: 'id', val: fnM[1].toLowerCase() });
+          i += fnM[1].length;
+        } else {
+          tokens.push({ type: 'id', val: ch });
+          i++;
+        }
+        continue;
+      }
+      if ('+-*/^'.indexOf(ch) !== -1) {
+        tokens.push({ type: 'op', val: ch });
+        i++;
+        continue;
+      }
+      if (ch === '(' || ch === '[') { tokens.push({ type: 'lp' }); i++; continue; }
+      if (ch === ')' || ch === ']') { tokens.push({ type: 'rp' }); i++; continue; }
+      return null;
+    }
+
+    // Insert implicit multiplication (e.g. 2x, -x -> -1*x via unary, 3(4), (x+1)(x-2), 2sqrt(9))
+    const expanded = [];
+    for (let t = 0; t < tokens.length; t++) {
+      const curr = tokens[t];
+      if (t > 0) {
+        const prev = tokens[t - 1];
+        const prevIsVal = prev.type === 'num' || prev.type === 'rp' || (prev.type === 'id' && !MATH_FUNCS.has(prev.val));
+        const currStartsFactor = curr.type === 'num' || curr.type === 'lp' || curr.type === 'id';
+        if (prevIsVal && currStartsFactor) {
+          expanded.push({ type: 'op', val: '*' });
+        }
+      }
+      expanded.push(curr);
+    }
+    return expanded;
+  }
+
+  function evalMathAst(exprStr, varsMap) {
+    const norm = normalizeMathExpr(exprStr);
+    const tokens = tokenizeMath(norm);
+    if (!tokens || !tokens.length) return { ok: false, error: 'PARSE' };
+    const vars = varsMap || {};
+    let pos = 0;
+
+    function peek() { return tokens[pos] || null; }
+    function consume() { return tokens[pos++]; }
+
+    function parseAddSub() {
+      let left = parseMulDiv();
+      while (peek() && peek().type === 'op' && (peek().val === '+' || peek().val === '-')) {
+        const op = consume().val;
+        const right = parseMulDiv();
+        left = op === '+' ? left + right : left - right;
+      }
+      return left;
+    }
+
+    function parseMulDiv() {
+      let left = parseUnary();
+      while (peek() && peek().type === 'op' && (peek().val === '*' || peek().val === '/')) {
+        const op = consume().val;
+        const right = parseUnary();
+        if (op === '/') {
+          if (Math.abs(right) < 1e-12) throw new Error('DIV_ZERO');
+          left = left / right;
+        } else {
+          left = left * right;
+        }
+      }
+      return left;
+    }
+
+    // Unary has LOWER precedence than exponentiation so -x^2 === -(x^2)
+    function parseUnary() {
+      if (peek() && peek().type === 'op' && (peek().val === '+' || peek().val === '-')) {
+        const op = consume().val;
+        const inner = parseUnary();
+        return op === '-' ? -inner : inner;
+      }
+      return parsePower();
+    }
+
+    function parsePower() {
+      const base = parseAtom();
+      if (peek() && peek().type === 'op' && peek().val === '^') {
+        consume();
+        const exp = parseUnary();
+        const res = Math.pow(base, exp);
+        if (!Number.isFinite(res)) throw new Error('DOMAIN');
+        return res;
+      }
+      return base;
+    }
+
+    function parseAtom() {
+      const tok = peek();
+      if (!tok) throw new Error('UNEXPECTED_END');
+      if (tok.type === 'num') {
+        consume();
+        return tok.val;
+      }
+      if (tok.type === 'lp') {
+        consume();
+        const val = parseAddSub();
+        if (!peek() || peek().type !== 'rp') throw new Error('MISSING_PAREN');
+        consume();
+        return val;
+      }
+      if (tok.type === 'id') {
+        consume();
+        if (tok.val === 'pi') return Math.PI;
+        if (tok.val === 'e' && !Object.prototype.hasOwnProperty.call(vars, 'e')) return Math.E;
+        if (MATH_FUNCS.has(tok.val)) {
+          const arg = peek() && peek().type === 'lp' ? parseAtom() : parseUnary();
+          if (tok.val === 'sqrt') {
+            if (arg < -1e-12) throw new Error('NEG_SQRT');
+            return Math.sqrt(Math.max(0, arg));
+          }
+          if (tok.val === 'abs') return Math.abs(arg);
+          if (tok.val === 'sin') return Math.sin(arg);
+          if (tok.val === 'cos') return Math.cos(arg);
+          if (tok.val === 'tan') return Math.tan(arg);
+          if (tok.val === 'log') { if (arg <= 0) throw new Error('DOMAIN'); return Math.log10(arg); }
+          if (tok.val === 'ln') { if (arg <= 0) throw new Error('DOMAIN'); return Math.log(arg); }
+        }
+        if (Object.prototype.hasOwnProperty.call(vars, tok.val)) {
+          return Number(vars[tok.val]);
+        }
+        throw new Error('UNKNOWN_VAR:' + tok.val);
+      }
+      throw new Error('UNEXPECTED_TOKEN');
+    }
+
+    try {
+      const value = parseAddSub();
+      if (pos !== tokens.length || !Number.isFinite(value)) {
+        return { ok: false, error: 'TRAILING' };
+      }
+      return { ok: true, value: Math.abs(value) < 1e-11 ? 0 : value };
+    } catch (err) {
+      return { ok: false, error: (err && err.message) || 'EVAL' };
+    }
+  }
+
+  function gcdInt(a, b) {
+    let x = Math.abs(Math.round(a));
+    let y = Math.abs(Math.round(b));
+    while (y) { const t = y; y = x % y; x = t; }
+    return x || 1;
+  }
+
+  function toExactFraction(val, maxDen) {
+    if (!Number.isFinite(val)) return null;
+    if (Math.abs(val - Math.round(val)) < 1e-9) {
+      return { num: Math.round(val), den: 1 };
+    }
+    const limit = maxDen || 36;
+    for (let d = 2; d <= limit; d++) {
+      const n = Math.round(val * d);
+      if (Math.abs(val - n / d) < 1e-9) {
+        const g = gcdInt(n, d);
+        return { num: n / g, den: d / g };
+      }
+    }
+    return null;
+  }
+
+  function formatExactNumber(val, isSec, forTex) {
+    if (!Number.isFinite(val)) return 'غير معرّف';
+    const clean = Math.abs(val) < 1e-10 ? 0 : val;
+    const frac = toExactFraction(clean, 24);
+    if (frac) {
+      if (frac.den === 1) {
+        return fmtPlainNum(String(frac.num), isSec);
+      }
+      const sign = frac.num < 0 ? '-' : '';
+      const a = Math.abs(frac.num);
+      const b = frac.den;
+      if (isSec) {
+        return forTex ? (sign + '\\dfrac{' + a + '}{' + b + '}') : (sign + a + '/' + b);
+      }
+      return fmtPlainNum(sign + a + '/' + b, false);
+    }
+    const rounded = Number(clean.toFixed(4)).toString();
+    if (isSec) return rounded;
+    return fmtPlainNum(rounded.replace('.', '٫'), false);
+  }
+
+  function wrapMathIfSec(texBody, isSec) {
+    if (!isSec) return fmtPlainNum(texBody, false);
+    return '$' + toWesternStr(texBody) + '$';
+  }
+
+  function toWesternStr(str) {
+    const utils = getUtils();
+    const s = String(str || '').replace(/٫/g, '.').replace(/،/g, ',').replace(/[−–—]/g, '-');
+    return utils && typeof utils.toWesternDigits === 'function'
+      ? utils.toWesternDigits(s)
+      : s.replace(/[٠-٩]/g, function (d) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)); });
+  }
+
+  function formatDisplayExpr(rawExpr, isSec, preferredVar) {
+    let s = String(rawExpr || '').trim();
+    if (isSec) {
+      s = toWesternStr(s)
+        .replace(/×/g, '\\cdot ')
+        .replace(/÷/g, '/')
+        .replace(/√\s*\(([^)]+)\)/g, '\\sqrt{$1}')
+        .replace(/√\s*([0-9a-zA-Z]+)/g, '\\sqrt{$1}')
+        .replace(/\$/g, '');
+      // Convert any Arabic variable letters to Latin
+      s = s.replace(/(^|[^A-Za-z\u0621-\u064A])([سصعنمكت])(?![A-Za-z\u0621-\u064A])/g, function (_, pre, ch) {
+        return pre + (AR_TO_LAT_VAR[ch] || preferredVar || ch);
+      });
+      return s.trim();
+    }
+    // Non-secondary: Eastern digits & Arabic symbols
+    s = s.replace(/\*/g, '×').replace(/\$/g, '').replace(/[−–—]/g, '-');
+    return fmtPlainNum(s, false);
+  }
+
+  function splitTopLevelTerms(normExpr) {
+    const s = String(normExpr || '').replace(/\s+/g, '');
+    if (!s) return null;
+    const terms = [];
+    let depth = 0;
+    let start = 0;
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      else if (depth === 0 && i > start && (ch === '+' || ch === '-') && s[i - 1] !== '^' && s[i - 1] !== '*' && s[i - 1] !== '/') {
+        terms.push(s.slice(start, i));
+        start = i;
+      }
+    }
+    terms.push(s.slice(start));
+    return terms.length >= 2 ? terms : null;
+  }
+
+  function substituteVariableDisplay(dispExpr, varSym, subText, isSec) {
+    let s = String(dispExpr || '');
+    const wrapSub = '(' + subText + ')';
+    if (/[\u0621-\u064A]/.test(varSym)) {
+      const re = new RegExp('(^|[^A-Za-z\\u0621-\\u064A])' + varSym.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z\\u0621-\\u064A])', 'g');
+      s = s.replace(re, '$1' + wrapSub);
+    } else {
+      const lat = AR_TO_LAT_VAR[varSym] || varSym;
+      const re = new RegExp('(^|[^A-Za-z])' + lat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z])', 'g');
+      s = s.replace(re, '$1' + wrapSub);
+    }
+    return isSec ? s : fmtPlainNum(s, false);
+  }
+
+  function buildSolvedEntry(lesson, query, level, cfg) {
+    const isSec = isSecondaryLesson(lesson);
+    const sum = (lesson && lesson.summary) || {};
+    const ruleTail = sum.golden_rule ? (' (يرتبط بالقاعدة: ' + asText(sum.golden_rule) + ')') : '';
+    return {
+      id: (lesson ? lesson.id : 'math') + '-solved-' + Date.now(),
+      title: query ? ('شرح جزئية: ' + fmtPlainNum(query, isSec)) : cfg.title,
+      badge: '🧮 حل فوري دقيق لمسألتك خطوة بخطوة (' + (level || 'متوسط منهجي') + ')',
+      source: 'local-solver',
+      summary: fmtPlainNum(cfg.summary + ruleTail, isSec),
+      steps: (cfg.steps || []).map(function (s) { return fmtPlainNum(s, isSec); }),
+      workedExample: normalizeExampleObj({
+        problem: fmtPlainNum(cfg.problem, isSec),
+        steps: (cfg.exSteps || []).map(function (s) { return fmtPlainNum(s, isSec); }),
+        finalAnswer: fmtPlainNum(cfg.finalAnswer, isSec),
+        isExactUserSolution: true
+      }, isSec),
+      commonMistake: fmtPlainNum(cfg.commonMistake || (lesson && lesson.prep && lesson.prep.station3 && lesson.prep.station3.misconceptions) || 'تحقق من الإشارات وأولوية العمليات الحسابية والتعويض الصحيح.', isSec),
+      quickCheck: cfg.quickCheck || { question: '', answer: '' }
+    };
+  }
+
+  function detectFunctionEvaluation(query, isSec, lesson) {
+    const cleanQ = String(query || '').trim();
+    const fnMatch = cleanQ.match(/(?:^|[^A-Za-z\u0621-\u064A])(هـ|[دقتركمعلfghpqrFGHPQ])\s*\(\s*([سصعنمكتa-zA-Z])\s*\)\s*=\s*([\s\S]+)$/);
+    if (!fnMatch) return null;
+
+    const fnName = fnMatch[1];
+    const varOrig = fnMatch[2];
+    const varLat = AR_TO_LAT_VAR[varOrig] || varOrig;
+    const tail = fnMatch[3].trim();
+
+    // Split RHS from trailing question ("، فأوجد قيمة د(٣)", "أوجد ق(2)", "when x = 3", etc.)
+    const sepRe = new RegExp(
+      '[،,;?!؟]|\\s+(?:فأوجد|أوجد|فاحسب|احسب|فما|ما\\s*قيمة|قيمة|حيث|عندما|عند|find|evaluate|compute|calculate|then|where)(?=[\\s،,;?!؟]|$)|\\s+(?=' +
+      fnName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\()',
+      'i'
+    );
+    const sepMatch = sepRe.exec(tail);
+    const rhsRaw = (sepMatch ? tail.slice(0, sepMatch.index) : tail).trim().replace(/[.=]+$/, '').trim();
+    const rest = sepMatch ? tail.slice(sepMatch.index).trim() : '';
+    if (!rhsRaw) return null;
+
+    let argRaw = '';
+    const escFn = fnName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const callRe = new RegExp(escFn + '\\s*\\(\\s*([^()]+(?:\\([^()]*\\)[^()]*)?)\\s*\\)');
+    const callM = (rest || '').match(callRe);
+    if (callM) {
+      argRaw = callM[1].trim();
+    } else {
+      const escVar = varOrig.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const atRe = new RegExp('(?:عندما|عند|when|at)\\s*' + escVar + '\\s*=\\s*([^\\s،,;؟?!]+)', 'i');
+      const atM = cleanQ.match(atRe);
+      if (atM) argRaw = atM[1].trim();
+    }
+    if (!argRaw) return null;
+
+    const argEval = evalMathAst(argRaw);
+    if (!argEval.ok) return null;
+    const argVal = argEval.value;
+    const vars = {};
+    vars[varLat] = argVal;
+    const valRes = evalMathAst(rhsRaw, vars);
+
+    const dispVar = isSec ? varLat : (LAT_TO_AR_VAR[varOrig] || varOrig);
+    const dispFn = isSec ? (AR_TO_LAT_VAR[fnName] ? 'f' : fnName) : fnName;
+    const dispArg = formatExactNumber(argVal, isSec, true);
+    const dispArgPlain = formatExactNumber(argVal, isSec, false);
+    const dispRhs = formatDisplayExpr(rhsRaw, isSec, dispVar);
+    const subExpr = substituteVariableDisplay(dispRhs, dispVar, dispArg, isSec).replace(/(^|[(+=])\s*-\s+\(/g, '$1-(');
+    const callLabel = dispFn + '(' + dispArg + ')';
+    const defLabel = dispFn + '(' + dispVar + ') = ' + dispRhs;
+
+    if (!valRes.ok && valRes.error === 'DIV_ZERO') {
+      return buildSolvedEntry(lesson, query, null, {
+        title: 'حساب قيمة الدالة',
+        summary: 'لإيجاد قيمة الدالة عند عدد معطى، نعوض بهذا العدد مكان المتغير ونتأكد أولاً أن المقام لا يساوي الصفر.',
+        steps: [
+          'نعوّض بالعدد المعطى مكان المتغير في قاعدة الدالة.',
+          'إذا أصبح المقام صفراً فإن الدالة تكون غير معرّفة عند هذه القيمة.'
+        ],
+        problem: query,
+        exSteps: [
+          'نكتب قاعدة الدالة: ' + wrapMathIfSec(defLabel, isSec),
+          'نعوّض عن ' + wrapMathIfSec(dispVar + ' = ' + dispArg, isSec) + ' فنجد أن المقام يصبح مساوياً للصفر.',
+          'القسمة على صفر غير معرّفة؛ إذن ' + wrapMathIfSec(callLabel, isSec) + ' غير معرّفة.'
+        ],
+        finalAnswer: wrapMathIfSec(callLabel, isSec) + ' غير معرّفة',
+        commonMistake: 'القسمة على الصفر لا تساوي صفراً بل تجعل العبارة غير معرّفة.'
+      });
+    }
+    if (!valRes.ok) return null;
+
+    const finalNumTex = formatExactNumber(valRes.value, isSec, true);
+    const finalEqTex = callLabel + ' = ' + finalNumTex;
+
+    const exSteps = [
+      'نكتب قاعدة الدالة المعطاة: ' + wrapMathIfSec(defLabel, isSec),
+      'نعوض عن ' + (isSec ? ('$' + dispVar + '$') : dispVar) + ' بالعدد ' + wrapMathIfSec(dispArg, isSec) + ': ' + wrapMathIfSec(callLabel + ' = ' + subExpr, isSec)
+    ];
+
+    // Add intermediate term-by-term simplification step when there are >= 2 terms
+    const normRhs = normalizeMathExpr(rhsRaw);
+    const rawTerms = splitTopLevelTerms(normRhs);
+    if (rawTerms && rawTerms.length >= 2) {
+      let termStr = '';
+      let allTermsOk = true;
+      for (let i = 0; i < rawTerms.length; i++) {
+        const tEval = evalMathAst(rawTerms[i], vars);
+        if (!tEval.ok) { allTermsOk = false; break; }
+        const tv = tEval.value;
+        const tvFmt = formatExactNumber(Math.abs(tv), isSec, true);
+        if (i === 0) {
+          termStr += (tv < 0 ? '-' : '') + tvFmt;
+        } else {
+          termStr += (tv < 0 ? ' - ' : ' + ') + tvFmt;
+        }
+      }
+      if (allTermsOk) {
+        const fullCalc = termStr + ' = ' + finalNumTex;
+        if (normCmpText(termStr) !== normCmpText(subExpr)) {
+          exSteps.push('نبسّط القوى والضرب ثم نجمع/نطرح: ' + wrapMathIfSec(fullCalc, isSec));
+        } else {
+          exSteps.push('نحسب الناتج: ' + wrapMathIfSec(fullCalc, isSec));
+        }
+      } else {
+        exSteps.push('نحسب الناتج النهائي: ' + wrapMathIfSec(finalEqTex, isSec));
+      }
+    } else {
+      exSteps.push('نبسّط العبارة الحسابية فنحصل على: ' + wrapMathIfSec(finalEqTex, isSec));
+    }
+
+    // Generate a tied quickCheck for argVal + 1
+    const nextArg = argVal + 1;
+    const nextVars = {};
+    nextVars[varLat] = nextArg;
+    const nextRes = evalMathAst(rhsRaw, nextVars);
+    const quickCheck = nextRes.ok ? {
+      question: 'باستعمال الدالة نفسها ' + wrapMathIfSec(defLabel, isSec) + '، أوجد قيمة ' + wrapMathIfSec(dispFn + '(' + formatExactNumber(nextArg, isSec, true) + ')', isSec) + '.',
+      answer: wrapMathIfSec(dispFn + '(' + formatExactNumber(nextArg, isSec, true) + ') = ' + formatExactNumber(nextRes.value, isSec, true), isSec)
+    } : null;
+
+    return buildSolvedEntry(lesson, query, null, {
+      title: 'حساب قيمة الدالة',
+      summary: 'لإيجاد قيمة الدالة ' + wrapMathIfSec(dispFn + '(' + dispVar + ')', isSec) + ' عند القيمة ' + wrapMathIfSec(dispArgPlain, isSec) + '، نستبدل كل ' + (isSec ? ('$' + dispVar + '$') : dispVar) + ' في قاعدة الدالة بالعدد (' + dispArgPlain + ') ثم نحسب الناتج وفق ترتيب العمليات.',
+      steps: [
+        'حدد قاعدة الدالة المعطاة في السؤال.',
+        'ضع قيمة المتغير المعطاة بين قوسين مكان كل ظهور للمتغير (خاصة عند وجود إشارة سالبة).',
+        'نفّذ الأسس أولاً، ثم الضرب والقسمة، وأخيراً الجمع والطرح.'
+      ],
+      problem: query,
+      exSteps: exSteps,
+      finalAnswer: wrapMathIfSec(finalEqTex, isSec),
+      commonMistake: 'الخطأ الأكثر شيوعاً هو نسيان الأقواس حول العدد السالب أو الخلط بين الإشارة السالبة أمام المتغير ومعامل المتغير، مثل كتابة -(' + dispArgPlain + ') على أنها موجبة دون مبرر.',
+      quickCheck: quickCheck
+    });
+  }
+
+  function detectLinearOrQuadraticEquation(query, isSec, lesson) {
+    const raw = String(query || '').trim();
+    if (raw.indexOf('=') === -1) return null;
+    // Skip function definitions like د(س) = ...
+    if (/(?:^|[^A-Za-z\u0621-\u064A])(?:هـ|[دقتركمعلfghpqrFGHPQ])\s*\(\s*[سصعنمكتa-zA-Z]\s*\)\s*=/.test(raw)) {
+      return null;
+    }
+    const stripped = raw
+      .replace(/^(?:حل|أوجد\s*حل|أوجد\s*قيمة(?:\s*المتغير)?(?:\s*[سصعنمكتa-zA-Z])?(?:\s*في)?|ما\s*حل|solve(?:\s+for\s+[a-zA-Z])?|find\s+[a-zA-Z]\s*(?:if|for)?)(?:\s+(?:المعادلة|التالية|الآتية))*(?:\s*[:：])?\s*/i, '')
+      .replace(/[؟?!.،,;]+$/g, '')
+      .trim();
+    const parts = stripped.split('=');
+    if (parts.length !== 2) return null;
+    const lhsRaw = parts[0].trim();
+    const rhsRaw = parts[1].trim();
+    if (!lhsRaw || !rhsRaw) return null;
+
+    const lhsNorm = normalizeMathExpr(lhsRaw);
+    const rhsNorm = normalizeMathExpr(rhsRaw);
+    // Find distinct variables (exclude math function names & 'pi')
+    const combinedNorm = lhsNorm + ' ' + rhsNorm;
+    const cleanedIds = combinedNorm.replace(/\b(?:sqrt|abs|sin|cos|tan|log|ln|pi)\b/g, ' ');
+    const varSet = new Set(cleanedIds.match(/[a-zA-Z]/g) || []);
+    if (varSet.size !== 1) return null;
+
+    const varLat = Array.from(varSet)[0];
+    const origHadArabic = new RegExp('(^|[^\\u0621-\\u064A])' + (LAT_TO_AR_VAR[varLat] || '__') + '(?![\\u0621-\\u064A])').test(stripped);
+    const dispVar = isSec ? varLat : (origHadArabic ? LAT_TO_AR_VAR[varLat] : varLat);
+
+    function evalSide(sideExpr, v) {
+      const m = {};
+      m[varLat] = v;
+      return evalMathAst(sideExpr, m);
+    }
+
+    const pts = [-2, -1, 0, 1, 2, 3];
+    const F = {};
+    const L = {};
+    const R = {};
+    for (let i = 0; i < pts.length; i++) {
+      const v = pts[i];
+      const lr = evalSide(lhsRaw, v);
+      const rr = evalSide(rhsRaw, v);
+      if (!lr.ok || !rr.ok) return null;
+      L[v] = lr.value;
+      R[v] = rr.value;
+      F[v] = lr.value - rr.value;
+    }
+
+    const a2 = (F[2] - 2 * F[1] + F[0]) / 2;
+    const c2 = F[0];
+    const b2 = F[1] - a2 - c2;
+
+    // Verify exact quadratic/linear fit at -2, -1, 3
+    for (let i = 0; i < pts.length; i++) {
+      const v = pts[i];
+      const pred = a2 * v * v + b2 * v + c2;
+      if (Math.abs(pred - F[v]) > 1e-7) return null;
+    }
+
+    const dispEq = formatDisplayExpr(lhsRaw, isSec, dispVar) + ' = ' + formatDisplayExpr(rhsRaw, isSec, dispVar);
+
+    // Case A: Linear (a2 === 0)
+    if (Math.abs(a2) < 1e-8) {
+      const coef = b2;
+      const constTerm = c2; // coef * x + constTerm = 0
+      if (Math.abs(coef) < 1e-9) {
+        const isIdentity = Math.abs(constTerm) < 1e-9;
+        return buildSolvedEntry(lesson, query, null, {
+          title: 'حل المعادلة الخطية',
+          summary: isIdentity ? 'عند تساوي الطرفين في المعاملات والحدود الثابتة تكون المعادلة متطابقة ومجموعة حلها جميع الأعداد الحقيقية.' : 'عند تساوي معامل المتغير في الطرفين واختلاف الحد الثابت تستحيل المعادلة ولا يوجد لها حل.',
+          steps: ['نجمع حدود المتغير في طرف والحدود الثابتة في الطرف الآخر.'],
+          problem: query,
+          exSteps: [
+            'المعادلة المعطاة: ' + wrapMathIfSec(dispEq, isSec),
+            isIdentity ? 'بطرح المتغير من الطرفين ينتج عبارة صحيحة دائماً (٠ = ٠).' : 'بطرح المتغير من الطرفين ينتج تناقض عددي؛ لذا لا يوجد حل.'
+          ],
+          finalAnswer: isIdentity ? 'مجموعة الحل: جميع الأعداد الحقيقية' : 'لا يوجد حل (مجموعة الحل: ∅)'
+        });
+      }
+
+      const sol = -constTerm / coef;
+      const solFmt = formatExactNumber(sol, isSec, true);
+      const rhsConst = formatExactNumber(-constTerm, isSec, true);
+      const coefFmt = formatExactNumber(coef, isSec, true);
+      const coefTermStr = (coef === 1 ? '' : (coef === -1 ? '-' : coefFmt)) + dispVar;
+      const lhsCheck = evalSide(lhsRaw, sol);
+
+      const exSteps = ['نكتب المعادلة المعطاة: ' + wrapMathIfSec(dispEq, isSec)];
+      if (Math.abs(coef - 1) > 1e-9 || Math.abs(R[0] - R[1]) > 1e-9 || Math.abs(L[0]) > 1e-9) {
+        exSteps.push('ننقل حدود المتغير في طرف والحدود الثابتة في الطرف الآخر: ' + wrapMathIfSec(coefTermStr + ' = ' + rhsConst, isSec));
+      }
+      if (Math.abs(coef - 1) > 1e-9) {
+        exSteps.push('نقسم الطرفين على المعامل (' + formatExactNumber(coef, isSec, false) + '): ' + wrapMathIfSec(dispVar + ' = ' + solFmt, isSec));
+      }
+      if (lhsCheck.ok) {
+        exSteps.push('التحقق: عند تعويض ' + wrapMathIfSec(dispVar + ' = ' + solFmt, isSec) + ' يتساوى الطرفان عند القيمة ' + wrapMathIfSec(formatExactNumber(lhsCheck.value, isSec, true), isSec) + '.');
+      }
+
+      return buildSolvedEntry(lesson, query, null, {
+        title: 'حل المعادلة الخطية في متغير واحد',
+        summary: 'نحل المعادلة الخطية بجعل حدود المتغير ' + (isSec ? ('$' + dispVar + '$') : dispVar) + ' في طرف واحد والأعداد الثابتة في الطرف الآخر، ثم نقسم على معامل المتغير.',
+        steps: [
+          'انقل الحدود التي تحوي المتغير إلى طرف والحدود الثابتة إلى الطرف الآخر مع عكس الإشارة.',
+          'بسط كل طرف بجمع الحدود المتشابهة.',
+          'اقسم كلا الطرفين على معامل المتغير ثم تحقق بالتعويض.'
+        ],
+        problem: query,
+        exSteps: exSteps,
+        finalAnswer: wrapMathIfSec(dispVar + ' = ' + solFmt, isSec),
+        commonMistake: 'نسيان عكس إشارة الحد عند نقله للطرف الآخر أو القسمة على إشارة سالبة دون الانتباه لإشارة الناتج.',
+        quickCheck: {
+          question: 'تحقق من فهمك: إذا استبدلنا ' + wrapMathIfSec(dispVar + ' = ' + solFmt, isSec) + ' في المعادلة ' + wrapMathIfSec(dispEq, isSec) + '، فما قيمة كل طرف؟',
+          answer: lhsCheck.ok ? ('كلا الطرفين يساوي ' + wrapMathIfSec(formatExactNumber(lhsCheck.value, isSec, true), isSec)) : ''
+        }
+      });
+    }
+
+    // Case B: Quadratic (|a2| > 1e-8)
+    let a = a2, b = b2, c = c2;
+    if (a < 0) { a = -a; b = -b; c = -c; }
+    const disc = b * b - 4 * a * c;
+    const aStr = (Math.abs(a - 1) < 1e-9 ? '' : formatExactNumber(a, isSec, true)) + dispVar + '^2';
+    const bStr = Math.abs(b) < 1e-9 ? '' : ((b > 0 ? ' + ' : ' - ') + (Math.abs(Math.abs(b) - 1) < 1e-9 ? '' : formatExactNumber(Math.abs(b), isSec, true)) + dispVar);
+    const cStr = Math.abs(c) < 1e-9 ? '' : ((c > 0 ? ' + ' : ' - ') + formatExactNumber(Math.abs(c), isSec, true));
+    const stdEq = aStr + bStr + cStr + ' = ' + (isSec ? '0' : '٠');
+
+    const exSteps = [
+      'نضع المعادلة في الصورة القياسية: ' + wrapMathIfSec(stdEq, isSec),
+      'نحدد المعاملات: ' + wrapMathIfSec('a = ' + formatExactNumber(a, isSec, true), isSec).replace(/\ba\b/, isSec ? 'a' : 'أ') + '، و' + wrapMathIfSec('b = ' + formatExactNumber(b, isSec, true), isSec).replace(/\bb\b/, isSec ? 'b' : 'ب') + '، و' + wrapMathIfSec('c = ' + formatExactNumber(c, isSec, true), isSec).replace(/\bc\b/, isSec ? 'c' : 'جـ'),
+      'نحسب المميز: ' + (isSec ? ('$\\Delta = b^2 - 4ac = ' + formatExactNumber(disc, true, true) + '$') : ('المميز = ب^٢ - ٤أجـ = ' + formatExactNumber(disc, false, false)))
+    ];
+
+    let finalAns = '';
+    if (disc < -1e-9) {
+      if (isSec) {
+        const realPart = -b / (2 * a);
+        const imagPart = Math.sqrt(-disc) / (2 * a);
+        const rFmt = Math.abs(realPart) < 1e-9 ? '' : formatExactNumber(realPart, true, true);
+        const iFmt = Math.abs(imagPart - 1) < 1e-9 ? 'i' : (formatExactNumber(imagPart, true, true) + 'i');
+        const rootTex = dispVar + ' = ' + (rFmt ? (rFmt + ' \\pm ' + iFmt) : ('\\pm ' + iFmt));
+        exSteps.push('بما أن المميز سالب توجد جذور مركبة مترافقة: $' + rootTex + '$');
+        finalAns = '$' + rootTex + '$';
+      } else {
+        exSteps.push('بما أن المميز سالب (< ٠)، فلا توجد حلول حقيقية لهذه المعادلة.');
+        finalAns = 'لا توجد حلول حقيقية (مجموعة الحل: ∅)';
+      }
+    } else if (Math.abs(disc) < 1e-9) {
+      const r0 = formatExactNumber(-b / (2 * a), isSec, true);
+      exSteps.push('المميز يساوي صفراً؛ إذن للمعادلة جذر حقيقي مكرر: ' + wrapMathIfSec(dispVar + ' = ' + r0, isSec));
+      finalAns = wrapMathIfSec(dispVar + ' = ' + r0, isSec);
+    } else {
+      const sDisc = Math.sqrt(disc);
+      const r1 = (-b + sDisc) / (2 * a);
+      const r2 = (-b - sDisc) / (2 * a);
+      const r1Fmt = formatExactNumber(r1, isSec, true);
+      const r2Fmt = formatExactNumber(r2, isSec, true);
+      if (toExactFraction(sDisc, 12)) {
+        const rhs1 = isSec ? (dispVar + ' = ' + r1Fmt) : (dispVar + ' = ' + r1Fmt);
+        const rhs2 = isSec ? (dispVar + ' = ' + r2Fmt) : (dispVar + ' = ' + r2Fmt);
+        exSteps.push('بتطبيق القانون العام أو التحليل: ' + wrapMathIfSec(rhs1, isSec) + ' أو ' + wrapMathIfSec(rhs2, isSec));
+        finalAns = wrapMathIfSec(dispVar + ' = ' + r1Fmt, isSec) + ' أو ' + wrapMathIfSec(dispVar + ' = ' + r2Fmt, isSec);
+      } else {
+        const negB = formatExactNumber(-b, isSec, true);
+        const twoA = formatExactNumber(2 * a, isSec, true);
+        const dFmt = formatExactNumber(disc, isSec, true);
+        const formulaTex = isSec
+          ? (dispVar + ' = \\dfrac{' + negB + ' \\pm \\sqrt{' + dFmt + '}}{' + twoA + '}')
+          : (dispVar + ' = (' + negB + ' ± جذر(' + dFmt + ')) / ' + twoA);
+        exSteps.push('بتطبيق القانون العام: ' + wrapMathIfSec(formulaTex, isSec) + ' (تقريباً ' + formatExactNumber(r1, isSec, false) + ' و ' + formatExactNumber(r2, isSec, false) + ')');
+        finalAns = wrapMathIfSec(formulaTex, isSec);
+      }
+    }
+
+    return buildSolvedEntry(lesson, query, null, {
+      title: 'حل المعادلة التربيعية',
+      summary: 'لحل المعادلة التربيعية نرتبها أولاً على الصورة القياسية ثم نستخدم التحليل أو القانون العام عبر حساب المميز.',
+      steps: [
+        'انقل جميع الحدود إلى طرف واحد لتصبح بصورة قياسية تساوي صفراً.',
+        'احسب المميز لتحديد عدد الجذور ونوعها.',
+        'أوجد قيم الجذور باستخدام القانون العام أو التحليل.'
+      ],
+      problem: query,
+      exSteps: exSteps,
+      finalAnswer: finalAns,
+      commonMistake: 'إغفال الإشارة السالبة للمعامل عند حساب المميز أو نسيان علامة (±) عند أخذ الجذر التربيعي.'
+    });
+  }
+
+  function detectTwoPointProblem(query, isSec, lesson) {
+    const raw = String(query || '');
+    const ptMatches = [];
+    const re = /\(\s*([^()،,]+)\s*[،,]\s*([^()،,]+)\s*\)/g;
+    let m;
+    while ((m = re.exec(raw)) !== null) {
+      const xEv = evalMathAst(m[1]);
+      const yEv = evalMathAst(m[2]);
+      if (xEv.ok && yEv.ok) {
+        ptMatches.push({ x: xEv.value, y: yEv.value });
+      }
+    }
+    if (ptMatches.length !== 2) return null;
+
+    const p1 = ptMatches[0];
+    const p2 = ptMatches[1];
+    const p1Str = '(' + formatExactNumber(p1.x, isSec, true) + (isSec ? ', ' : '، ') + formatExactNumber(p1.y, isSec, true) + ')';
+    const p2Str = '(' + formatExactNumber(p2.x, isSec, true) + (isSec ? ', ' : '، ') + formatExactNumber(p2.y, isSec, true) + ')';
+
+    const ctx = raw + ' ' + ((lesson && lesson.title) || '');
+    const isMid = /منتصف|midpoint/i.test(ctx);
+    const isDist = /مسافة|طول|distance/i.test(ctx);
+    const isSlope = /ميل|slope/i.test(ctx) || (!isMid && !isDist);
+
+    if (isSlope) {
+      const dy = p2.y - p1.y;
+      const dx = p2.x - p1.x;
+      const slopeUndef = Math.abs(dx) < 1e-10;
+      const mTex = isSec ? 'm' : 'م';
+      const formulaTex = isSec ? 'm = \\dfrac{y_2 - y_1}{x_2 - x_1}' : 'الميل = (ص٢ - ص١) / (س٢ - س١)';
+      const subTex = isSec
+        ? ('m = \\dfrac{' + formatExactNumber(p2.y, true, true) + ' - (' + formatExactNumber(p1.y, true, true) + ')}{' + formatExactNumber(p2.x, true, true) + ' - (' + formatExactNumber(p1.x, true, true) + ')}')
+        : ('الميل = (' + formatExactNumber(p2.y, false, false) + ' - (' + formatExactNumber(p1.y, false, false) + ')) / (' + formatExactNumber(p2.x, false, false) + ' - (' + formatExactNumber(p1.x, false, false) + '))');
+      const finalAns = slopeUndef
+        ? 'الميل غير معرّف (مستقيم رأسي)'
+        : wrapMathIfSec(mTex + ' = ' + formatExactNumber(dy / dx, isSec, true), isSec);
+
+      return buildSolvedEntry(lesson, query, null, {
+        title: 'إيجاد ميل المستقيم المار بنقطتين',
+        summary: 'ميل المستقيم هو نسبة التغير الرأسي (فرق الإحداثيات الصادية) إلى التغير الأفقي (فرق الإحداثيات السينية).',
+        steps: [
+          'عيّن إحداثيات النقطتين الأولى والثانية.',
+          'طبّق قانون الميل وابدأ بطرح الصادات في البسط ثم السينات في المقام بالترتيب نفسه.'
+        ],
+        problem: query,
+        exSteps: [
+          'النقطتان المعطاتان: ' + wrapMathIfSec(p1Str, isSec) + ' و ' + wrapMathIfSec(p2Str, isSec),
+          'نكتب قانون الميل: ' + wrapMathIfSec(formulaTex, isSec),
+          'نعوّض بالإحداثيات: ' + wrapMathIfSec(subTex, isSec) + (slopeUndef ? '' : (' = ' + wrapMathIfSec(formatExactNumber(dy, isSec, true) + ' / ' + formatExactNumber(dx, isSec, true), isSec))),
+          slopeUndef ? 'المقام يساوي صفراً؛ إذن المستقيم رأسي وميله غير معرّف.' : ('نبسّط الكسر فنحصل على: ' + finalAns)
+        ],
+        finalAnswer: finalAns,
+        commonMistake: 'عكس الترتيب بين البسط والمقام أو نسيان علامة السالب المزدوجة عند طرح عدد سالب.'
+      });
+    }
+
+    if (isMid) {
+      const mx = (p1.x + p2.x) / 2;
+      const my = (p1.y + p2.y) / 2;
+      const midStr = '(' + formatExactNumber(mx, isSec, true) + (isSec ? ', ' : '، ') + formatExactNumber(my, isSec, true) + ')';
+      return buildSolvedEntry(lesson, query, null, {
+        title: 'إيجاد إحداثيي نقطة المنتصف',
+        summary: 'إحداثيا نقطة المنتصف هما المتوسط الحسابي للإحداثيات السينية والمتوسط الحسابي للإحداثيات الصادية.',
+        steps: ['اجمع الإحداثيين السينيين واقسم على ٢، واجمع الإحداثيين الصاديين واقسم على ٢.'],
+        problem: query,
+        exSteps: [
+          'النقطتان: ' + wrapMathIfSec(p1Str, isSec) + ' و ' + wrapMathIfSec(p2Str, isSec),
+          'نحسب منتصف السينات ومنتصف الصادات: ' + wrapMathIfSec(midStr, isSec)
+        ],
+        finalAnswer: 'نقطة المنتصف = ' + wrapMathIfSec(midStr, isSec)
+      });
+    }
+
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    const d2 = dx * dx + dy * dy;
+    const dist = Math.sqrt(d2);
+    const distFmt = formatExactNumber(dist, isSec, true);
+    return buildSolvedEntry(lesson, query, null, {
+      title: 'حساب المسافة بين نقطتين',
+      summary: 'تُحسب المسافة بين نقطتين في المستوى الإحداثي باستعمال الجذر التربيعي لمجموع مربعي فرق السينات وفرق الصادات.',
+      steps: ['أوجد فرق السينات وفرق الصادات، ثم ربّع كلاً منهما واجمعهما تحت الجذر التربيعي.'],
+      problem: query,
+      exSteps: [
+        'نحسب مربع المسافة: ' + wrapMathIfSec('(' + formatExactNumber(dx, isSec, true) + ')^2 + (' + formatExactNumber(dy, isSec, true) + ')^2 = ' + formatExactNumber(d2, isSec, true), isSec),
+        'نأخذ الجذر التربيعي: ' + (isSec ? ('$\\sqrt{' + formatExactNumber(d2, true, true) + '} \\approx ' + distFmt + '$') : ('جذر(' + formatExactNumber(d2, false, false) + ') ≈ ' + distFmt))
+      ],
+      finalAnswer: 'المسافة = ' + (toExactFraction(dist, 12) ? wrapMathIfSec(distFmt, isSec) : (isSec ? ('$\\sqrt{' + formatExactNumber(d2, true, true) + '}$') : ('جذر(' + formatExactNumber(d2, false, false) + ')')))
+    });
+  }
+
+  function detectConicClassification(query, isSec, lesson) {
+    const raw = String(query || '').trim();
+    if (raw.indexOf('=') === -1) return null;
+    const parts = raw.replace(/[؟?!.،,;]+$/g, '').split('=');
+    if (parts.length !== 2) return null;
+    const lhsRaw = parts[0].trim();
+    const rhsRaw = parts[1].trim();
+    if (!lhsRaw || !rhsRaw) return null;
+
+    const lhsToks = tokenizeMath(normalizeMathExpr(lhsRaw)) || [];
+    const rhsToks = tokenizeMath(normalizeMathExpr(rhsRaw)) || [];
+    const allToks = lhsToks.concat(rhsToks);
+    const hasX = allToks.some(function (t) { return t.type === 'id' && t.val === 'x'; });
+    const hasY = allToks.some(function (t) { return t.type === 'id' && t.val === 'y'; });
+    const hasDeg2 = allToks.some(function (t) { return t.type === 'op' && t.val === '^'; }) ||
+      /x\s*\*?\s*y|y\s*\*?\s*x/.test(normalizeMathExpr(raw).replace(/\s+/g, ''));
+    if (!hasX || !hasY || !hasDeg2) return null;
+
+    function F(xv, yv) {
+      const l = evalMathAst(lhsRaw, { x: xv, y: yv });
+      const r = evalMathAst(rhsRaw, { x: xv, y: yv });
+      if (!l.ok || !r.ok) return null;
+      return l.value - r.value;
+    }
+
+    const f00 = F(0, 0), f10 = F(1, 0), fm10 = F(-1, 0), f01 = F(0, 1), f0m1 = F(0, -1), f11 = F(1, 1), f20 = F(2, 0), f02 = F(0, 2);
+    if ([f00, f10, fm10, f01, f0m1, f11, f20, f02].some(function (v) { return v === null; })) return null;
+
+    const A = (f10 + fm10 - 2 * f00) / 2;
+    const C = (f01 + f0m1 - 2 * f00) / 2;
+    const B = f11 - f10 - f01 + f00;
+    const D = (f10 - fm10) / 2;
+    const E = (f01 - f0m1) / 2;
+    const K = f00;
+
+    // Verify exact quadratic fit at (2,0) and (0,2)
+    if (Math.abs((4 * A + 2 * D + K) - f20) > 1e-7 || Math.abs((4 * C + 2 * E + K) - f02) > 1e-7) return null;
+    if (Math.abs(A) + Math.abs(B) + Math.abs(C) < 1e-9) return null;
+
+    const disc = B * B - 4 * A * C;
+    let kind = 'قطع ناقص';
+    if (Math.abs(disc) < 1e-9) kind = 'قطع مكافئ';
+    else if (disc > 0) kind = 'قطع زائد';
+    else if (Math.abs(B) < 1e-9 && Math.abs(A - C) < 1e-9) kind = 'دائرة';
+
+    return buildSolvedEntry(lesson, query, null, {
+      title: 'تحديد نوع القطع المخروطي باستعمال المميز',
+      summary: 'لتصنيف معادلة القطع المخروطي من الدرجة الثانية نحسب المميز $B^2 - 4AC$ بعد تعيين المعاملات $A, B, C$.',
+      steps: [
+        'استخرج معامل $x^2$ ($A$)، ومعامل $xy$ ($B$)، ومعامل $y^2$ ($C$).',
+        'احسب قيمة المميز $\\Delta = B^2 - 4AC$ وقارنها بالصفر.'
+      ],
+      problem: query,
+      exSteps: [
+        'نحدد المعاملات: $A = ' + formatExactNumber(A, isSec, true) + ',\\; B = ' + formatExactNumber(B, isSec, true) + ',\\; C = ' + formatExactNumber(C, isSec, true) + '$',
+        'نحسب المميز: $B^2 - 4AC = (' + formatExactNumber(B, isSec, true) + ')^2 - 4(' + formatExactNumber(A, isSec, true) + ')(' + formatExactNumber(C, isSec, true) + ') = ' + formatExactNumber(disc, isSec, true) + '$',
+        Math.abs(disc) < 1e-9
+          ? 'بما أن المميز يساوي $0$ فالمعادلة تمثل **قطعاً مكافئاً**.'
+          : (disc > 0
+              ? 'بما أن المميز أكبر من $0$ فالمعادلة تمثل **قطعاً زائداً**.'
+              : ('بما أن المميز أصغر من $0$ ' + (kind === 'دائرة' ? 'مع $B=0$ و $A=C$ فالمعادلة تمثل **دائرة**.' : 'ولا تتحقق شروط الدائرة فالمعادلة تمثل **قطعاً ناقصاً**.')))
+      ],
+      finalAnswer: 'نوع القطع المخروطي: ' + kind
+    });
+  }
+
+  function detectNumericExpression(query, isSec, lesson) {
+    const raw = String(query || '').trim();
+    if (!raw || raw.indexOf('=') !== -1) return null;
+    const stripped = raw
+      .replace(/^(?:احسب|أوجد\s*(?:قيمة|ناتج)?|ما\s*(?:قيمة|ناتج)|بسط|بسّط|ناتج|قيمة|evaluate|calculate|compute|simplify)\s*:?\s*/i, '')
+      .replace(/[؟?!.،,;]+$/g, '')
+      .trim();
+    if (!stripped) return null;
+    if (!/[0-9٠-٩]/.test(stripped)) return null;
+    if (!/[+\-*×÷/^√()|]|جذر/.test(stripped)) return null;
+
+    const ev = evalMathAst(stripped);
+    if (!ev.ok) return null;
+
+    const dispExpr = formatDisplayExpr(stripped, isSec, 'x');
+    const ansFmt = formatExactNumber(ev.value, isSec, true);
+
+    return buildSolvedEntry(lesson, query, null, {
+      title: 'تبسيط وحساب العبارة العددية',
+      summary: 'لحساب قيمة العبارة العددية بدقة نطبق ترتيب العمليات: الأقواس أولاً، ثم القوى والجذور، ثم الضرب والقسمة من اليمين إلى اليسار (أو اليسار لليمين بالرموز اللاتينية)، وأخيراً الجمع والطرح.',
+      steps: [
+        'احسب ما بداخل الأقواس والقيمة المطلقة أو الجذور أولاً.',
+        'نفّذ القوى والأسس قبل الضرب والقسمة.',
+        'أكمل بالجمع والطرح للوصول إلى الناتج النهائي.'
+      ],
+      problem: query,
+      exSteps: [
+        'العبارة المعطاة: ' + wrapMathIfSec(dispExpr, isSec),
+        'بتطبيق أولوية العمليات الحسابية: ' + wrapMathIfSec(dispExpr + ' = ' + ansFmt, isSec)
+      ],
+      finalAnswer: wrapMathIfSec(ansFmt, isSec)
+    });
+  }
+
+  function trySolveUserProblemLocally(query, isSec, lesson) {
+    const q = String(query || '').trim();
+    if (!q || q.length > 260) return null;
+    try {
+      return (
+        detectFunctionEvaluation(q, isSec, lesson) ||
+        detectTwoPointProblem(q, isSec, lesson) ||
+        detectConicClassification(q, isSec, lesson) ||
+        detectLinearOrQuadraticEquation(q, isSec, lesson) ||
+        detectNumericExpression(q, isSec, lesson)
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
    * مطابقة محلية ذكية من نصوص الدرس وأمثلة الكتاب عند العمل بدون إنترنت أو بدون ضبط GEMINI_API_KEY
    */
   function buildSmartLocalMatch(lesson, query, level, extraNote) {
@@ -478,6 +1459,26 @@
     const prep = lesson.prep || {};
     const sum = lesson.summary || {};
     const quiz = lesson.quiz || {};
+
+    // Priority 0: Try exact deterministic algebraic/numeric problem solver first
+    const directSolved = trySolveUserProblemLocally(query, isSec, lesson);
+    const pool = collectExamplePool(lesson, isSec);
+
+    if (directSolved) {
+      return {
+        id: directSolved.id,
+        title: directSolved.title,
+        badge: '🧮 حل فوري دقيق لمسألتك خطوة بخطوة (' + (level || 'متوسط منهجي') + ')',
+        source: 'local-solver',
+        summary: directSolved.summary,
+        steps: directSolved.steps,
+        workedExample: directSolved.workedExample,
+        altExamples: pool.slice(0, 5),
+        commonMistake: directSolved.commonMistake,
+        quickCheck: (directSolved.quickCheck && directSolved.quickCheck.question) ? directSolved.quickCheck : (builtins[0] ? builtins[0].quickCheck : { question: '', answer: '' }),
+        systemHint: ''
+      };
+    }
 
     // 1. Find best matching built-in sub-topic
     let bestSub = builtins[0] || null;
@@ -523,7 +1524,6 @@
     }
 
     // 3. Find best matching worked example across full lesson pool + all MCQs/TFs/Essays
-    const pool = collectExamplePool(lesson, isSec);
     let bestEx = pool[0] || (bestSub ? bestSub.workedExample : normalizeExampleObj({}, isSec));
     let bestExScore = -1;
     const altPool = [];
@@ -536,6 +1536,7 @@
         altPool.push(ex);
       }
     });
+    bestEx = Object.assign({}, bestEx, { isExactUserSolution: false });
 
     // 4. Find best quick check from quiz questions matching query
     let qc = bestSub ? bestSub.quickCheck : { question: '', answer: '' };
@@ -556,6 +1557,7 @@
       title: query ? ('شرح جزئية: ' + query) : (bestSub ? bestSub.title : lesson.title),
       badge: '⚡ شرح فوري من قاعدة بيانات المنهج المعتمد (' + (level || 'متوسط منهجي') + ')',
       source: 'local-smart',
+      isSimilarOnly: !!query,
       summary: (scoredSnippets[0] && scoredSnippets[0].score > 0)
         ? scoredSnippets[0].txt
         : (bestSub ? bestSub.summary : (sum.concept || '')),
@@ -677,8 +1679,20 @@
       ? '<div class="ce-admin-hint">💡 <strong>ملاحظة للمدير العام:</strong> لتفعيل التوليد الذكي الحر عبر Gemini لطلبات المستخدمين المفتوحة، أضف متغير <code>GEMINI_API_KEY</code> في إعدادات Vercel → Environment Variables.</div>'
       : '';
 
+    const isShowingAlt = (st.altExOffset || 0) > 0;
+    const isExactSol = !!ex.isExactUserSolution;
+    const isSimilarFallback = !isExactSol && sub.source === 'local-smart' && sub.isSimilarOnly && !isShowingAlt;
+    const exHeaderLabel = isExactSol
+      ? '✍️ حل مسألتك خطوة بخطوة'
+      : (isSimilarFallback ? '📖 أقرب مثال مشابه من المنهج المعتمد' : '✍️ المثال التوضيحي المحلول خطوة بخطوة');
+    const exProbLabel = isExactSol ? 'المسألة:' : 'المثال:';
+    const showFinalAnswer = !!(ex.finalAnswer && !isRedundantFinalAnswer(ex.steps, ex.finalAnswer));
+    const similarNoteHtml = isSimilarFallback
+      ? '<div class="ce-similar-note">ℹ️ تعذّر حل الصيغة الحرة محلياً دون خادم الذكاء الاصطناعي؛ فيما يلي أقرب مثال محلول من المنهج على نفس القاعدة:</div>'
+      : '';
+
     return `
-      <div class="ce-card ${sub.source === 'ai' ? 'is-ai' : ''}">
+      <div class="ce-card ${sub.source === 'ai' ? 'is-ai' : ''} ${sub.source === 'local-solver' ? 'is-solved' : ''}">
         <div class="ce-card-header">
           <div>
             <span class="ce-source-badge">${escHtml(fmtPlainNum(sub.badge || '📚 شرح تفصيلي', isSec))}</span>
@@ -708,12 +1722,13 @@
 
         <div class="ce-example-box">
           <div class="ce-example-hdr">
-            <span>✍️ المثال التوضيحي المحلول خطوة بخطوة</span>
+            <span>${exHeaderLabel}</span>
           </div>
-          <div class="ce-ex-problem"><strong>المثال:</strong> ${fmt(ex.problem, isSec)}</div>
+          ${similarNoteHtml}
+          <div class="ce-ex-problem"><strong>${exProbLabel}</strong> ${fmt(ex.problem, isSec)}</div>
           ${figHtml}
           ${exStepsHtml}
-          ${ex.finalAnswer ? `<div class="ce-ex-final">✅ <strong>الخلاصة / الناتج النهائي:</strong> ${fmt(ex.finalAnswer, isSec)}</div>` : ''}
+          ${showFinalAnswer ? `<div class="ce-ex-final">✅ <strong>الخلاصة / الناتج النهائي:</strong> ${fmt(ex.finalAnswer, isSec)}</div>` : ''}
         </div>
 
         ${mistakeHtml}
@@ -763,11 +1778,11 @@
     }).join('');
 
     const placeholderText = isSec
-      ? 'اكتب أي جزئية تريد شرحها بمثال (مثال: المجال الجبري، عدم الاتصال القفزي، خطي التقارب...)'
-      : 'اكتب أي جزئية تريد شرحها بمثال (مثال: تحليل العوامل، ترتيب العمليات، توحيد المقامات...)';
+      ? 'اكتب أي جزئية أو مسألة تريد حلها وشرحها بمثال (مثال: f(x) = 2x^2 - 3x + 5 أوجد f(-3))'
+      : 'اكتب أي جزئية أو مسألة تريد حلها وشرحها بمثال (مثال: د(س) = -س + ٧، فأوجد قيمة د(٣))';
 
     return `
-      <div class="ce-wrapper" id="ce-root-${escHtml(lesson.id)}">
+      <div class="ce-wrapper ${isSec ? 'is-sec-stage' : 'is-ar-stage'}" id="ce-root-${escHtml(lesson.id)}">
         <div class="ce-hero">
           <div>
             <div class="ce-hero-title">🧠 الشارح التفصيلي للجزئيات بالأمثلة التوضيحية (النظام الهجين)</div>
@@ -910,12 +1925,37 @@
 
     const cacheKey = getCacheKey(lessonId, query, level);
     const cached = getCachedExplanation(cacheKey);
-    if (cached) {
+    if (cached && cached.source === 'ai') {
       st.customResult = cached;
       st.altExOffset = 0;
       st.revealCheck = false;
       rerenderInDom(lessonId);
       return cached;
+    }
+
+    // Priority 1: Exact built-in mathematical problem solver (0ms, 100% deterministic accuracy)
+    const directSolved = trySolveUserProblemLocally(query, isSec, lesson);
+    if (directSolved) {
+      const poolAlts = collectExamplePool(lesson, isSec).slice(0, 5);
+      const builtins = buildBuiltInSubtopics(lesson);
+      const solvedEntry = {
+        id: directSolved.id,
+        title: directSolved.title,
+        badge: '🧮 حل فوري دقيق لمسألتك خطوة بخطوة (' + level + ')',
+        source: 'local-solver',
+        summary: directSolved.summary,
+        steps: directSolved.steps,
+        workedExample: directSolved.workedExample,
+        altExamples: poolAlts,
+        commonMistake: directSolved.commonMistake,
+        quickCheck: (directSolved.quickCheck && directSolved.quickCheck.question) ? directSolved.quickCheck : (builtins[0] ? builtins[0].quickCheck : { question: '', answer: '' }),
+        systemHint: ''
+      };
+      st.customResult = solvedEntry;
+      st.altExOffset = 0;
+      st.revealCheck = false;
+      rerenderInDom(lessonId);
+      return solvedEntry;
     }
 
     const canCallNetwork = typeof fetch === 'function' &&
@@ -965,7 +2005,8 @@
               workedExample: normalizeExampleObj({
                 problem: fmtPlainNum(d.workedExample && d.workedExample.problem, isSec),
                 steps: (d.workedExample && d.workedExample.steps || []).map(function (s) { return fmtPlainNum(s, isSec); }),
-                finalAnswer: fmtPlainNum(d.workedExample && d.workedExample.finalAnswer, isSec)
+                finalAnswer: fmtPlainNum(d.workedExample && d.workedExample.finalAnswer, isSec),
+                isExactUserSolution: true
               }, isSec),
               altExamples: localAlts,
               commonMistake: fmtPlainNum(d.commonMistake || '', isSec),
@@ -993,7 +2034,6 @@
     st.customResult = localEntry;
     st.altExOffset = 0;
     st.revealCheck = false;
-    setCachedExplanation(cacheKey, localEntry);
     rerenderInDom(lessonId);
     return localEntry;
   }
@@ -1014,6 +2054,8 @@
     const sub = getActiveSubtopic(lesson);
     if (!sub) return false;
     const ex = getDisplayedExample(sub, st);
+    const listStyle = isSec ? 'decimal' : 'arabic-indic';
+    const showFinal = !!(ex.finalAnswer && !isRedundantFinalAnswer(ex.steps, ex.finalAnswer));
 
     const wFmt = function (txt) {
       return utils.formatMathForWordHtml ? utils.formatMathForWordHtml(String(txt || ''), isSec) : escHtml(String(txt || ''));
@@ -1025,14 +2067,14 @@
           '<h3 style="margin:0 0 6pt 0; color:#1e3a8a; font-size:16pt;">' + wFmt(lesson.title + ' — ' + sub.title) + '</h3>' +
           '<p style="margin:4pt 0; font-size:14pt;"><strong>📌 التوضيح المفاهيمي:</strong> ' + wFmt(sub.summary) + '</p>' +
           ((sub.steps && sub.steps.length)
-            ? '<ol style="margin:4pt 18pt 6pt 0; font-size:13.5pt;">' + sub.steps.map(function (s) { return '<li>' + wFmt(s) + '</li>'; }).join('') + '</ol>'
+            ? '<ol style="margin:4pt 18pt 6pt 0; font-size:13.5pt; list-style-type:' + listStyle + ';">' + sub.steps.map(function (s) { return '<li>' + wFmt(s) + '</li>'; }).join('') + '</ol>'
             : '') +
           '<div style="background:#ecfdf5; border-right:3pt solid #059669; padding:8pt; margin-top:8pt;">' +
-            '<p style="margin:0 0 4pt 0; font-size:14pt; color:#065f46;"><strong>✍️ مثال توضيحي محلول:</strong> ' + wFmt(ex.problem) + '</p>' +
+            '<p style="margin:0 0 4pt 0; font-size:14pt; color:#065f46;"><strong>✍️ ' + (ex.isExactUserSolution ? 'المسألة:' : 'مثال توضيحي محلول:') + '</strong> ' + wFmt(ex.problem) + '</p>' +
             ((ex.steps && ex.steps.length)
-              ? '<ol style="margin:4pt 18pt; font-size:13.5pt;">' + ex.steps.map(function (s) { return '<li>' + wFmt(s) + '</li>'; }).join('') + '</ol>'
+              ? '<ol style="margin:4pt 18pt; font-size:13.5pt; list-style-type:' + listStyle + ';">' + ex.steps.map(function (s) { return '<li>' + wFmt(s) + '</li>'; }).join('') + '</ol>'
               : '') +
-            (ex.finalAnswer ? '<p style="margin:4pt 0 0 0; font-size:13.5pt;"><strong>✅ الخلاصة:</strong> ' + wFmt(ex.finalAnswer) + '</p>' : '') +
+            (showFinal ? '<p style="margin:4pt 0 0 0; font-size:13.5pt;"><strong>✅ الخلاصة:</strong> ' + wFmt(ex.finalAnswer) + '</p>' : '') +
           '</div>' +
           (sub.commonMistake
             ? '<p style="margin:8pt 0 0 0; font-size:13pt; color:#92400e;"><strong>⚠️ تنبيه خطأ شائع:</strong> ' + wFmt(sub.commonMistake) + '</p>'
@@ -1043,10 +2085,10 @@
     const plainText = [
       stripToPlain(lesson.title + ' — ' + sub.title, isSec),
       'التوضيح: ' + stripToPlain(sub.summary, isSec),
-      (sub.steps || []).map(function (s, idx) { return (idx + 1) + ') ' + stripToPlain(s, isSec); }).join('\n'),
-      'المثال التوضيحي: ' + stripToPlain(ex.problem, isSec),
-      (ex.steps || []).map(function (s, idx) { return '  - ' + stripToPlain(s, isSec); }).join('\n'),
-      ex.finalAnswer ? ('الناتج: ' + stripToPlain(ex.finalAnswer, isSec)) : ''
+      (sub.steps || []).map(function (s, idx) { return fmtPlainNum(idx + 1, isSec) + ') ' + stripToPlain(s, isSec); }).join('\n'),
+      (ex.isExactUserSolution ? 'المسألة: ' : 'المثال التوضيحي: ') + stripToPlain(ex.problem, isSec),
+      (ex.steps || []).map(function (s) { return '  - ' + stripToPlain(s, isSec); }).join('\n'),
+      showFinal ? ('الناتج: ' + stripToPlain(ex.finalAnswer, isSec)) : ''
     ].filter(Boolean).join('\n');
 
     try {
@@ -1088,8 +2130,9 @@
       '<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">' +
       '<link rel="stylesheet" href="assets/css/platform.css">' +
       '<style>body{background:#fff;padding:18px;font-family:\'Cairo\',\'Tajawal\',sans-serif;} .ce-card-actions,.ce-admin-hint,.ce-mini-btn{display:none!important;}</style>' +
-      '</head><body><h2 style="color:#1e3a8a;margin-bottom:12px;">' + fmt(lesson.title + ' (' + (lesson.grade || '') + ')', isSec) + '</h2>' +
-      cardHtml + '<script>setTimeout(function(){window.print();},350);</script></body></html>'
+      '</head><body><div class="ce-wrapper ' + (isSec ? 'is-sec-stage' : 'is-ar-stage') + '">' +
+      '<h2 style="color:#1e3a8a;margin-bottom:12px;">' + fmt(lesson.title + ' (' + (lesson.grade || '') + ')', isSec) + '</h2>' +
+      cardHtml + '</div><script>setTimeout(function(){window.print();},350);</script></body></html>'
     );
     win.document.close();
   }
@@ -1097,6 +2140,8 @@
   global.ConceptExplainer = {
     buildBuiltInSubtopics: buildBuiltInSubtopics,
     buildSmartLocalMatch: buildSmartLocalMatch,
+    trySolveUserProblemLocally: trySolveUserProblemLocally,
+    isRedundantFinalAnswer: isRedundantFinalAnswer,
     renderPane: renderPane,
     selectSubtopic: selectSubtopic,
     nextExample: nextExample,

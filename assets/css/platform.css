@@ -6078,6 +6078,32 @@ html {
   gap: 6px;
   font-size: 0.94rem;
 }
+.ce-wrapper.is-ar-stage .ce-steps-list,
+.ce-wrapper.is-ar-stage .ce-ex-steps {
+  list-style-type: arabic-indic;
+}
+.ce-wrapper.is-sec-stage .ce-steps-list,
+.ce-wrapper.is-sec-stage .ce-ex-steps {
+  list-style-type: decimal;
+}
+.ce-card.is-solved {
+  border-color: #6ee7b7;
+  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.1);
+}
+.ce-similar-note {
+  font-size: 0.84rem;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px dashed #94a3b8;
+  border-radius: 7px;
+  padding: 6px 10px;
+  line-height: 1.65;
+}
+[data-theme="dark"] .ce-similar-note {
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.45);
+  border-color: #475569;
+}
 .ce-example-box {
   background: #f0fdf4;
   border: 1.5px solid #86efac;

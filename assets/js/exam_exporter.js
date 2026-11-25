@@ -339,7 +339,7 @@
 <style>
   @page { size: A4 portrait; margin: 8mm; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Cairo', 'Tajawal', 'Segoe UI', 'Arial', sans-serif; direction: rtl; text-align: right; background: #fff; color: #000; font-size: 12.5px; line-height: 1.45; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: 'Cairo', 'Tajawal', 'Segoe UI', 'Arial', sans-serif; direction: rtl; text-align: right; background: #fff; color: #000; font-size: 11px; line-height: 1.4; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .page-frame-fixed { position: fixed; top: 0; right: 0; bottom: 0; left: 0; border: 2px solid #000; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3.2px #000; pointer-events: none; z-index: 9999; }
   .print-shell-tbl { width: 100%; border-collapse: collapse; border: none; }
   .print-shell-tbl > thead > tr > td, .print-shell-tbl > tfoot > tr > td { height: 4mm; border: none; }
@@ -368,7 +368,7 @@
   .a4-doc-score-blank { display: inline-block; min-width: 28px; }
   .a4-doc-mcq-tbl, .a4-doc-tf-tbl, .a4-doc-es-tbl { width: 100%; border-collapse: collapse; margin-bottom: 6px; border: 1.2px solid #000; }
   tbody.a4-q-pair { break-inside: avoid; }
-  .a4-doc-mcq-tbl td, .a4-doc-tf-tbl td, .a4-doc-tf-tbl th, .a4-doc-es-tbl td { border: 1px solid #000; padding: 4px 6px; font-size: 12px; vertical-align: middle; }
+  .a4-doc-mcq-tbl td, .a4-doc-tf-tbl td, .a4-doc-tf-tbl th, .a4-doc-es-tbl td { border: 1px solid #000; padding: 3px 5px; font-size: 10.5px; vertical-align: middle; }
   .a4-doc-num { width: 5.5%; text-align: center; font-weight: 800; background: #fff; }
   .a4-doc-prompt { width: 94.5%; background: #F2F2F2; font-weight: 700; text-align: right; vertical-align: top; }
   .a4-doc-mcq-let { width: 4.5%; text-align: center; font-weight: 800; background: #fff; }
@@ -1085,20 +1085,20 @@
             globalQ++;
             const qImgXml = maybeImageXml(q, 10.4, 4.6);
             const promptParas =
-              wPara(secRun(ed(q.q || q.statement || ''), { sizePt: 12.5, bold: true, color: '000000' }), { before: 0, after: qImgXml ? 20 : 0, keepNext: true }) +
+              wPara(secRun(ed(q.q || q.statement || ''), { sizePt: 10.5, bold: true, color: '000000' }), { before: 0, after: qImgXml ? 20 : 0, keepNext: true }) +
               qImgXml;
             const qOpts = (q.options || []).slice(0, 4);
             while (qOpts.length < 4) qOpts.push('');
             const optCells = qOpts.map(function (opt, oIdx) {
               return (
-                wCell(wPara(secRun(choiceLetters[oIdx] || (isSec ? 'A' : 'أ'), { sizePt: 12, bold: true, color: '000000', ltr: isSec }), { align: 'center', before: 0, after: 0 }), mcqWidths[1 + 2 * oIdx], { marLeft: 30, marRight: 30 }) +
-                wCell(wPara(secRun(ed(opt), { sizePt: 12 }), { before: 0, after: 0 }), mcqWidths[2 + 2 * oIdx], { marLeft: 55, marRight: 55 })
+                wCell(wPara(secRun(choiceLetters[oIdx] || (isSec ? 'A' : 'أ'), { sizePt: 10, bold: true, color: '000000', ltr: isSec }), { align: 'center', before: 0, after: 0 }), mcqWidths[1 + 2 * oIdx], { marLeft: 30, marRight: 30 }) +
+                wCell(wPara(secRun(ed(opt), { sizePt: 10 }), { before: 0, after: 0 }), mcqWidths[2 + 2 * oIdx], { marLeft: 55, marRight: 55 })
               );
             }).join('');
 
             return (
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-              wCell(wPara(secRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }), mcqWidths[0], { vMerge: 'restart', marLeft: 30, marRight: 30 }) +
+              wCell(wPara(secRun(ed(globalQ), { sizePt: 10.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }), mcqWidths[0], { vMerge: 'restart', marLeft: 30, marRight: 30 }) +
               wCell(promptParas, promptSpanW, { gridSpan: 8, fill: 'F2F2F2', vAlign: 'top' }) +
               '</w:tr>' +
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
@@ -1113,7 +1113,7 @@
           const tfHdr =
             '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
             wCell(
-              wPara(wRun('ضع علامة ( ✓ ) أمام العبارة الصحيحة وعلامة ( ✗ ) أمام العبارة الخاطئة:', { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }),
+              wPara(wRun('ضع علامة ( ✓ ) أمام العبارة الصحيحة وعلامة ( ✗ ) أمام العبارة الخاطئة:', { sizePt: 10.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }),
               tfWidths[0] + tfWidths[1] + tfWidths[2],
               { gridSpan: 3, fill: 'F2F2F2' }
             ) +
@@ -1123,9 +1123,9 @@
             const tfImg = maybeImageXml(q, 7.0, 3.5);
             return (
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-              wCell(wPara(secRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), tfWidths[0]) +
-              wCell(wPara(secRun(ed(q.statement || q.q || ''), { sizePt: 12.5, color: '000000' }), { before: 0, after: tfImg ? 20 : 0 }) + tfImg, tfWidths[1]) +
-              wCell(wPara(secRun('(          )', { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), tfWidths[2]) +
+              wCell(wPara(secRun(ed(globalQ), { sizePt: 10.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), tfWidths[0]) +
+              wCell(wPara(secRun(ed(q.statement || q.q || ''), { sizePt: 10.5, color: '000000' }), { before: 0, after: tfImg ? 20 : 0 }) + tfImg, tfWidths[1]) +
+              wCell(wPara(secRun('(          )', { sizePt: 10.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0 }), tfWidths[2]) +
               '</w:tr>'
             );
           }).join('');
@@ -1139,12 +1139,12 @@
             let solParas = '';
             for (let l = 0; l < lc; l++) {
               const prefix = l === 0 ? 'الحل /  ' : '';
-              solParas += wPara(secRun(prefix + '....................................................................................................', { sizePt: 11.5, bold: l === 0, color: '475569' }), { before: 20, after: 25 });
+              solParas += wPara(secRun(prefix + '....................................................................................................', { sizePt: 10, bold: l === 0, color: '475569' }), { before: 20, after: 25 });
             }
             return (
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
-              wCell(wPara(secRun(ed(globalQ), { sizePt: 12.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }), esWidths[0], { vMerge: 'restart' }) +
-              wCell(wPara(secRun(ed(q.q || q.statement || ''), { sizePt: 12.5, bold: true, color: '000000' }), { before: 0, after: qImgXml ? 20 : 0, keepNext: true }) + qImgXml, esWidths[1], { fill: 'F2F2F2', vAlign: 'top' }) +
+              wCell(wPara(secRun(ed(globalQ), { sizePt: 10.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 0, keepNext: true }), esWidths[0], { vMerge: 'restart' }) +
+              wCell(wPara(secRun(ed(q.q || q.statement || ''), { sizePt: 10.5, bold: true, color: '000000' }), { before: 0, after: qImgXml ? 20 : 0, keepNext: true }) + qImgXml, esWidths[1], { fill: 'F2F2F2', vAlign: 'top' }) +
               '</w:tr>' +
               '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
               wCell('', esWidths[0], { vMerge: 'continue' }) +

@@ -691,9 +691,9 @@
 
     .quiz-q-title {
       font-weight: 800;
-      font-size: 0.98rem;
-      margin-bottom: 12px;
-      line-height: 1.6;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+      line-height: 1.55;
     }
 
     .quiz-opts-grid {
@@ -709,10 +709,10 @@
     .quiz-opt-label {
       background: var(--bg-card);
       border: 1.5px solid var(--border-color);
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-radius: 8px;
+      padding: 8px 12px;
       cursor: pointer;
-      font-size: 0.88rem;
+      font-size: 0.74rem;
       font-weight: 600;
       display: flex;
       align-items: center;

@@ -84,7 +84,7 @@
     const questions = examData.questions || [];
     const options = examData.options || {};
 
-    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && questions[0].gradeId === 'g1s'));
+    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && (questions[0].gradeId === 'g1s' || questions[0].gradeId === 'g2s')));
     const dNum = function (v) {
       const s = v === null || v === undefined ? '' : String(v);
       return isSec ? (utils && utils.toWesternDigits ? utils.toWesternDigits(s) : s) : (utils ? utils.toEasternDigits(s) : s);
@@ -905,7 +905,7 @@
     const header = examData.header || {};
     const questions = examData.questions || [];
     const options = examData.options || {};
-    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && questions[0].gradeId === 'g1s'));
+    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && (questions[0].gradeId === 'g1s' || questions[0].gradeId === 'g2s')));
     const choiceLetters = (isSec && utils && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : WORD_CHOICE_LETTERS;
     const totalMarks = computeTotalMarks(questions);
     const totalStr = utils.formatMarkShort(totalMarks, isSec);

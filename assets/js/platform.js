@@ -17,13 +17,13 @@
     termFilter: 'all',
     searchQuery: '',
     quizScores: {}, // lessonId -> { answeredCount, correctCount, userAnswers: {} }
-    expandedNodes: new Set(['elementary', 'g6', 'g6-term1', 'g6-t1-c1', 'intermediate', 'g1m', 'g1m-term1', 'g1m-t1-c1', 'g3m', 'g3m-term1', 'secondary', 'g1s', 'g1s-term1'])
+    expandedNodes: new Set(['elementary', 'g6', 'g6-term1', 'g6-t1-c1', 'intermediate', 'g1m', 'g1m-term1', 'g1m-t1-c1', 'g3m', 'g3m-term1', 'secondary', 'g1s', 'g1s-term1', 'g2s', 'g2s-term1'])
   };
 
   function isCurrentSecondary() {
-    if (state.currentLessonId && state.currentLessonId.startsWith('g1s')) return true;
-    if (window.QuestionBank && window.QuestionBank.getCurrentBookId && window.QuestionBank.getCurrentBookId() === 'g1s') return true;
-    if (window.ExamBuilder && window.ExamBuilder.getCurrentBookId && window.ExamBuilder.getCurrentBookId() === 'g1s') return true;
+    if (state.currentLessonId && (state.currentLessonId.startsWith('g1s') || state.currentLessonId.startsWith('g2s'))) return true;
+    if (window.QuestionBank && window.QuestionBank.getCurrentBookId && (window.QuestionBank.getCurrentBookId() === 'g1s' || window.QuestionBank.getCurrentBookId() === 'g2s')) return true;
+    if (window.ExamBuilder && window.ExamBuilder.getCurrentBookId && (window.ExamBuilder.getCurrentBookId() === 'g1s' || window.ExamBuilder.getCurrentBookId() === 'g2s')) return true;
     return false;
   }
 
@@ -58,7 +58,7 @@
   }
 
   function isFullBookLesson(lesson) {
-    return !!(lesson && lesson.id && (lesson.id.startsWith('g6') || lesson.id.startsWith('g1m') || lesson.id.startsWith('g3m') || lesson.id.startsWith('g1s')));
+    return !!(lesson && lesson.id && (lesson.id.startsWith('g6') || lesson.id.startsWith('g1m') || lesson.id.startsWith('g3m') || lesson.id.startsWith('g1s') || lesson.id.startsWith('g2s')));
   }
 
   function mergeBookData() {
@@ -94,6 +94,42 @@
                 badge: ch.badge || 'مكتمل بالكامل',
                 lessons: (ch.lessons || []).map(l => {
                   const fullL = (window.GRADE1S_BOOK_DATA.lessons && window.GRADE1S_BOOK_DATA.lessons[l.id]) || {};
+                  return {
+                    id: l.id,
+                    number: l.number || fullL.number || '',
+                    title: fullL.title || l.title || '',
+                    pages: fullL.pages || l.pages || '',
+                    status: 'completed'
+                  };
+                })
+              }));
+            }
+          }
+        }
+      }
+    }
+    if (window.GRADE2S_BOOK_DATA && window.GRADE2S_BOOK_DATA.lessons) {
+      Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE2S_BOOK_DATA.lessons);
+
+      // Dynamically sync and rebuild the Secondary tree structure in stages from GRADE2S_BOOK_DATA
+      if (window.CURRICULUM_DATA.stages && window.GRADE2S_BOOK_DATA.chapters) {
+        const secStage = window.CURRICULUM_DATA.stages.find(s => s.id === 'secondary');
+        if (secStage && secStage.grades) {
+          const g2s = secStage.grades.find(g => g.id === 'g2s');
+          if (g2s && g2s.terms) {
+            g2s.badge = window.GRADE2S_BOOK_DATA.bookMeta ? window.GRADE2S_BOOK_DATA.bookMeta.badge : 'مكتمل 100% (4 فصول • 26 درساً)';
+            const t1 = g2s.terms.find(t => t.id === 'term1');
+            if (t1) {
+              t1.chapters = window.GRADE2S_BOOK_DATA.chapters.map(ch => ({
+                id: ch.id,
+                number: ch.number,
+                title: ch.title,
+                pages: ch.pages || '',
+                lessons_count: (ch.lessons || []).length,
+                status: 'completed',
+                badge: ch.badge || 'مكتمل بالكامل',
+                lessons: (ch.lessons || []).map(l => {
+                  const fullL = (window.GRADE2S_BOOK_DATA.lessons && window.GRADE2S_BOOK_DATA.lessons[l.id]) || {};
                   return {
                     id: l.id,
                     number: l.number || fullL.number || '',
@@ -802,7 +838,7 @@
   function buildLessonQuestionPayload(lesson, type, idx) {
     const utils = window.ArabicUtils;
     if (!lesson) return null;
-    const inferredGradeId = lesson.gradeId || (lesson.id && lesson.id.startsWith('g1s') ? 'g1s' : (lesson.id && lesson.id.startsWith('g3m') ? 'g3m' : (lesson.id && lesson.id.startsWith('g1m') ? 'g1m' : 'g6')));
+    const inferredGradeId = lesson.gradeId || (lesson.id && lesson.id.startsWith('g2s') ? 'g2s' : (lesson.id && lesson.id.startsWith('g1s') ? 'g1s' : (lesson.id && lesson.id.startsWith('g3m') ? 'g3m' : (lesson.id && lesson.id.startsWith('g1m') ? 'g1m' : 'g6'))));
     if (type === 'mcq') {
       const m = lesson.quiz.mcq[idx];
       if (!m) return null;
@@ -913,7 +949,7 @@
       window.ArabicUtils.copyQuestionsToWord([qObj], {
         includeAnswers: false,
         numbered: false,
-        isSecondary: !!(lessonId && lessonId.startsWith('g1s'))
+        isSecondary: !!(lessonId && (lessonId.startsWith('g1s') || lessonId.startsWith('g2s')))
       });
     }
   }

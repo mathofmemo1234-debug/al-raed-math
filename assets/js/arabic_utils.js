@@ -28,14 +28,19 @@
   function isSecondaryStage(val) {
     if (!val) return false;
     if (typeof val === 'string') {
-      return val === 'g1s' || val === '1s' || val === 'secondary' || val === 'المرحلة الثانوية' || val.startsWith('g1s');
+      return (
+        val === 'g1s' || val === '1s' ||
+        val === 'g2s' || val === '2s' ||
+        val === 'secondary' || val === 'المرحلة الثانوية' ||
+        val.startsWith('g1s') || val.startsWith('g2s')
+      );
     }
     if (typeof val === 'object') {
       if (val.isSecondary || val.secondary) return true;
-      if (val.id && (val.id === 'g1s' || val.id.startsWith('g1s'))) return true;
-      if (val.bookId && (val.bookId === 'g1s' || val.bookId === '1s')) return true;
-      if (val.gradeId && (val.gradeId === 'g1s' || val.gradeId === '1s')) return true;
-      if (val.lessonId && val.lessonId.startsWith('g1s')) return true;
+      if (val.id && (val.id === 'g1s' || val.id.startsWith('g1s') || val.id === 'g2s' || val.id.startsWith('g2s'))) return true;
+      if (val.bookId && (val.bookId === 'g1s' || val.bookId === '1s' || val.bookId === 'g2s' || val.bookId === '2s')) return true;
+      if (val.gradeId && (val.gradeId === 'g1s' || val.gradeId === '1s' || val.gradeId === 'g2s' || val.gradeId === '2s')) return true;
+      if (val.lessonId && (val.lessonId.startsWith('g1s') || val.lessonId.startsWith('g2s'))) return true;
       if (val.stage && (val.stage === 'المرحلة الثانوية' || val.stage.includes('ثانوي'))) return true;
       if (val.grade && val.grade.includes('الثانوي')) return true;
     }

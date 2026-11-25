@@ -16,6 +16,18 @@
   const PROFILE_KEYS = ['ministry', 'district', 'schoolCompany', 'school', 'teacher', 'principal', 'includeLogo'];
 
   const BOOK_PRESETS = {
+    g2s: {
+      id: 'g2s',
+      label: 'الثاني الثانوي (2 ث)',
+      heroTitle: '📝 منشئ الاختبارات التفاعلي (اختبار فترة / اختبار نهائي) — الصف الثاني الثانوي',
+      autogenTitle: '⚡ التوليد المتوازن التلقائي من فصول كتاب «2 ث»',
+      grade: 'الثاني الثانوي',
+      stage: 'المرحلة الثانوية',
+      periodTitle: 'اختبار الفترة الأولى — رياضيات 2-1',
+      finalTitle: 'الاختبار النهائي للفصل الدراسي الأول — رياضيات 2-1',
+      periodChapters: ['g2s-t1-c1', 'g2s-t1-c2'],
+      finalChapters: ['g2s-t1-c1', 'g2s-t1-c2', 'g2s-t1-c3', 'g2s-t1-c4']
+    },
     g1s: {
       id: 'g1s',
       label: 'الأول الثانوي (1 ث)',
@@ -68,6 +80,11 @@
 
   function getPreset(bookId) {
     return BOOK_PRESETS[bookId] || BOOK_PRESETS.g1m;
+  }
+
+  function isSecondaryBook(bid) {
+    const id = bid || (typeof state !== 'undefined' ? state.bookId : '');
+    return id === 'g1s' || id === 'g2s';
   }
 
   function loadSavedProfile() {
@@ -149,7 +166,7 @@
   function makeDefaultHeader(bookId, examType) {
     const preset = getPreset(bookId);
     const isFinal = examType === 'final';
-    const isSec = bookId === 'g1s';
+    const isSec = isSecondaryBook(bookId);
     const base = {
       ministry: 'المملكة العربية السعودية',
       district: 'الإدارة العامة للتعليم بمحافظة جدة',
@@ -192,6 +209,7 @@
       if (typeof localStorage !== 'undefined') {
         const savedBook = localStorage.getItem(ACTIVE_BOOK_STORAGE_KEY);
         if (savedBook && BOOK_PRESETS[savedBook]) {
+          if (savedBook === 'g2s' && global.GRADE2S_BOOK_DATA) return 'g2s';
           if (savedBook === 'g1s' && global.GRADE1S_BOOK_DATA) return 'g1s';
           if (savedBook === 'g3m' && global.GRADE3M_BOOK_DATA) return 'g3m';
           if (savedBook === 'g1m' && global.GRADE1M_BOOK_DATA) return 'g1m';
@@ -199,7 +217,7 @@
         }
       }
     } catch (e) { /* ignore */ }
-    return global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6'));
+    return global.GRADE2S_BOOK_DATA ? 'g2s' : (global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6')));
   })();
 
   const state = {
@@ -233,10 +251,12 @@
 
   function getBookData(bookId) {
     const bid = bookId || state.bookId;
+    if (bid === 'g2s' && global.GRADE2S_BOOK_DATA) return global.GRADE2S_BOOK_DATA;
     if (bid === 'g1s' && global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (bid === 'g3m' && global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (bid === 'g1m' && global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
     if (bid === 'g6' && global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
+    if (global.GRADE2S_BOOK_DATA) return global.GRADE2S_BOOK_DATA;
     if (global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
@@ -246,6 +266,9 @@
 
   function inferQuestionBookId(q) {
     if (!q) return state.bookId;
+    if (q.gradeId === 'g2s' || (q.lessonId && q.lessonId.indexOf('g2s') === 0) || (q.chapterId && q.chapterId.indexOf('g2s') === 0)) {
+      return 'g2s';
+    }
     if (q.gradeId === 'g1s' || (q.lessonId && q.lessonId.indexOf('g1s') === 0) || (q.chapterId && q.chapterId.indexOf('g1s') === 0)) {
       return 'g1s';
     }
@@ -315,7 +338,7 @@
         const savedProf = loadSavedProfile();
         if (parsed.header) {
           state.header = Object.assign({}, baseHeader, parsed.header, savedProf);
-          if (bid === 'g1s') {
+          if (isSecondaryBook(bid)) {
             const utils = getUtils();
             if (utils && utils.toWesternDigits) {
               Object.keys(state.header).forEach(function (k) {
@@ -374,7 +397,7 @@
   function updateBadge() {
     if (typeof document === 'undefined') return;
     const utils = getUtils();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     const text = isSec
       ? (utils ? utils.toWesternDigits(state.questions.length) : String(state.questions.length))
       : (utils ? utils.toEasternDigits(state.questions.length) : String(state.questions.length));
@@ -408,7 +431,7 @@
     const utils = getUtils();
     const approved = isUserApproved();
     const targetBook = inferQuestionBookId(q);
-    const isSec = (targetBook || state.bookId) === 'g1s';
+    const isSec = isSecondaryBook(targetBook);
 
     // قيد الأعضاء غير المعتمدين: 5 أسئلة كحد أقصى من كل نوع
     if (!approved) {
@@ -456,7 +479,7 @@
     });
 
     const firstBook = qs && qs[0] ? inferQuestionBookId(qs[0]) : state.bookId;
-    const isSec = (firstBook || state.bookId) === 'g1s';
+    const isSec = isSecondaryBook(firstBook);
     const d = function (v) { return isSec ? String(v) : utils.toEasternDigits(v); };
 
     if (added > 0) {
@@ -492,7 +515,7 @@
     const preset = getPreset(state.bookId);
     const defaults = makeDefaultHeader(state.bookId, mode);
     const approved = isUserApproved();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     const d = function (v) { return isSec ? String(v) : utils.toEasternDigits(v); };
     state.examType = mode;
     state.header.examTitle = defaults.examTitle;
@@ -526,7 +549,7 @@
   function setAutoCount(key, val) {
     const utils = getUtils();
     const approved = isUserApproved();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     let num = Math.max(0, Math.min(50, Math.round(utils.toWesternNumber(val, 0))));
     if (!approved && num > 5) {
       num = 5;
@@ -598,7 +621,7 @@
     let targetTf = state.autoGen.tfCount;
     let targetEssay = state.autoGen.essayCount;
 
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     const d = function (v) { return isSec ? utils.toWesternDigits(v) : utils.toEasternDigits(v); };
 
     if (!approved) {
@@ -637,7 +660,7 @@
 
   function updateHeaderField(key, val) {
     const utils = getUtils();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     if (key === 'includeLogo') {
       state.header.includeLogo = !!val;
     } else if (key === 'customLogoDataUrl') {
@@ -791,7 +814,7 @@
     const utils = getUtils();
     const q = state.questions[idx];
     if (!q) return;
-    const qIsSec = inferQuestionBookId(q) === 'g1s';
+    const qIsSec = isSecondaryBook(inferQuestionBookId(q));
     const normDigits = function (s) { return qIsSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s); };
 
     const textEl = document.getElementById('eb-edit-text-' + idx);
@@ -846,7 +869,7 @@
   function saveCustomQuestion(e) {
     e.preventDefault();
     const utils = getUtils();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     const normDigits = function (s) { return isSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s); };
     const choiceLetters = (isSec && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : utils.CHOICE_LETTERS;
     const t = state.customType;
@@ -919,7 +942,7 @@
   function getExamPayload() {
     return {
       bookId: state.bookId,
-      isSecondary: state.bookId === 'g1s',
+      isSecondary: isSecondaryBook(),
       examType: state.examType,
       header: state.header,
       options: state.options,
@@ -936,7 +959,7 @@
 
   function copyFullExamToWord() {
     if (!state.questions.length) {
-      getUtils().showToast('يرجى إضافة أسئلة أولاً قبل النسخ إلى Word.', 'warning', state.bookId === 'g1s');
+      getUtils().showToast('يرجى إضافة أسئلة أولاً قبل النسخ إلى Word.', 'warning', isSecondaryBook());
       return;
     }
     const sections = global.ExamExporter
@@ -952,7 +975,7 @@
       asTable: true,
       header: state.header,
       sections: sections,
-      isSecondary: state.bookId === 'g1s'
+      isSecondary: isSecondaryBook()
     });
   }
 
@@ -963,7 +986,7 @@
       includeAnswers: false,
       numbered: false,
       asTable: true,
-      isSecondary: inferQuestionBookId(q) === 'g1s'
+      isSecondary: isSecondaryBook(inferQuestionBookId(q))
     });
   }
 
@@ -980,7 +1003,7 @@
     if (!state.container) return;
 
     const utils = getUtils();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     const dNum = function (v) {
       const s = v === null || v === undefined ? '' : String(v);
       return isSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s);
@@ -1003,11 +1026,13 @@
         <div class="eb-hero-banner">
           <div>
             <div class="qb-grade-switcher" role="group" aria-label="اختيار الصف الدراسي للاختبار">
-              ${['g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
+              ${['g2s', 'g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
                 const cfg = BOOK_PRESETS[bid];
-                const hasData = bid === 'g1s'
+                const hasData = bid === 'g2s'
+                  ? !!global.GRADE2S_BOOK_DATA
+                  : (bid === 'g1s'
                   ? !!global.GRADE1S_BOOK_DATA
-                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA));
+                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA)));
                 if (!hasData) return '';
                 return '<button type="button" class="qb-grade-btn ' + (state.bookId === bid ? 'active' : '') +
                   '" onclick="window.ExamBuilder.setBook(\'' + bid + '\')">📘 ' + utils.escapeHtml(cfg.label) + '</button>';
@@ -1258,7 +1283,7 @@
     const utils = getUtils();
     const isEditing = state.editingIndex === idx;
     const typeLabel = q.type === 'mcq' ? 'اختيار من متعدد' : (q.type === 'tf' ? 'صواب وخطأ' : 'مسألة مقالية');
-    const qIsSec = inferQuestionBookId(q) === 'g1s';
+    const qIsSec = isSecondaryBook(inferQuestionBookId(q));
     const qDNum = function (v) {
       const s = v === null || v === undefined ? '' : String(v);
       return qIsSec ? utils.toWesternDigits(s) : utils.toEasternDigits(s);
@@ -1380,7 +1405,7 @@
 
   function renderCustomQuestionForm() {
     const utils = getUtils();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     const choiceLetters = (isSec && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : utils.CHOICE_LETTERS;
     const t = state.customType;
     return `

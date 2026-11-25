@@ -1259,6 +1259,89 @@ window.CURRICULUM_DATA = {
               ]
             }
           ]
+        },
+        {
+          "id": "g2s",
+          "name": "الصف الثاني الثانوي (رياضيات 2)",
+          "badge": "مكتمل 100% (4 فصول • 26 درساً)",
+          "terms": [
+            {
+              "id": "term1",
+              "name": "الفصل الدراسي الأول",
+              "chapters": [
+                {
+                  "id": "g2s-t1-c1",
+                  "number": "الفصل 1",
+                  "title": "الدوال والمتباينات",
+                  "pages": "10 - 59",
+                  "lessons_count": 6,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (10 - 59)",
+                  "lessons": [
+                    { "id": "g2s-t1-c1-l1", "number": "1-1", "title": "خصائص الأعداد الحقيقية", "pages": "ص 12 – 17", "status": "completed" },
+                    { "id": "g2s-t1-c1-l2", "number": "1-2", "title": "العلاقات والدوال", "pages": "ص 18 – 24", "status": "completed" },
+                    { "id": "g2s-t1-c1-l3", "number": "1-3", "title": "دوال خاصة", "pages": "ص 25 – 31", "status": "completed" },
+                    { "id": "g2s-t1-c1-l4", "number": "1-4", "title": "تمثيل المتباينات الخطية ومتباينات القيمة المطلقة بيانياً", "pages": "ص 32 – 36", "status": "completed" },
+                    { "id": "g2s-t1-c1-l5", "number": "1-5", "title": "حل أنظمة المتباينات الخطية بيانياً", "pages": "ص 37 – 43", "status": "completed" },
+                    { "id": "g2s-t1-c1-l6", "number": "1-6", "title": "البرمجة الخطية والحل الأمثل", "pages": "ص 44 – 49", "status": "completed" }
+                  ]
+                },
+                {
+                  "id": "g2s-t1-c2",
+                  "number": "الفصل 2",
+                  "title": "المصفوفات",
+                  "pages": "60 - 105",
+                  "lessons_count": 5,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (60 - 105)",
+                  "lessons": [
+                    { "id": "g2s-t1-c2-l1", "number": "2-1", "title": "مقدمة في المصفوفات", "pages": "ص 62 – 68", "status": "completed" },
+                    { "id": "g2s-t1-c2-l2", "number": "2-2", "title": "العمليات على المصفوفات", "pages": "ص 69 – 74", "status": "completed" },
+                    { "id": "g2s-t1-c2-l3", "number": "2-3", "title": "ضرب المصفوفات", "pages": "ص 75 – 82", "status": "completed" },
+                    { "id": "g2s-t1-c2-l4", "number": "2-4", "title": "المحددات وقاعدة كرامر", "pages": "ص 83 – 90", "status": "completed" },
+                    { "id": "g2s-t1-c2-l5", "number": "2-5", "title": "النظير الضربي للمصفوفة وأنظمة المعادلات الخطية", "pages": "ص 91 – 97", "status": "completed" }
+                  ]
+                },
+                {
+                  "id": "g2s-t1-c3",
+                  "number": "الفصل 3",
+                  "title": "كثيرات الحدود ودوالها",
+                  "pages": "106 - 175",
+                  "lessons_count": 8,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (106 - 175)",
+                  "lessons": [
+                    { "id": "g2s-t1-c3-l1", "number": "3-1", "title": "الأعداد المركبة", "pages": "ص 108 – 114", "status": "completed" },
+                    { "id": "g2s-t1-c3-l2", "number": "3-2", "title": "القانون العام والمميز", "pages": "ص 115 – 124", "status": "completed" },
+                    { "id": "g2s-t1-c3-l3", "number": "3-3", "title": "العمليات على كثيرات الحدود", "pages": "ص 125 – 130", "status": "completed" },
+                    { "id": "g2s-t1-c3-l4", "number": "3-4", "title": "قسمة كثيرات الحدود", "pages": "ص 131 – 137", "status": "completed" },
+                    { "id": "g2s-t1-c3-l5", "number": "3-5", "title": "دوال كثيرات الحدود", "pages": "ص 138 – 144", "status": "completed" },
+                    { "id": "g2s-t1-c3-l6", "number": "3-6", "title": "حل معادلات كثيرات الحدود", "pages": "ص 145 – 154", "status": "completed" },
+                    { "id": "g2s-t1-c3-l7", "number": "3-7", "title": "نظريتا الباقي والعوامل", "pages": "ص 155 – 160", "status": "completed" },
+                    { "id": "g2s-t1-c3-l8", "number": "3-8", "title": "الجذور والأصفار", "pages": "ص 161 – 170", "status": "completed" }
+                  ]
+                },
+                {
+                  "id": "g2s-t1-c4",
+                  "number": "الفصل 4",
+                  "title": "العلاقات والدوال العكسية والجذرية",
+                  "pages": "176 - 228",
+                  "lessons_count": 7,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (176 - 228)",
+                  "lessons": [
+                    { "id": "g2s-t1-c4-l1", "number": "4-1", "title": "العمليات على الدوال", "pages": "ص 178 – 184", "status": "completed" },
+                    { "id": "g2s-t1-c4-l2", "number": "4-2", "title": "العلاقات والدوال العكسية", "pages": "ص 185 – 190", "status": "completed" },
+                    { "id": "g2s-t1-c4-l3", "number": "4-3", "title": "دالة الجذر التربيعي", "pages": "ص 191 – 195", "status": "completed" },
+                    { "id": "g2s-t1-c4-l4", "number": "4-4", "title": "العلاقات والدوال الجذرية", "pages": "ص 196 – 202", "status": "completed" },
+                    { "id": "g2s-t1-c4-l5", "number": "4-5", "title": "الأسس النسبية", "pages": "ص 203 – 208", "status": "completed" },
+                    { "id": "g2s-t1-c4-l6", "number": "4-6", "title": "حل المعادلات والمتباينات الجذرية", "pages": "ص 209 – 214", "status": "completed" },
+                    { "id": "g2s-t1-c4-l7", "number": "4-7", "title": "أنظمة المعادلات غير الخطية", "pages": "ص 215 – 222", "status": "completed" }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
@@ -25930,6 +26013,46 @@ if (typeof window !== 'undefined') {
               })
             }));
           }
+        }
+      }
+    }
+  }
+  if (window.GRADE2S_BOOK_DATA && window.GRADE2S_BOOK_DATA.lessons) {
+    Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE2S_BOOK_DATA.lessons);
+    if (window.CURRICULUM_DATA.stages && window.GRADE2S_BOOK_DATA.chapters) {
+      const secStage = window.CURRICULUM_DATA.stages.find(s => s.id === 'secondary');
+      if (secStage && secStage.grades) {
+        let g2s = secStage.grades.find(g => g.id === 'g2s');
+        if (!g2s) {
+          g2s = {
+            id: 'g2s',
+            name: 'الصف الثاني الثانوي (رياضيات 2)',
+            terms: [{ id: 'term1', name: 'الفصل الدراسي الأول', chapters: [] }]
+          };
+          secStage.grades.push(g2s);
+        }
+        g2s.badge = window.GRADE2S_BOOK_DATA.bookMeta ? window.GRADE2S_BOOK_DATA.bookMeta.badge : 'مكتمل 100% (4 فصول • 26 درساً)';
+        const t1 = g2s.terms ? g2s.terms.find(t => t.id === 'term1') : null;
+        if (t1) {
+          t1.chapters = window.GRADE2S_BOOK_DATA.chapters.map(ch => ({
+            id: ch.id,
+            number: ch.number,
+            title: ch.title,
+            pages: ch.pages || '',
+            lessons_count: (ch.lessons || []).length,
+            status: 'completed',
+            badge: ch.badge || 'مكتمل بالكامل',
+            lessons: (ch.lessons || []).map(l => {
+              const fullL = (window.GRADE2S_BOOK_DATA.lessons && window.GRADE2S_BOOK_DATA.lessons[l.id]) || {};
+              return {
+                id: l.id,
+                number: l.number || fullL.number || '',
+                title: fullL.title || l.title || '',
+                pages: fullL.pages || l.pages || '',
+                status: 'completed'
+              };
+            })
+          }));
         }
       }
     }

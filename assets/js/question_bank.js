@@ -11,6 +11,12 @@
   const PAGE_SIZE = 20;
 
   const BOOKS_CONFIG = {
+    g2s: {
+      id: 'g2s',
+      label: 'الثاني الثانوي (2 ث)',
+      heading: '🏦 بنك أسئلة الصف الثاني الثانوي (الفصل الدراسي الأول)',
+      subtitle: 'مستخرج ومنقح بالكامل من كتاب الرياضيات 2-1 • 4 فصول • 26 درساً • أرقام إنجليزية ومعادلات LTR وجاهز للنسخ المباشر إلى Word'
+    },
     g1s: {
       id: 'g1s',
       label: 'الأول الثانوي (1 ث)',
@@ -38,7 +44,7 @@
   };
 
   const state = {
-    bookId: global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6')),
+    bookId: global.GRADE2S_BOOK_DATA ? 'g2s' : (global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6'))),
     chapterId: 'all',
     lessonId: 'all',
     type: 'all', // 'all' | 'mcq' | 'tf' | 'essay'
@@ -60,12 +66,19 @@
     return !!(global.FirebaseAuthManager && typeof global.FirebaseAuthManager.isApproved === 'function' && global.FirebaseAuthManager.isApproved());
   }
 
+  function isSecondaryBook(bid) {
+    const id = bid || state.bookId;
+    return id === 'g1s' || id === 'g2s';
+  }
+
   function getBookData(bookId) {
     const id = bookId || state.bookId;
+    if (id === 'g2s' && global.GRADE2S_BOOK_DATA) return global.GRADE2S_BOOK_DATA;
     if (id === 'g1s' && global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (id === 'g3m' && global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (id === 'g1m' && global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
     if (id === 'g6' && global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
+    if (global.GRADE2S_BOOK_DATA) return global.GRADE2S_BOOK_DATA;
     if (global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
@@ -87,7 +100,7 @@
       if (state.lessonId !== 'all' && q.lessonId !== state.lessonId) return false;
       if (state.type !== 'all' && q.type !== state.type) return false;
       if (state.difficulty !== 'all' && q.difficulty !== state.difficulty) return false;
-      if (state.onlyImages && !q.image) return false;
+      if (state.onlyImages && !q.image && !q.fig) return false;
 
       if (searchNorm) {
         const parts = [
@@ -139,9 +152,9 @@
     const totalMcq = bank.filter(function (q) { return q.type === 'mcq'; }).length;
     const totalTf = bank.filter(function (q) { return q.type === 'tf'; }).length;
     const totalEssay = bank.filter(function (q) { return q.type === 'essay'; }).length;
-    const totalIllustrated = bank.filter(function (q) { return !!q.image; }).length;
+    const totalIllustrated = bank.filter(function (q) { return !!(q.image || q.fig); }).length;
     const bookInfo = BOOKS_CONFIG[state.bookId] || BOOKS_CONFIG.g1m;
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     const dNum = function (v) {
       return isSec ? utils.toWesternDigits(v == null ? '' : v) : utils.toEasternDigits(v == null ? '' : v);
     };
@@ -173,11 +186,13 @@
         <div class="qb-hero-banner">
           <div>
             <div class="qb-grade-switcher" role="group" aria-label="اختيار المرحلة الدراسية">
-              ${['g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
+              ${['g2s', 'g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
                 const cfg = BOOKS_CONFIG[bid];
-                const hasData = bid === 'g1s'
+                const hasData = bid === 'g2s'
+                  ? !!global.GRADE2S_BOOK_DATA
+                  : (bid === 'g1s'
                   ? !!global.GRADE1S_BOOK_DATA
-                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA));
+                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA)));
                 if (!hasData) return '';
                 return '<button type="button" class="qb-grade-btn ' + (state.bookId === bid ? 'active' : '') +
                   '" onclick="window.QuestionBank.setBook(\'' + bid + '\')">📘 ' + utils.escapeHtml(cfg.label) + '</button>';
@@ -350,7 +365,7 @@
             const approved = isUserApproved();
             const visitorTypeCounts = { mcq: 0, tf: 0, essay: 0 };
 
-            const isSec = state.bookId === 'g1s';
+            const isSec = isSecondaryBook();
             const choiceLetters = (isSec && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : utils.CHOICE_LETTERS;
 
             return pageItems.map(function (q, i) {
@@ -493,7 +508,7 @@
   function renderPagination(totalPages) {
     if (totalPages <= 1) return '';
     const utils = getUtils();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     let pagesHtml = '';
     const maxButtons = 7;
     let startP = Math.max(1, state.page - 3);
@@ -605,7 +620,7 @@
     getUtils().copyQuestionsToWord([q], {
       includeAnswers: state.includeAnswersOnCopy,
       numbered: false,
-      isSecondary: state.bookId === 'g1s'
+      isSecondary: isSecondaryBook()
     });
   }
 
@@ -616,7 +631,7 @@
       return;
     }
     const approved = isUserApproved();
-    const isSec = state.bookId === 'g1s';
+    const isSec = isSecondaryBook();
     if (!approved) {
       const counts = { mcq: 0, tf: 0, essay: 0 };
       const safeList = [];

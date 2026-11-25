@@ -138,6 +138,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <style>
     .katex, .sec-math .katex, .ltr-math .katex { direction: ltr !important; unicode-bidi: isolate !important; font-style: normal !important; font-weight: 400 !important; vertical-align: middle !important; }
+    .ar-frac { display: inline-flex !important; flex-direction: column !important; align-items: center !important; vertical-align: middle !important; line-height: 1.08 !important; margin: 0 3px !important; font-weight: 700 !important; font-size: 0.92em !important; }
+    .ar-frac-num { display: block !important; padding: 0 4px 2px 4px !important; border-bottom: 1.6px solid currentColor !important; text-align: center !important; }
+    .ar-frac-den { display: block !important; padding: 2px 4px 0 4px !important; text-align: center !important; }
+    .sec-exp { font-size: 0.72em !important; font-weight: 700 !important; font-style: normal !important; vertical-align: super !important; line-height: 0 !important; }
     .sec-matrix-container { display: inline-flex; align-items: stretch; vertical-align: middle; margin: 0 4px; direction: ltr !important; unicode-bidi: isolate; font-family: 'Cambria Math', 'Times New Roman', serif; line-height: 1.2; }
     .sec-det-container { border-left: 2px solid currentColor; border-right: 2px solid currentColor; padding: 2px 6px; }
     .sec-bracket-container { border-left: 2px solid currentColor; border-right: 2px solid currentColor; position: relative; padding: 2px 6px; }

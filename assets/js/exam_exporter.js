@@ -340,6 +340,10 @@
 <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
 <style>
   .katex, .sec-math .katex, .ltr-math .katex { direction: ltr !important; unicode-bidi: isolate !important; font-style: normal !important; font-weight: 400 !important; font-family: KaTeX_Main, 'Times New Roman', serif !important; vertical-align: middle !important; }
+  .ar-frac { display: inline-flex !important; flex-direction: column !important; align-items: center !important; vertical-align: middle !important; line-height: 1.05 !important; margin: 0 3px !important; font-weight: 700 !important; font-size: 0.92em !important; }
+  .ar-frac-num { display: block !important; padding: 0 3px 1.5px 3px !important; border-bottom: 1.4px solid #000 !important; text-align: center !important; }
+  .ar-frac-den { display: block !important; padding: 1.5px 3px 0 3px !important; text-align: center !important; }
+  .sec-exp { font-size: 0.72em !important; font-weight: 700 !important; font-style: normal !important; vertical-align: super !important; line-height: 0 !important; }
   .sec-matrix-container { display: inline-flex; align-items: stretch; vertical-align: middle; margin: 0 4px; direction: ltr !important; unicode-bidi: isolate; font-family: 'Cambria Math', 'Times New Roman', serif; line-height: 1.2; }
   .sec-det-container { border-left: 1.8px solid #000; border-right: 1.8px solid #000; padding: 2px 6px; }
   .sec-bracket-container { border-left: 1.8px solid #000; border-right: 1.8px solid #000; position: relative; padding: 2px 6px; }

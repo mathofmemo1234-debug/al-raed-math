@@ -245,20 +245,493 @@
     return rows.length ? rows : null;
   }
 
-  function cleanTexCell(cell) {
-    return String(cell != null ? cell : '')
-      .replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, '_{$1}')
-      .replace(/<sup\b[^>]*>([\s\S]*?)<\/sup>/gi, '^{$1}')
-      .replace(/<[^>]+>/g, '')
-      .replace(/&nbsp;|\u00a0/g, ' ')
+  const SUP_CHAR_TO_ASCII = {
+    '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+    '⁺': '+', '⁻': '-', 'ⁿ': 'n'
+  };
+
+  function findBalancedClose(str, openPos) {
+    const openCh = str.charAt(openPos);
+    const closeCh = openCh === '(' ? ')' : (openCh === '[' ? ']' : (openCh === '{' ? '}' : ''));
+    if (!closeCh) return -1;
+    let depth = 0;
+    let inTag = false;
+    for (let i = openPos; i < str.length; i++) {
+      const ch = str.charAt(i);
+      if (ch === '<' && /^<\/?[A-Za-z]/.test(str.slice(i, i + 3))) { inTag = true; continue; }
+      if (inTag) {
+        if (ch === '>') inTag = false;
+        continue;
+      }
+      if (ch === openCh) depth++;
+      else if (ch === closeCh) {
+        depth--;
+        if (depth === 0) return i;
+      }
+    }
+    return -1;
+  }
+
+  function findBalancedOpenBackward(str, closePos) {
+    const closeCh = str.charAt(closePos);
+    const openCh = closeCh === ')' ? '(' : (closeCh === ']' ? '[' : (closeCh === '}' ? '{' : ''));
+    if (!openCh) return -1;
+    let depth = 0;
+    for (let i = closePos; i >= 0; i--) {
+      const ch = str.charAt(i);
+      if (ch === '>') {
+        // تخطي وسوم HTML الحقيقية فقط (وليس علامات المتباينات > أو <)
+        const tagOpen = str.lastIndexOf('<', i);
+        if (tagOpen !== -1 && /^<\/?[A-Za-z][^<>]*>$/.test(str.slice(tagOpen, i + 1))) {
+          i = tagOpen;
+          continue;
+        }
+      }
+      if (ch === closeCh) depth++;
+      else if (ch === openCh) {
+        depth--;
+        if (depth === 0) return i;
+      }
+    }
+    return -1;
+  }
+
+  function stripOuterBalancedDelims(str) {
+    let s = String(str || '').trim();
+    if (s.length >= 2 && ((s.charAt(0) === '(' && s.charAt(s.length - 1) === ')') || (s.charAt(0) === '[' && s.charAt(s.length - 1) === ']'))) {
+      if (findBalancedClose(s, 0) === s.length - 1) {
+        return s.slice(1, -1).trim();
+      }
+    }
+    return s;
+  }
+
+  function exprHtmlToTex(raw, useDisplayFrac) {
+    if (raw === null || raw === undefined) return '';
+    let s = toWesternDigits(String(raw));
+    // تحويل وسوم الأسس والمؤشرات السفلية HTML إلى صيغة LaTeX أولاً
+    s = s.replace(/<span\s+class=["'][^"']*sec-pow[^"']*["'][^>]*>\s*<span\s+class=["'][^"']*sec-base[^"']*["'][^>]*>([\s\S]*?)<\/span>\s*<(?:sup|span)\s+class=["'][^"']*sec-exp[^"']*["'][^>]*>([\s\S]*?)<\/(?:sup|span)>\s*<\/span>/gi, function (_, base, exp) {
+      return '{' + exprHtmlToTex(base, false) + '}^{' + exprHtmlToTex(exp, false) + '}';
+    });
+    s = s.replace(/<span\s+class=["']sec-pow["'][^>]*>([^<]+)<\/span>/gi, '^{$1}');
+    s = s.replace(/<(?:sup|span)\s+class=["'][^"']*sec-exp[^"']*["'][^>]*>([\s\S]*?)<\/(?:sup|span)>/gi, '^{$1}');
+    s = s.replace(/<sup\b[^>]*>([\s\S]*?)<\/sup>/gi, '^{$1}');
+    s = s.replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, '_{$1}');
+    s = s.replace(/<span\s+class=["'][^"']*sec-sub[^"']*["'][^>]*>([\s\S]*?)<\/span>/gi, '_{$1}');
+    s = s.replace(/<[^>]+>/g, '');
+    s = s.replace(/&nbsp;|\u00a0/g, ' ')
       .replace(/&minus;|−/g, '-')
-      .replace(/&times;|×/g, '\\times ')
-      .replace(/·/g, '\\cdot ')
-      .replace(/&divide;|÷/g, '\\div ')
-      .replace(/([A-Za-z])_([A-Za-z0-9]{2,})/g, '$1_{$2}')
-      .replace(/([A-Za-z0-9)])\^([+\-]?[A-Za-z0-9]{2,})/g, '$1^{$2}')
-      .replace(/²/g, '^2').replace(/³/g, '^3')
-      .trim();
+      .replace(/&times;|×/g, ' \\times ')
+      .replace(/·/g, ' \\cdot ')
+      .replace(/&divide;|÷/g, ' \\div ')
+      .replace(/±/g, ' \\pm ')
+      .replace(/≤/g, ' \\le ')
+      .replace(/≥/g, ' \\ge ')
+      .replace(/≠/g, ' \\ne ')
+      .replace(/≈/g, ' \\approx ')
+      .replace(/∞/g, ' \\infty ')
+      .replace(/π/g, ' \\pi ')
+      .replace(/θ/g, ' \\theta ')
+      .replace(/°/g, '^\\circ');
+
+    // تحويل المؤشرات السفلية اليونيكود (x₂ -> x_{2})
+    s = s.replace(/([A-Za-z])([₀₁₂₃₄₅₆₇₈₉]+)/g, function (_, v, subs) {
+      return v + '_{' + Array.from(subs).map(function (c) { return String(c.charCodeAt(0) - 0x2080); }).join('') + '}';
+    });
+    s = s.replace(/(^|[^A-Za-z0-9_\\])([xym])([0-9])(?![A-Za-z0-9])/g, '$1$2_{$3}');
+    s = s.replace(/([A-Za-z])_([A-Za-z0-9]+)/g, '$1_{$2}');
+
+    // تحويل الجذور المتداخلة مع الأقواس المتوازنة قبل تحويل الأسس اليونيكود (لحماية ⁴√ و ⁿ√)
+    s = convertRadicalsInTex(s);
+
+    // تحويل الأسس اليونيكود المتبقية (x⁴ -> x^{4})
+    s = s.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ]+)/g, function (sups) {
+      const ascii = Array.from(sups).map(function (c) { return SUP_CHAR_TO_ASCII[c] || c; }).join('');
+      return '^{' + ascii + '}';
+    });
+    s = s.replace(/([A-Za-z0-9})])\^([+\-]?[A-Za-z0-9]+)/g, '$1^{$2}');
+
+    // تحويل الكسور الداخلية (مثل 3V/(4π) داخل جذر أو 9/3 داخل مصفوفة)
+    s = convertSimpleFractionsInTex(s, !!useDisplayFrac);
+    return s.replace(/\s+/g, ' ').trim();
+  }
+
+  function convertRadicalsInTex(str) {
+    let s = String(str || '');
+    let guard = 0;
+    while (guard++ < 30) {
+      const m = /([²³⁴⁵⁶⁷⁸⁹ⁿ])?([√∛∜])/.exec(s);
+      if (!m) break;
+      const start = m.index;
+      const idxChar = m[1] || '';
+      const radChar = m[2];
+      let rootIdx = '';
+      if (radChar === '∛') rootIdx = '3';
+      else if (radChar === '∜') rootIdx = '4';
+      else if (idxChar) rootIdx = SUP_CHAR_TO_ASCII[idxChar] || idxChar;
+
+      let pos = start + m[0].length;
+      while (pos < s.length && s.charAt(pos) === ' ') pos++;
+      let inner = '';
+      let endPos = pos;
+
+      if (pos < s.length && (s.charAt(pos) === '(' || s.charAt(pos) === '[')) {
+        const closeIdx = findBalancedClose(s, pos);
+        if (closeIdx !== -1) {
+          inner = s.slice(pos + 1, closeIdx);
+          endPos = closeIdx + 1;
+        }
+      }
+      if (!inner && endPos === pos) {
+        const atomM = s.slice(pos).match(/^([+\-]?(?:\\pi|[0-9]+(?:\.[0-9]+)?|[A-Za-z])(?:_\{[^{}]+\}|\^\{[^{}]+\}|[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ]+|[A-Za-z0-9])*)/);
+        if (atomM) {
+          inner = atomM[1];
+          endPos = pos + atomM[0].length;
+        } else {
+          break;
+        }
+      }
+      const convertedInner = exprHtmlToTex(inner, false);
+      const texRad = rootIdx ? ('\\sqrt[' + rootIdx + ']{' + convertedInner + '}') : ('\\sqrt{' + convertedInner + '}');
+      s = s.slice(0, start) + texRad + s.slice(endPos);
+    }
+    return s;
+  }
+
+  function convertSimpleFractionsInTex(str, useDisplay) {
+    const fracCmd = useDisplay ? '\\dfrac' : '\\frac';
+    let s = String(str || '');
+    // كسور بأقواس أو جذور داخل تعبير TeX (مثل 3V/(4\pi))
+    s = s.replace(/(\([^()]+\)|[0-9A-Za-z\\{}^_]+)\s*\/\s*(\([^()]+\)|[0-9A-Za-z\\{}^_]+)/g, function (full, n, d) {
+      if (/[A-Za-z]{3,}/.test(n.replace(/\\(?:sqrt|pi|theta|times|cdot|pm|frac|dfrac|le|ge|ne|approx|infty|circ)\b/g, '')) ||
+          /[A-Za-z]{3,}/.test(d.replace(/\\(?:sqrt|pi|theta|times|cdot|pm|frac|dfrac|le|ge|ne|approx|infty|circ)\b/g, ''))) {
+        return full;
+      }
+      const nc = stripOuterBalancedDelims(n);
+      const dc = stripOuterBalancedDelims(d);
+      return fracCmd + '{' + nc + '}{' + dc + '}';
+    });
+    return s;
+  }
+
+  function isValidMathFracSide(raw) {
+    if (!raw) return false;
+    const plain = String(raw).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+    if (!plain || plain.length > 90) return false;
+    if (/[\u0600-\u06FF\n\r]/.test(plain)) return false;
+    if (plain.indexOf('___') !== -1) return false;
+    if (/^(?:14|19|20)\d{2}$/.test(plain)) return false;
+    // منع الكلمات الإنجليزية العادية (3 أحرف فأكثر غير الدوال الرياضية المعروفة)
+    const strippedFns = plain.replace(/\b(?:sin|cos|tan|sec|csc|cot|log|ln|lim|det|max|min|mod)\b/gi, '');
+    if (/[A-Za-z]{3,}/.test(strippedFns)) return false;
+    return /[0-9A-Za-zπθ√∛∜]/.test(plain);
+  }
+
+  function isInsideProtectedTag(str, idx) {
+    // 1. داخل وسم HTML حقيقي <tag ...> (مع تمييزه عن علامة المتباينة الرياضية < مثل -64 < 0)
+    const lastLt = str.lastIndexOf('<', idx);
+    const lastGt = str.lastIndexOf('>', idx);
+    if (lastLt > lastGt && /^<\/?[A-Za-z]/.test(str.slice(lastLt, lastLt + 3))) return true;
+    // 2. داخل <sup> أو <span class="sec-exp"> حتى لا تُضخّم الأسس النسبية (مثل x^{3/5})
+    const before = str.slice(0, idx);
+    const supOpens = (before.match(/<sup\b/gi) || []).length;
+    const supCloses = (before.match(/<\/sup>/gi) || []).length;
+    if (supOpens > supCloses) return true;
+    const expOpens = (before.match(/<span\s+class=["'][^"']*sec-exp[^"']*["']/gi) || []).length;
+    if (expOpens > 0) {
+      const lastExpOpen = before.search(/<span\s+class=["'][^"']*sec-exp[^"']*["'][^>]*>(?![\s\S]*<span\s+class=["'][^"']*sec-exp)/i);
+      if (lastExpOpen !== -1 && before.indexOf('</span>', lastExpOpen) === -1) return true;
+    }
+    return false;
+  }
+
+  function isSlashInsideRadicalGroup(str, slashIdx) {
+    // تحقق إذا كان / يقع داخل (...) أو [...] مسبوقاً مباشرة بعلامة جذر (مثل ∛[3V/(4π)])
+    let depthP = 0, depthB = 0;
+    for (let i = slashIdx - 1; i >= 0; i--) {
+      const ch = str.charAt(i);
+      if (ch === '>') {
+        const tagOpen = str.lastIndexOf('<', i);
+        if (tagOpen !== -1 && /^<\/?[A-Za-z][^<>]*>$/.test(str.slice(tagOpen, i + 1))) {
+          i = tagOpen;
+          continue;
+        }
+      }
+      if (ch === ')') depthP++;
+      else if (ch === '(') {
+        if (depthP === 0) {
+          let j = i - 1;
+          while (j >= 0 && str.charAt(j) === ' ') j--;
+          if (j >= 0 && /[√∛∜]/.test(str.charAt(j))) return true;
+        } else depthP--;
+      } else if (ch === ']') depthB++;
+      else if (ch === '[') {
+        if (depthB === 0) {
+          let j = i - 1;
+          while (j >= 0 && str.charAt(j) === ' ') j--;
+          if (j >= 0 && /[√∛∜]/.test(str.charAt(j))) return true;
+        } else depthB--;
+      }
+    }
+    return false;
+  }
+
+  function renderSecRadicalsAndFractions(inputStr, stashKtx) {
+    const k = getKatex();
+    if (!k || typeof k.renderToString !== 'function') return inputStr;
+    let s = String(inputStr);
+
+    // الخطوة 1: تحويل الكسور الرياضية (البسيطة والمركبة المحتوية على جذور أو أقواس أو قيمة مطلقة) إلى كسور رأسية KaTeX
+    let scanPos = 0;
+    let safety = 0;
+    while (scanPos < s.length && safety++ < 250) {
+      const slashIdx = s.indexOf('/', scanPos);
+      if (slashIdx === -1) break;
+      scanPos = slashIdx + 1;
+
+      if (isInsideProtectedTag(s, slashIdx)) continue;
+      // تجاهل الروابط والتعليقات // أو /* أو ://
+      const prevCh = slashIdx > 0 ? s.charAt(slashIdx - 1) : '';
+      const nextCh = slashIdx + 1 < s.length ? s.charAt(slashIdx + 1) : '';
+      if (prevCh === ':' || prevCh === '/' || prevCh === '<' || nextCh === '/' || nextCh === '*') continue;
+      if (isSlashInsideRadicalGroup(s, slashIdx)) continue;
+
+      // استخراج البسط (يسار /)
+      let numEnd = slashIdx;
+      while (numEnd > 0 && s.charAt(numEnd - 1) === ' ') numEnd--;
+      if (numEnd <= 0) continue;
+      let numStart = -1;
+      const lastNumCh = s.charAt(numEnd - 1);
+
+      if (lastNumCh === ')' || lastNumCh === ']') {
+        numStart = findBalancedOpenBackward(s, numEnd - 1);
+        if (numStart !== -1) {
+          // ضم معامل أو متغير ملاصق قبل القوس مثل n(n-1)/2 أو 2(x+1)/3
+          const preCoef = s.slice(0, numStart).match(/([0-9]+(?:\.[0-9]+)?|[A-Za-z])$/);
+          if (preCoef) {
+            const cStart = numStart - preCoef[0].length;
+            const beforeC = cStart > 0 ? s.charAt(cStart - 1) : '';
+            if (!/[A-Za-z0-9_]/.test(beforeC)) numStart = cStart;
+          }
+        }
+      } else if (lastNumCh === '|') {
+        // قيمة مطلقة أو محددة في البسط مثل |Ax₁ + By₁ + C| أو |A_x|
+        let j = numEnd - 2;
+        while (j >= 0 && s.charAt(j) !== '|' && s.charAt(j) !== '\n' && !/[\u0600-\u06FF]/.test(s.charAt(j))) j--;
+        if (j >= 0 && s.charAt(j) === '|') numStart = j;
+      } else {
+        // عنصر رياضي بسيط في البسط (عدد، متغير، أس، جذر بسيط)
+        const leftSlice = s.slice(0, numEnd);
+        const atomM = leftSlice.match(/(?:[²³⁴⁵⁶⁷⁸⁹ⁿ]?[√∛∜]\s*)?(?:[0-9]+(?:\.[0-9]+)?[A-Za-zπθ]*|[A-Za-z](?:_[A-Za-z0-9]+|[₀₁₂₃₄₅₆₇₈₉]+|[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ]+)?)(?:<sub\b[^>]*>[^<]*<\/sub>|<sup\b[^>]*>[^<]*<\/sup>)?$/);
+        if (atomM) {
+          numStart = numEnd - atomM[0].length;
+          // ضم الإشارة الأحادية الملاصقة (-8/3 أو +5/8) دون المساس بالطرح الثنائي (x - 1/2)
+          if (numStart > 0 && (s.charAt(numStart - 1) === '-' || s.charAt(numStart - 1) === '+')) {
+            const beforeSign = numStart >= 2 ? s.charAt(numStart - 2) : '';
+            if (numStart === 1 || /[\s>(\[{,،=:؛]/.test(beforeSign)) {
+              numStart--;
+            }
+          }
+        }
+      }
+
+      if (numStart === -1 || numStart >= numEnd) continue;
+      const numRaw = s.slice(numStart, numEnd).trim();
+      if (!isValidMathFracSide(numRaw)) continue;
+
+      // استخراج المقام (يمين /)
+      let denStart = slashIdx + 1;
+      while (denStart < s.length && s.charAt(denStart) === ' ') denStart++;
+      if (denStart >= s.length) continue;
+      let denEnd = -1;
+      const firstDenCh = s.charAt(denStart);
+
+      if (firstDenCh === '(' || firstDenCh === '[') {
+        const cIdx = findBalancedClose(s, denStart);
+        if (cIdx !== -1) denEnd = cIdx + 1;
+      } else if (/^[²³⁴⁵⁶⁷⁸⁹ⁿ]?[√∛∜]/.test(s.slice(denStart))) {
+        const rm = s.slice(denStart).match(/^[²³⁴⁵⁶⁷⁸⁹ⁿ]?[√∛∜]\s*/);
+        const afterRad = denStart + rm[0].length;
+        if (afterRad < s.length && (s.charAt(afterRad) === '(' || s.charAt(afterRad) === '[')) {
+          const cIdx = findBalancedClose(s, afterRad);
+          if (cIdx !== -1) denEnd = cIdx + 1;
+        } else {
+          const rAtom = s.slice(afterRad).match(/^[+\-]?(?:[0-9]+(?:\.[0-9]+)?[A-Za-zπθ]*|[A-Za-z][0-9A-Za-z_₀-₉⁰-⁹]*)/);
+          if (rAtom) denEnd = afterRad + rAtom[0].length;
+        }
+      } else if (firstDenCh === '|') {
+        let j = denStart + 1;
+        while (j < s.length && s.charAt(j) !== '|' && s.charAt(j) !== '\n' && !/[\u0600-\u06FF]/.test(s.charAt(j))) j++;
+        if (j < s.length && s.charAt(j) === '|') denEnd = j + 1;
+      } else {
+        const rightSlice = s.slice(denStart);
+        const dAtom = rightSlice.match(/^-?(?:[0-9]+(?:\.[0-9]+)?(?:\([^()]{1,12}\)|[A-Za-zπθ]*(?:_[A-Za-z0-9]+|[₀₁₂₃₄₅₆₇₈₉]+|[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ]+)?)|[A-Za-z](?:_[A-Za-z0-9]+|[₀₁₂₃₄₅₆₇₈₉]+|[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ]+)?)(?:<sub\b[^>]*>[^<]*<\/sub>|<sup\b[^>]*>[^<]*<\/sup>)?/);
+        if (dAtom) {
+          denEnd = denStart + dAtom[0].length;
+        }
+      }
+
+      if (denEnd === -1 || denEnd <= denStart) continue;
+      // تأكد أنه ليس متبوعاً بحرف مباشر يشكل كلمة (مثل 1/2nd أو a/bcde)
+      if (denEnd < s.length && /[A-Za-z]{2}/.test(s.slice(denEnd, denEnd + 2))) continue;
+
+      const denRaw = s.slice(denStart, denEnd).trim();
+      if (!isValidMathFracSide(denRaw)) continue;
+
+      // بناء صيغة LaTeX للكسر الرأسي
+      let leadSign = '';
+      let numForTex = stripOuterBalancedDelims(numRaw);
+      const denForTex = stripOuterBalancedDelims(denRaw);
+      // إخراج الإشارة الأحادية السالبة/الموجبة أمام خط الكسر للكسور البسيطة (-8/3 -> -\dfrac{8}{3})
+      if (/^[+\-][0-9A-Za-z.]+$/.test(numForTex) && !/^-/.test(denForTex)) {
+        leadSign = numForTex.charAt(0);
+        numForTex = numForTex.slice(1);
+      }
+
+      const numTex = exprHtmlToTex(numForTex, false);
+      const denTex = exprHtmlToTex(denForTex, false);
+      if (!numTex || !denTex) continue;
+
+      // ضم الطرف الأيسر للمعادلة مثل (x = ، d = ، m = ، f(x) =) داخل نفس كتلة KaTeX لضمان الاتجاه LTR
+      let replaceStart = numStart;
+      let lhsTex = '';
+      const beforeNum = s.slice(0, numStart);
+      const lhsM = beforeNum.match(/(?:^|[\s>،,;:(])([A-Za-z](?:\([A-Za-z]\)|[0-9]|_[A-Za-z0-9]+)?)\s*=\s*$/);
+      if (lhsM) {
+        const matchStr = lhsM[0];
+        const trimOffset = matchStr.search(/[A-Za-z]/);
+        replaceStart = numStart - (matchStr.length - trimOffset);
+        lhsTex = exprHtmlToTex(lhsM[1], false) + ' = ';
+      }
+
+      try {
+        const rendered = k.renderToString(lhsTex + leadSign + '\\dfrac{' + numTex + '}{' + denTex + '}', { throwOnError: false, displayMode: false });
+        const ph = stashKtx(rendered);
+        s = s.slice(0, replaceStart) + ph + s.slice(denEnd);
+        scanPos = replaceStart + ph.length;
+      } catch (e) {}
+    }
+
+    // الخطوة 2: تحويل جميع الجذور المتبقية (√49 ، √(x⁴) ، ∛(-64y⁹) ، ⁴√(16x⁸) ، ∛[3V/(4π)] ، √[(x₂-x₁)²+(y₂-y₁)²]) إلى KaTeX مع خط علوي متصل
+    scanPos = 0;
+    safety = 0;
+    while (scanPos < s.length && safety++ < 250) {
+      const rest = s.slice(scanPos);
+      const m = /([²³⁴⁵⁶⁷⁸⁹ⁿ])?([√∛∜])/.exec(rest);
+      if (!m) break;
+      const start = scanPos + m.index;
+      if (isInsideProtectedTag(s, start)) {
+        scanPos = start + m[0].length;
+        continue;
+      }
+      const idxChar = m[1] || '';
+      const radChar = m[2];
+      let rootIdx = '';
+      if (radChar === '∛') rootIdx = '3';
+      else if (radChar === '∜') rootIdx = '4';
+      else if (idxChar) rootIdx = SUP_CHAR_TO_ASCII[idxChar] || idxChar;
+
+      let pos = start + m[0].length;
+      while (pos < s.length && s.charAt(pos) === ' ') pos++;
+      let innerRaw = '';
+      let endPos = pos;
+
+      if (pos < s.length && (s.charAt(pos) === '(' || s.charAt(pos) === '[')) {
+        const closeIdx = findBalancedClose(s, pos);
+        if (closeIdx !== -1) {
+          innerRaw = s.slice(pos + 1, closeIdx);
+          endPos = closeIdx + 1;
+        }
+      }
+      if (!innerRaw && endPos === pos) {
+        const atomM = s.slice(pos).match(/^([+\-]?(?:[0-9]+(?:\.[0-9]+)?[A-Za-zπθ]*|[A-Za-z])(?:_[A-Za-z0-9]+|[₀₁₂₃₄₅₆₇₈₉]+|[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ]+|<sub\b[^>]*>[^<]*<\/sub>|<sup\b[^>]*>[^<]*<\/sup>)*)/);
+        if (atomM) {
+          innerRaw = atomM[1];
+          endPos = pos + atomM[0].length;
+        } else {
+          scanPos = pos + 1;
+          continue;
+        }
+      }
+
+      if (/[\u0600-\u06FF]/.test(innerRaw.replace(/<[^>]+>/g, ''))) {
+        scanPos = endPos;
+        continue;
+      }
+
+      const innerTex = exprHtmlToTex(innerRaw, false);
+      if (!innerTex) {
+        scanPos = endPos;
+        continue;
+      }
+
+      // ضم الطرف الأيسر للمعادلة (d = ، r = ، i =) أو إشارة ± أو معامل ملاصق (مثل 2√3) داخل نفس كتلة KaTeX
+      let radStart = start;
+      let radPrefixTex = '';
+      const beforeRad = s.slice(0, start);
+      const radLhsM = beforeRad.match(/(?:^|[\s>،,;:(])([A-Za-z](?:\([A-Za-z]\)|[0-9]|_[A-Za-z0-9]+)?)\s*=\s*(±)?$/);
+      if (radLhsM) {
+        const matchStr = radLhsM[0];
+        const trimOffset = matchStr.search(/[A-Za-z]/);
+        radStart = start - (matchStr.length - trimOffset);
+        radPrefixTex = exprHtmlToTex(radLhsM[1], false) + ' = ' + (radLhsM[2] ? '\\pm ' : '');
+      } else {
+        const coefM = beforeRad.match(/(?:^|[\s>،,;:(])([+\-±]?(?:[0-9]+(?:\.[0-9]+)?i?|±))$/);
+        if (coefM) {
+          const ms = coefM[0];
+          const off = ms.search(/[+\-±0-9]/);
+          if (off !== -1) {
+            radStart = start - (ms.length - off);
+            radPrefixTex = coefM[1].replace(/±/g, '\\pm ');
+          }
+        }
+      }
+
+      try {
+        const tex = radPrefixTex + (rootIdx ? ('\\sqrt[' + rootIdx + ']{' + innerTex + '}') : ('\\sqrt{' + innerTex + '}'));
+        const rendered = k.renderToString(tex, { throwOnError: false, displayMode: false });
+        const ph = stashKtx(rendered);
+        s = s.slice(0, radStart) + ph + s.slice(endPos);
+        scanPos = radStart + ph.length;
+      } catch (e) {
+        scanPos = endPos;
+      }
+    }
+
+    // الخطوة 3: تغليف سلاسل المساواة التي تبدأ بكتلة KaTeX خارج <span class="sec-math"> (مثل ∛(-64y⁹) = -4y³ أو 5/√5 = √5) بوسم LTR لضمان عدم انعكاسها في RTL
+    s = s.replace(/(___KTXPH[A-Z]+___(?:\s*[=≈≠<>≤≥±+\-×·]\s*(?:___KTXPH[A-Z]+___|[+\-±]?[0-9A-Za-z().,|²³⁴⁵⁶⁷⁸⁹⁰¹⁺⁻ⁿ₀-₉]+(?:\s*[+\-±]\s*[0-9A-Za-z().,|²³⁴⁵⁶⁷⁸⁹⁰¹⁺⁻ⁿ₀-₉]+)?))+)/g, function (full, seq, offset, whole) {
+      if (isInsideProtectedTag(whole, offset)) return full;
+      // لا تعيد تغليفها إذا كانت بالفعل داخل <span class="sec-math">
+      const before = whole.slice(0, offset);
+      const lastMathOpen = before.lastIndexOf('sec-math');
+      const lastSpanClose = before.lastIndexOf('</span>');
+      if (lastMathOpen !== -1 && lastMathOpen > lastSpanClose) return full;
+      return '<span class="sec-math ltr-math" dir="ltr">' + seq + '</span>';
+    });
+
+    return s;
+  }
+
+  function formatArabicVerticalFractions(html) {
+    if (!html || html.indexOf('/') === -1) return html;
+    // تطبيق الكسور الرأسية على النصوص خارج وسوم HTML فقط لحماية الوسوم والخصائص
+    return String(html).split(/(<[^>]+>|___[A-Z]+___)/).map(function (seg) {
+      if (!seg || seg.charAt(0) === '<' || /^___[A-Z]+___$/.test(seg) || seg.indexOf('/') === -1) return seg;
+      // 1. كسور بأقواس مشرقية مثل (١ + ١) / (٢ + ٢) أو (٤٥÷١٥)/(٦٠÷١٥)
+      seg = seg.replace(/\(([٠-٩□]+(?:\s*[+\-×÷]\s*[٠-٩□]+)+)\)\s*\/\s*\(([٠-٩□]+(?:\s*[+\-×÷]\s*[٠-٩□]+)+)\)/g,
+        '<span class="ar-frac"><span class="ar-frac-num">$1</span><span class="ar-frac-den">$2</span></span>');
+      // 2. كسور مشرقية بسيطة مثل ١/٢ ، ٤/١٢ ، ٥٦٫٢٥ / ١٠٠ ، □/٢١
+      seg = seg.replace(/(?<![٠-٩٫\/])([٠-٩]+(?:٫[٠-٩]+)?|□)\s*\/\s*([٠-٩]+(?:٫[٠-٩]+)?|□)(?![٠-٩٫\/])/g, function (full, n, d) {
+        // استثناء التواريخ الهجرية والميلادية (١٤٤٨ / ٢٠٢٦)
+        if (/^(?:١٤|١٩|٢٠)[٠-٩]{2}$/.test(n) || /^(?:١٤|١٩|٢٠)[٠-٩]{2}$/.test(d)) return full;
+        return '<span class="ar-frac"><span class="ar-frac-num">' + n + '</span><span class="ar-frac-den">' + d + '</span></span>';
+      });
+      return seg;
+    }).join('');
+  }
+
+  function cleanTexCell(cell) {
+    return exprHtmlToTex(cell, false);
   }
 
   function formatWordMatrixTable(rows, isDet, isSec) {
@@ -772,8 +1245,12 @@
     });
 
     if (sec) {
-      // المرحلة الثانوية: أرقام إنجليزية (0-9) حصراً + تحويل الأسس والمؤشرات السفلية داخل وسوم LTR وخارجها بأمان تام
+      // المرحلة الثانوية: أرقام إنجليزية (0-9) حصراً + تحويل الأسس والمؤشرات السفلية والكسور والجذور بأمان تام
       s = toWesternDigits(s);
+      // توحيد وسوم الأس المفردة <span class="sec-pow">2</span> إلى أسس حقيقية <sup class="sec-exp">2</sup>
+      s = s.replace(/<span\s+class=["']sec-pow["'][^>]*>([^<]+)<\/span>/gi, '<sup class="sec-exp">$1</sup>');
+      // تصيير الكسور الرأسية (-8/3) والجذور بالخط العلوي (√49, ∛, ⁴√) عبر KaTeX وحفظها قبل تحليل الوسوم
+      s = renderSecRadicalsAndFractions(s, stashKtx);
       const secTags = [];
       const stashTag = function (fullTag) {
         const ph = '___SECTAG' + numToAlpha(secTags.length) + '___';
@@ -896,6 +1373,9 @@
       const ph = '___ARPOW' + numToAlpha(i) + '___';
       s = s.split(ph).join('<span class="ar-pow"><span class="ar-base">' + p.base + '</span><sup class="ar-exp">' + p.exp + '</sup></span>');
     });
+
+    // تحويل الكسور المشرقية (١/٢ ، ٤/١٢ ، ٥/٧) إلى كسور رأسية عربية مطابقة للكتاب المدرسي
+    s = formatArabicVerticalFractions(s);
 
     for (let i = ktxBlocks.length - 1; i >= 0; i--) {
       const ph = '___KTXPH' + numToAlpha(i) + '___';

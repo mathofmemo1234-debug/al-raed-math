@@ -900,13 +900,14 @@
   </div>
 
   <!-- Required Scripts -->
-  <script src="assets/js/arabic_utils.js?v=20261125_v3"></script>
-  <script src="assets/js/grade6_book_data.js?v=20261125_v3"></script>
-  <script src="assets/js/grade1m_book_data.js?v=20261125_v3"></script>
-  <script src="assets/js/grade3m_book_data.js?v=20261125_v3"></script>
-  <script src="assets/js/grade1s_book_data.js?v=20261125_v3"></script>
-  <script src="assets/js/grade2s_book_data.js?v=20261125_v3"></script>
-  <script src="assets/js/curriculum_tree.js?v=20261125_v3"></script>
+  <script src="assets/js/arabic_utils.js?v=20261125_v8"></script>
+  <script src="assets/js/grade6_book_data.js?v=20261125_v8"></script>
+  <script src="assets/js/grade1m_book_data.js?v=20261125_v8"></script>
+  <script src="assets/js/grade3m_book_data.js?v=20261125_v8"></script>
+  <script src="assets/js/grade1s_book_data.js?v=20261125_v8"></script>
+  <script src="assets/js/grade2s_book_data.js?v=20261125_v8"></script>
+  <script src="assets/js/grade3s_book_data.js?v=20261125_v8"></script>
+  <script src="assets/js/curriculum_tree.js?v=20261125_v8"></script>
 
   <script>
     (function () {
@@ -928,6 +929,9 @@
         }
         if (window.GRADE2S_BOOK_DATA && window.GRADE2S_BOOK_DATA.lessons) {
           Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE2S_BOOK_DATA.lessons);
+        }
+        if (window.GRADE3S_BOOK_DATA && window.GRADE3S_BOOK_DATA.lessons) {
+          Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE3S_BOOK_DATA.lessons);
         }
       }
 
@@ -977,7 +981,7 @@
       function initSession() {
         if (!lesson) return;
         const s = lesson.socratic || {};
-        const isSec = lessonId.startsWith('g1s') || lessonId.startsWith('g2s') || (lesson && (lesson.gradeId === 'g1s' || lesson.gradeId === 'g2s' || lesson.stageId === 'secondary' || (utils.isSecondaryStage && utils.isSecondaryStage(lesson))));
+        const isSec = lessonId.startsWith('g1s') || lessonId.startsWith('g2s') || lessonId.startsWith('g3s') || (lesson && (lesson.gradeId === 'g1s' || lesson.gradeId === 'g2s' || lesson.gradeId === 'g3s' || lesson.stageId === 'secondary' || (utils.isSecondaryStage && utils.isSecondaryStage(lesson))));
         const fmtD = function (v) {
           const str = v === null || v === undefined ? '' : String(v);
           return isSec ? (utils.toWesternDigits ? utils.toWesternDigits(str) : str) : utils.toEasternDigits(str);

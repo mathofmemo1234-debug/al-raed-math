@@ -31,16 +31,17 @@
       return (
         val === 'g1s' || val === '1s' ||
         val === 'g2s' || val === '2s' ||
+        val === 'g3s' || val === '3s' ||
         val === 'secondary' || val === 'المرحلة الثانوية' ||
-        val.startsWith('g1s') || val.startsWith('g2s')
+        val.startsWith('g1s') || val.startsWith('g2s') || val.startsWith('g3s')
       );
     }
     if (typeof val === 'object') {
       if (val.isSecondary || val.secondary) return true;
-      if (val.id && (val.id === 'g1s' || val.id.startsWith('g1s') || val.id === 'g2s' || val.id.startsWith('g2s'))) return true;
-      if (val.bookId && (val.bookId === 'g1s' || val.bookId === '1s' || val.bookId === 'g2s' || val.bookId === '2s')) return true;
-      if (val.gradeId && (val.gradeId === 'g1s' || val.gradeId === '1s' || val.gradeId === 'g2s' || val.gradeId === '2s')) return true;
-      if (val.lessonId && (val.lessonId.startsWith('g1s') || val.lessonId.startsWith('g2s'))) return true;
+      if (val.id && (val.id === 'g1s' || val.id.startsWith('g1s') || val.id === 'g2s' || val.id.startsWith('g2s') || val.id === 'g3s' || val.id.startsWith('g3s'))) return true;
+      if (val.bookId && (val.bookId === 'g1s' || val.bookId === '1s' || val.bookId === 'g2s' || val.bookId === '2s' || val.bookId === 'g3s' || val.bookId === '3s')) return true;
+      if (val.gradeId && (val.gradeId === 'g1s' || val.gradeId === '1s' || val.gradeId === 'g2s' || val.gradeId === '2s' || val.gradeId === 'g3s' || val.gradeId === '3s')) return true;
+      if (val.lessonId && (val.lessonId.startsWith('g1s') || val.lessonId.startsWith('g2s') || val.lessonId.startsWith('g3s'))) return true;
       if (val.stage && (val.stage === 'المرحلة الثانوية' || val.stage.includes('ثانوي'))) return true;
       if (val.grade && val.grade.includes('الثانوي')) return true;
     }
@@ -981,10 +982,106 @@
     return s;
   }
 
+  function latexToReadableUnicode(tex) {
+    if (!tex) return '';
+    let s = String(tex).trim();
+    // Preserve literal set braces \{ and \}
+    s = s.replace(/\\\{/g, '___LBRACE___').replace(/\\\}/g, '___RBRACE___');
+    s = s.replace(/\\begin\{cases\}([\s\S]*?)\\end\{cases\}/g, function (_, body) {
+      const rows = body.trim().split(/\\\\/).map(function (r) {
+        return r.replace(/&/g, ' ').trim();
+      }).filter(Boolean);
+      return '___LBRACE___ ' + rows.join(' ; ') + ' ___RBRACE___';
+    });
+    s = s.replace(/\\begin\{(vmatrix|matrix)\}([\s\S]*?)\\end\{\1\}/g, function (_, env, body) {
+      const rows = body.trim().split(/\\\\/).map(function (r) {
+        return r.split('&').map(function (c) { return c.trim(); }).join('  ');
+      });
+      return '| ' + rows.join(' ; ') + ' |';
+    });
+    s = s.replace(/\\begin\{(bmatrix|pmatrix)\}([\s\S]*?)\\end\{\1\}/g, function (_, env, body) {
+      const rows = body.trim().split(/\\\\/).map(function (r) {
+        return r.split('&').map(function (c) { return c.trim(); }).join('  ');
+      });
+      return '[ ' + rows.join(' ; ') + ' ]';
+    });
+    s = s.replace(/\\text\{([^{}]*)\}/g, '$1');
+    s = s.replace(/\\mathbb\{([A-Za-z])\}/g, '$1');
+    s = s.replace(/\\left\s*/g, '').replace(/\\right\s*/g, '');
+    s = s.replace(/\\[,;:!]/g, ' ');
+    // Resolve \sqrt[n]{...} and \sqrt{...} (inner-out up to 4 passes)
+    for (let pass = 0; pass < 4; pass++) {
+      s = s.replace(/\\sqrt\[([^\[\]]+)\]\{([^{}]+)\}/g, function (_, n, inner) {
+        const prefix = n.trim() === '3' ? '∛' : (n.trim() === '4' ? '∜' : (toSuperscriptText(n.trim()) + '√'));
+        return /^[A-Za-z0-9]+$/.test(inner.trim()) ? (prefix + inner.trim()) : (prefix + '(' + inner.trim() + ')');
+      });
+      s = s.replace(/\\sqrt\{([^{}]+)\}/g, function (_, inner) {
+        return /^[A-Za-z0-9]+$/.test(inner.trim()) ? ('√' + inner.trim()) : ('√(' + inner.trim() + ')');
+      });
+      s = s.replace(/\\d?frac\{([^{}]+)\}\{([^{}]+)\}/g, function (_, num, den) {
+        const nt = num.trim();
+        const dt = den.trim();
+        const nWrap = /^[+\-]?[A-Za-z0-9√πθ]+$/.test(nt) ? nt : ('(' + nt + ')');
+        const dWrap = /^[+\-]?[A-Za-z0-9√πθ]+$/.test(dt) ? dt : ('(' + dt + ')');
+        return nWrap + '/' + dWrap;
+      });
+    }
+    // Limits and logarithms
+    s = s.replace(/\\lim_\{([^{}]+)\}/g, 'lim($1) ');
+    // Common symbols (MUST run BEFORE stripping backslashes from \sin, \csc, etc., so \theta\csc stays delimited!)
+    const symMap = [
+      [/\\circ(?![A-Za-z])/g, '°'], [/\\theta(?![A-Za-z])/g, 'θ'], [/\\alpha(?![A-Za-z])/g, 'α'], [/\\beta(?![A-Za-z])/g, 'β'],
+      [/\\pi(?![A-Za-z])/g, 'π'], [/\\Delta(?![A-Za-z])/g, 'Δ'], [/\\infty(?![A-Za-z])/g, '∞'], [/\\pm(?![A-Za-z])/g, '±'],
+      [/\\mp(?![A-Za-z])/g, '∓'], [/\\le(?![A-Za-z])/g, '≤'], [/\\ge(?![A-Za-z])/g, '≥'], [/\\ne(?![A-Za-z])/g, '≠'],
+      [/\\approx(?![A-Za-z])/g, '≈'], [/\\times(?![A-Za-z])/g, '×'], [/\\cdot(?![A-Za-z])/g, '·'], [/\\div(?![A-Za-z])/g, '÷'],
+      [/\\iff(?![A-Za-z])/g, '⇔'], [/\\Rightarrow(?![A-Za-z])/g, '⇒'], [/\\rightarrow(?![A-Za-z])/g, '→'], [/\\to(?![A-Za-z])/g, '→'],
+      [/\\in(?![A-Za-z])/g, '∈'], [/\\notin(?![A-Za-z])/g, '∉'], [/\\cup(?![A-Za-z])/g, '∪'], [/\\cap(?![A-Za-z])/g, '∩'],
+      [/\\setminus(?![A-Za-z])/g, ' \\ '], [/\\varnothing(?![A-Za-z])/g, '∅'], [/\\mid(?![A-Za-z])/g, '|'],
+      [/\\lfloor(?![A-Za-z])/g, '⌊'], [/\\rfloor(?![A-Za-z])/g, '⌋'], [/\\\%/g, '%']
+    ];
+    symMap.forEach(function (pair) { s = s.replace(pair[0], pair[1]); });
+    s = s.replace(/\\(sin|cos|tan|sec|csc|cot|log|ln|lim)\b/g, ' $1');
+    // Degree power ^° -> °
+    s = s.replace(/\^\s*°/g, '°').replace(/\^\{\s*°\s*\}/g, '°');
+    // Exponents and subscripts
+    s = s.replace(/\^\{([^{}]+)\}/g, function (_, e) { return toSuperscriptText(e); });
+    s = s.replace(/\^([0-9n])/g, function (_, e) { return toSuperscriptText(e); });
+    s = s.replace(/_\{([^{}]+)\}/g, function (_, sub) { return toSubscriptText(sub); });
+    s = s.replace(/_([0-9])/g, function (_, sub) { return toSubscriptText(sub); });
+    // Strip leftover TeX grouping braces and restore set braces
+    s = s.replace(/[{}]/g, '').replace(/___LBRACE___/g, '{').replace(/___RBRACE___/g, '}');
+    return s.replace(/\s+/g, ' ').trim();
+  }
+
+  function convertLatexBlocksToPlain(input) {
+    if (!input) return '';
+    let s = String(input);
+    s = s.replace(/\$\$([\s\S]+?)\$\$/g, function (_, tex) { return latexToReadableUnicode(tex); });
+    s = s.replace(/\\\[([\s\S]+?)\\\]/g, function (_, tex) { return latexToReadableUnicode(tex); });
+    s = s.replace(/\\\(([\s\S]+?)\\\)/g, function (_, tex) { return latexToReadableUnicode(tex); });
+    s = s.replace(/(^|[^\\])\$([^\$]+?)\$/g, function (_, pre, tex) { return pre + latexToReadableUnicode(tex); });
+    return s;
+  }
+
   function formatMathForWordHtml(input, opts) {
     if (input === null || input === undefined) return '';
     let s = String(input);
     const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
+
+    if (s.indexOf('$') !== -1 || s.indexOf('\\(') !== -1 || s.indexOf('\\[') !== -1) {
+      s = s.replace(/\$\$([\s\S]+?)\$\$/g, function (_, tex) {
+        return '<span class="sec-math ltr-math" dir="ltr">' + latexToReadableUnicode(tex) + '</span>';
+      });
+      s = s.replace(/\\\[([\s\S]+?)\\\]/g, function (_, tex) {
+        return '<span class="sec-math ltr-math" dir="ltr">' + latexToReadableUnicode(tex) + '</span>';
+      });
+      s = s.replace(/\\\(([\s\S]+?)\\\)/g, function (_, tex) {
+        return '<span class="sec-math ltr-math" dir="ltr">' + latexToReadableUnicode(tex) + '</span>';
+      });
+      s = s.replace(/(^|[^\\])\$([^\$]+?)\$/g, function (_, pre, tex) {
+        return pre + '<span class="sec-math ltr-math" dir="ltr">' + latexToReadableUnicode(tex) + '</span>';
+      });
+    }
 
     if (s.indexOf('&lt;') !== -1 && (s.indexOf('ar-pow') !== -1 || s.indexOf('sec-pow') !== -1 || s.indexOf('span') !== -1 || s.indexOf('sup') !== -1 || s.indexOf('vmatrix') !== -1 || s.indexOf('bmatrix') !== -1)) {
       s = s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
@@ -1172,18 +1269,32 @@
       return stashKtx(m);
     });
 
-    // 1. استخراج وتصيير بيئات المصفوفات والمحددات في LaTeX
-    s = s.replace(/\\begin\{(vmatrix|bmatrix|pmatrix|matrix)\}[\s\S]*?\\end\{\1\}/g, function (m) {
+    // 1. تصيير صيغ LaTeX المحصورة بين علامات $ أو \( \) أو $$ أو \[ \] أولاً (لحماية \begin{cases} وغيرها داخل $)
+    s = s.replace(/\$\$([\s\S]+?)\$\$/g, function (_, tex) {
+      return stashKtx(renderLatexFormula(tex, true, sec));
+    });
+    s = s.replace(/\\\[([\s\S]+?)\\\]/g, function (_, tex) {
+      return stashKtx(renderLatexFormula(tex, true, sec));
+    });
+    s = s.replace(/\\\(([\s\S]+?)\\\)/g, function (_, tex) {
+      return stashKtx(renderLatexFormula(tex, false, sec));
+    });
+    s = s.replace(/(^|[^\\])\$([^\$]+?)\$/g, function (_, pre, tex) {
+      return pre + stashKtx(renderLatexFormula(tex, false, sec));
+    });
+
+    // 2. استخراج وتصيير بيئات المصفوفات والمحددات والدوال متعددة التعريف غير المحصورة بـ $
+    s = s.replace(/\\begin\{(vmatrix|bmatrix|pmatrix|matrix|cases)\}[\s\S]*?\\end\{\1\}/g, function (m) {
       return stashKtx(renderLatexFormula(m, false, sec));
     });
 
-    // 2. تصيير المحددات في التنسيق الموروث | <span class="sec-row">...</span> |
+    // 3. تصيير المحددات في التنسيق الموروث | <span class="sec-row">...</span> |
     s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)*)\s*\|/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
       return rows ? stashKtx(format2DMatrixHtml(rows, true, sec)) : _;
     });
 
-    // 3. تصيير المصفوفات في التنسيق الموروث (متعددة الصفوف وأحادية الصف)
+    // 4. تصيير المصفوفات في التنسيق الموروث (متعددة الصفوف وأحادية الصف)
     s = s.replace(/<span\s+class=["']sec-brack["']>\[<\/span>\s*([\s\S]*?)\s*<span\s+class=["']sec-brack["']>\]<\/span>/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
       return rows ? stashKtx(format2DMatrixHtml(rows, false, sec)) : _;
@@ -1193,7 +1304,7 @@
       return rows ? stashKtx(format2DMatrixHtml(rows, false, sec)) : _;
     });
 
-    // 3ب. تصيير المحددات والمصفوفات المكتوبة بصيغة |[[...]]| و [[...]] في الشروح والتدريبات
+    // 4ب. تصيير المحددات والمصفوفات المكتوبة بصيغة |[[...]]| و [[...]] في الشروح والتدريبات
     // مع دمج رمز المصفوفة السابق مثل (A = ، |A| = ، X =) داخل نفس سياق KaTeX LTR لمنع الانعكاس
     s = s.replace(/(?:(\|[A-Za-z][A-Za-z0-9_]*\||[A-Za-z][A-Za-z0-9_]*(?:\^-1|⁻¹)?)\s*=\s*)?\|\s*\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]\s*\|/g, function (full, lhs, body) {
       const rows = parseBracketMatrixRows(body);
@@ -1228,20 +1339,6 @@
         return stashKtx('<span class="sec-math ltr-math" dir="ltr">' + lhs + ' = ' + matHtml + '</span>');
       }
       return stashKtx(matHtml);
-    });
-
-    // 4. تصيير صيغ LaTeX المحصورة بين علامات $ أو \( \) أو $$ أو \[ \]
-    s = s.replace(/\$\$([\s\S]+?)\$\$/g, function (_, tex) {
-      return stashKtx(renderLatexFormula(tex, true, sec));
-    });
-    s = s.replace(/\\\[([\s\S]+?)\\\]/g, function (_, tex) {
-      return stashKtx(renderLatexFormula(tex, true, sec));
-    });
-    s = s.replace(/\\\(([\s\S]+?)\\\)/g, function (_, tex) {
-      return stashKtx(renderLatexFormula(tex, false, sec));
-    });
-    s = s.replace(/(^|[^\\])\$([^\$]+?)\$/g, function (_, pre, tex) {
-      return pre + stashKtx(renderLatexFormula(tex, false, sec));
     });
 
     if (sec) {
@@ -1391,7 +1488,7 @@
    */
   function stripMathToPlain(input, opts) {
     if (input === null || input === undefined) return '';
-    let s = String(input);
+    let s = convertLatexBlocksToPlain(String(input));
     const sec = (opts === true) || isSecondaryStage(opts) || s.indexOf('class="sec-math"') !== -1 || s.indexOf('class="ltr-math"') !== -1 || s.indexOf('class="sec-pow"') !== -1;
 
     // تحويل بيئات المصفوفات والمحددات في LaTeX إلى صيغة نصية مقروءة ونظيفة
@@ -2083,6 +2180,8 @@
     getKatex: getKatex,
     format2DMatrixHtml: format2DMatrixHtml,
     renderLatexFormula: renderLatexFormula,
+    latexToReadableUnicode: latexToReadableUnicode,
+    convertLatexBlocksToPlain: convertLatexBlocksToPlain,
     renderMathHtml: renderMathHtml,
     stripMathToPlain: stripMathToPlain,
     stripMathToInputText: stripMathToInputText,

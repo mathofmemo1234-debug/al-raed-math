@@ -5,7 +5,7 @@
  * ==========================================================================
  */
 
-const CACHE_NAME = 'alraed-platform-v4';
+const CACHE_NAME = 'alraed-platform-v5';
 const CORE_ASSETS = [
   './',
   './index.html',

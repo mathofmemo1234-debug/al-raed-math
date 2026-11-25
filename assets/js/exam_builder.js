@@ -16,6 +16,18 @@
   const PROFILE_KEYS = ['ministry', 'district', 'schoolCompany', 'school', 'teacher', 'principal', 'includeLogo'];
 
   const BOOK_PRESETS = {
+    g3s: {
+      id: 'g3s',
+      label: 'الثالث الثانوي (3 ث)',
+      heroTitle: '📝 منشئ الاختبارات التفاعلي (اختبار فترة / اختبار نهائي) — الصف الثالث الثانوي',
+      autogenTitle: '⚡ التوليد المتوازن التلقائي من فصول كتاب «3 ث»',
+      grade: 'الثالث الثانوي',
+      stage: 'المرحلة الثانوية',
+      periodTitle: 'اختبار الفترة الأولى — رياضيات 3-1',
+      finalTitle: 'الاختبار النهائي للفصل الدراسي الأول — رياضيات 3-1',
+      periodChapters: ['g3s-t1-c1', 'g3s-t1-c2'],
+      finalChapters: ['g3s-t1-c1', 'g3s-t1-c2', 'g3s-t1-c3', 'g3s-t1-c4']
+    },
     g2s: {
       id: 'g2s',
       label: 'الثاني الثانوي (2 ث)',
@@ -84,7 +96,7 @@
 
   function isSecondaryBook(bid) {
     const id = bid || (typeof state !== 'undefined' ? state.bookId : '');
-    return id === 'g1s' || id === 'g2s';
+    return id === 'g1s' || id === 'g2s' || id === 'g3s';
   }
 
   function loadSavedProfile() {
@@ -209,6 +221,7 @@
       if (typeof localStorage !== 'undefined') {
         const savedBook = localStorage.getItem(ACTIVE_BOOK_STORAGE_KEY);
         if (savedBook && BOOK_PRESETS[savedBook]) {
+          if (savedBook === 'g3s' && global.GRADE3S_BOOK_DATA) return 'g3s';
           if (savedBook === 'g2s' && global.GRADE2S_BOOK_DATA) return 'g2s';
           if (savedBook === 'g1s' && global.GRADE1S_BOOK_DATA) return 'g1s';
           if (savedBook === 'g3m' && global.GRADE3M_BOOK_DATA) return 'g3m';
@@ -217,7 +230,7 @@
         }
       }
     } catch (e) { /* ignore */ }
-    return global.GRADE2S_BOOK_DATA ? 'g2s' : (global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6')));
+    return global.GRADE3S_BOOK_DATA ? 'g3s' : (global.GRADE2S_BOOK_DATA ? 'g2s' : (global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6'))));
   })();
 
   const state = {
@@ -251,11 +264,13 @@
 
   function getBookData(bookId) {
     const bid = bookId || state.bookId;
+    if (bid === 'g3s' && global.GRADE3S_BOOK_DATA) return global.GRADE3S_BOOK_DATA;
     if (bid === 'g2s' && global.GRADE2S_BOOK_DATA) return global.GRADE2S_BOOK_DATA;
     if (bid === 'g1s' && global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (bid === 'g3m' && global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (bid === 'g1m' && global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
     if (bid === 'g6' && global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
+    if (global.GRADE3S_BOOK_DATA) return global.GRADE3S_BOOK_DATA;
     if (global.GRADE2S_BOOK_DATA) return global.GRADE2S_BOOK_DATA;
     if (global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
@@ -266,6 +281,9 @@
 
   function inferQuestionBookId(q) {
     if (!q) return state.bookId;
+    if (q.gradeId === 'g3s' || (q.lessonId && q.lessonId.indexOf('g3s') === 0) || (q.chapterId && q.chapterId.indexOf('g3s') === 0)) {
+      return 'g3s';
+    }
     if (q.gradeId === 'g2s' || (q.lessonId && q.lessonId.indexOf('g2s') === 0) || (q.chapterId && q.chapterId.indexOf('g2s') === 0)) {
       return 'g2s';
     }
@@ -1026,13 +1044,15 @@
         <div class="eb-hero-banner">
           <div>
             <div class="qb-grade-switcher" role="group" aria-label="اختيار الصف الدراسي للاختبار">
-              ${['g2s', 'g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
+              ${['g3s', 'g2s', 'g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
                 const cfg = BOOK_PRESETS[bid];
-                const hasData = bid === 'g2s'
+                const hasData = bid === 'g3s'
+                  ? !!global.GRADE3S_BOOK_DATA
+                  : (bid === 'g2s'
                   ? !!global.GRADE2S_BOOK_DATA
                   : (bid === 'g1s'
                   ? !!global.GRADE1S_BOOK_DATA
-                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA)));
+                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA))));
                 if (!hasData) return '';
                 return '<button type="button" class="qb-grade-btn ' + (state.bookId === bid ? 'active' : '') +
                   '" onclick="window.ExamBuilder.setBook(\'' + bid + '\')">📘 ' + utils.escapeHtml(cfg.label) + '</button>';

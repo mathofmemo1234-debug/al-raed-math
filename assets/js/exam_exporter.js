@@ -84,7 +84,7 @@
     const questions = examData.questions || [];
     const options = examData.options || {};
 
-    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && (questions[0].gradeId === 'g1s' || questions[0].gradeId === 'g2s')));
+    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && (questions[0].gradeId === 'g1s' || questions[0].gradeId === 'g2s' || questions[0].gradeId === 'g3s')));
     const dNum = function (v) {
       const s = v === null || v === undefined ? '' : String(v);
       return isSec ? (utils && utils.toWesternDigits ? utils.toWesternDigits(s) : s) : (utils ? utils.toEasternDigits(s) : s);
@@ -601,6 +601,22 @@
     const utils = getUtils();
     const o = Object.assign({ sizePt: 14, bold: false, color: '0F172A', sup: false, isSecondary: false, ltr: false }, opts || {});
     let textStr = String(text || '');
+    // Convert $...$ LaTeX blocks (3S calculus/logs/trig/conics) cleanly to Unicode math wrapped in LTR spans before DOCX XML run building
+    if (utils && utils.latexToReadableUnicode && (textStr.indexOf('$') !== -1 || textStr.indexOf('\\(') !== -1 || textStr.indexOf('\\[') !== -1)) {
+      textStr = textStr
+        .replace(/\$\$([\s\S]+?)\$\$/g, function (_, tex) {
+          return '<span class="sec-math ltr-math" dir="ltr">' + utils.latexToReadableUnicode(tex) + '</span>';
+        })
+        .replace(/\\\[([\s\S]+?)\\\]/g, function (_, tex) {
+          return '<span class="sec-math ltr-math" dir="ltr">' + utils.latexToReadableUnicode(tex) + '</span>';
+        })
+        .replace(/\\\(([\s\S]+?)\\\)/g, function (_, tex) {
+          return '<span class="sec-math ltr-math" dir="ltr">' + utils.latexToReadableUnicode(tex) + '</span>';
+        })
+        .replace(/(^|[^\\])\$([^\$]+?)\$/g, function (_, pre, tex) {
+          return pre + '<span class="sec-math ltr-math" dir="ltr">' + utils.latexToReadableUnicode(tex) + '</span>';
+        });
+    }
     // Normalize LaTeX / legacy / bracket matrices cleanly before Word XML run serialization
     // so formatMathExponents never injects KaTeX HTML/MathML into DOCX XML runs
     const _cleanRowSpan = function (html) {
@@ -959,7 +975,7 @@
     const header = examData.header || {};
     const questions = examData.questions || [];
     const options = examData.options || {};
-    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && (questions[0].gradeId === 'g1s' || questions[0].gradeId === 'g2s')));
+    const isSec = !!(examData.isSecondary || (utils && utils.isSecondaryStage && utils.isSecondaryStage(header)) || (questions[0] && (questions[0].gradeId === 'g1s' || questions[0].gradeId === 'g2s' || questions[0].gradeId === 'g3s')));
     const choiceLetters = (isSec && utils && utils.SECONDARY_CHOICE_LETTERS) ? utils.SECONDARY_CHOICE_LETTERS : WORD_CHOICE_LETTERS;
     const totalMarks = computeTotalMarks(questions);
     const totalStr = utils.formatMarkShort(totalMarks, isSec);

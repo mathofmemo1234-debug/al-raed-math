@@ -1342,6 +1342,85 @@ window.CURRICULUM_DATA = {
               ]
             }
           ]
+        },
+        {
+          "id": "g3s",
+          "name": "الصف الثالث الثانوي (رياضيات 3)",
+          "badge": "مكتمل 100% (4 فصول • 22 درساً)",
+          "terms": [
+            {
+              "id": "term1",
+              "name": "الفصل الدراسي الأول",
+              "chapters": [
+                {
+                  "id": "g3s-t1-c1",
+                  "number": "الفصل 1",
+                  "title": "تحليل الدوال",
+                  "pages": "8 - 79",
+                  "lessons_count": 7,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (8 - 79)",
+                  "lessons": [
+                    { "id": "g3s-t1-c1-l1", "number": "1-1", "title": "الدوال", "pages": "ص 10 – 17", "status": "completed" },
+                    { "id": "g3s-t1-c1-l2", "number": "1-2", "title": "تحليل التمثيلات البيانية للدوال والعلاقات", "pages": "ص 18 – 27", "status": "completed" },
+                    { "id": "g3s-t1-c1-l3", "number": "1-3", "title": "الاتصال والنهايات", "pages": "ص 28 – 37", "status": "completed" },
+                    { "id": "g3s-t1-c1-l4", "number": "1-4", "title": "القيم القصوى ومتوسط معدل التغير", "pages": "ص 38 – 46", "status": "completed" },
+                    { "id": "g3s-t1-c1-l5", "number": "1-5", "title": "الدوال الرئيسة (الأم) والتحويلات الهندسية", "pages": "ص 48 – 57", "status": "completed" },
+                    { "id": "g3s-t1-c1-l6", "number": "1-6", "title": "العمليات على الدوال وتركيب دالتين", "pages": "ص 58 – 65", "status": "completed" },
+                    { "id": "g3s-t1-c1-l7", "number": "1-7", "title": "العلاقات والدوال العكسية", "pages": "ص 66 – 73", "status": "completed" }
+                  ]
+                },
+                {
+                  "id": "g3s-t1-c2",
+                  "number": "الفصل 2",
+                  "title": "العلاقات والدوال الأسية واللوغاريتمية",
+                  "pages": "80 - 133",
+                  "lessons_count": 6,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (80 - 133)",
+                  "lessons": [
+                    { "id": "g3s-t1-c2-l1", "number": "2-1", "title": "الدوال الأسية", "pages": "ص 82 – 89", "status": "completed" },
+                    { "id": "g3s-t1-c2-l2", "number": "2-2", "title": "حل المعادلات والمتباينات الأسية", "pages": "ص 92 – 96", "status": "completed" },
+                    { "id": "g3s-t1-c2-l3", "number": "2-3", "title": "اللوغاريتمات والدوال اللوغاريتمية", "pages": "ص 97 – 103", "status": "completed" },
+                    { "id": "g3s-t1-c2-l4", "number": "2-4", "title": "خصائص اللوغاريتمات", "pages": "ص 105 – 111", "status": "completed" },
+                    { "id": "g3s-t1-c2-l5", "number": "2-5", "title": "حل المعادلات والمتباينات اللوغاريتمية", "pages": "ص 112 – 117", "status": "completed" },
+                    { "id": "g3s-t1-c2-l6", "number": "2-6", "title": "اللوغاريتمات العشرية", "pages": "ص 118 – 124", "status": "completed" }
+                  ]
+                },
+                {
+                  "id": "g3s-t1-c3",
+                  "number": "الفصل 3",
+                  "title": "المتطابقات والمعادلات المثلثية",
+                  "pages": "134 - 169",
+                  "lessons_count": 5,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (134 - 169)",
+                  "lessons": [
+                    { "id": "g3s-t1-c3-l1", "number": "3-1", "title": "المتطابقات المثلثية", "pages": "ص 136 – 140", "status": "completed" },
+                    { "id": "g3s-t1-c3-l2", "number": "3-2", "title": "إثبات صحة المتطابقات المثلثية", "pages": "ص 141 – 145", "status": "completed" },
+                    { "id": "g3s-t1-c3-l3", "number": "3-3", "title": "المتطابقات المثلثية لمجموع زاويتين والفرق بينهما", "pages": "ص 146 – 149", "status": "completed" },
+                    { "id": "g3s-t1-c3-l4", "number": "3-4", "title": "المتطابقات المثلثية لضعف الزاوية ونصفها", "pages": "ص 151 – 156", "status": "completed" },
+                    { "id": "g3s-t1-c3-l5", "number": "3-5", "title": "حل المعادلات المثلثية", "pages": "ص 158 – 163", "status": "completed" }
+                  ]
+                },
+                {
+                  "id": "g3s-t1-c4",
+                  "number": "الفصل 4",
+                  "title": "القطوع المخروطية",
+                  "pages": "170 - 209",
+                  "lessons_count": 4,
+                  "status": "completed",
+                  "badge": "مكتمل بالكامل (170 - 209)",
+                  "lessons": [
+                    { "id": "g3s-t1-c4-l1", "number": "4-1", "title": "القطوع المكافئة", "pages": "ص 172 – 179", "status": "completed" },
+                    { "id": "g3s-t1-c4-l2", "number": "4-2", "title": "القطوع الناقصة والدوائر", "pages": "ص 180 – 187", "status": "completed" },
+                    { "id": "g3s-t1-c4-l3", "number": "4-3", "title": "القطوع الزائدة", "pages": "ص 189 – 197", "status": "completed" },
+                    { "id": "g3s-t1-c4-l4", "number": "4-4", "title": "تحديد أنواع القطوع المخروطية", "pages": "ص 198 – 201", "status": "completed" }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
@@ -26044,6 +26123,46 @@ if (typeof window !== 'undefined') {
             badge: ch.badge || 'مكتمل بالكامل',
             lessons: (ch.lessons || []).map(l => {
               const fullL = (window.GRADE2S_BOOK_DATA.lessons && window.GRADE2S_BOOK_DATA.lessons[l.id]) || {};
+              return {
+                id: l.id,
+                number: l.number || fullL.number || '',
+                title: fullL.title || l.title || '',
+                pages: fullL.pages || l.pages || '',
+                status: 'completed'
+              };
+            })
+          }));
+        }
+      }
+    }
+  }
+  if (window.GRADE3S_BOOK_DATA && window.GRADE3S_BOOK_DATA.lessons) {
+    Object.assign(window.CURRICULUM_DATA.lessons, window.GRADE3S_BOOK_DATA.lessons);
+    if (window.CURRICULUM_DATA.stages && window.GRADE3S_BOOK_DATA.chapters) {
+      const secStage = window.CURRICULUM_DATA.stages.find(s => s.id === 'secondary');
+      if (secStage && secStage.grades) {
+        let g3s = secStage.grades.find(g => g.id === 'g3s');
+        if (!g3s) {
+          g3s = {
+            id: 'g3s',
+            name: 'الصف الثالث الثانوي (رياضيات 3)',
+            terms: [{ id: 'term1', name: 'الفصل الدراسي الأول', chapters: [] }]
+          };
+          secStage.grades.push(g3s);
+        }
+        g3s.badge = window.GRADE3S_BOOK_DATA.bookMeta ? window.GRADE3S_BOOK_DATA.bookMeta.badge : 'مكتمل 100% (4 فصول • 22 درساً)';
+        const t1 = g3s.terms ? g3s.terms.find(t => t.id === 'term1') : null;
+        if (t1) {
+          t1.chapters = window.GRADE3S_BOOK_DATA.chapters.map(ch => ({
+            id: ch.id,
+            number: ch.number,
+            title: ch.title,
+            pages: ch.pages || '',
+            lessons_count: (ch.lessons || []).length,
+            status: 'completed',
+            badge: ch.badge || 'مكتمل بالكامل',
+            lessons: (ch.lessons || []).map(l => {
+              const fullL = (window.GRADE3S_BOOK_DATA.lessons && window.GRADE3S_BOOK_DATA.lessons[l.id]) || {};
               return {
                 id: l.id,
                 number: l.number || fullL.number || '',

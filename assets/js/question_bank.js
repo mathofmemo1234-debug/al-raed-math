@@ -11,6 +11,12 @@
   const PAGE_SIZE = 20;
 
   const BOOKS_CONFIG = {
+    g3s: {
+      id: 'g3s',
+      label: 'الثالث الثانوي (3 ث)',
+      heading: '🏦 بنك أسئلة الصف الثالث الثانوي (الفصل الدراسي الأول)',
+      subtitle: 'مستخرج ومنقح بالكامل من كتاب الرياضيات 3-1 • 4 فصول • 22 درساً • 12 شكلاً هندسياً • أرقام إنجليزية ومعادلات KaTeX/LTR وجاهز للنسخ المباشر إلى Word'
+    },
     g2s: {
       id: 'g2s',
       label: 'الثاني الثانوي (2 ث)',
@@ -44,7 +50,7 @@
   };
 
   const state = {
-    bookId: global.GRADE2S_BOOK_DATA ? 'g2s' : (global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6'))),
+    bookId: global.GRADE3S_BOOK_DATA ? 'g3s' : (global.GRADE2S_BOOK_DATA ? 'g2s' : (global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6')))),
     chapterId: 'all',
     lessonId: 'all',
     type: 'all', // 'all' | 'mcq' | 'tf' | 'essay'
@@ -68,16 +74,18 @@
 
   function isSecondaryBook(bid) {
     const id = bid || state.bookId;
-    return id === 'g1s' || id === 'g2s';
+    return id === 'g1s' || id === 'g2s' || id === 'g3s';
   }
 
   function getBookData(bookId) {
     const id = bookId || state.bookId;
+    if (id === 'g3s' && global.GRADE3S_BOOK_DATA) return global.GRADE3S_BOOK_DATA;
     if (id === 'g2s' && global.GRADE2S_BOOK_DATA) return global.GRADE2S_BOOK_DATA;
     if (id === 'g1s' && global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (id === 'g3m' && global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
     if (id === 'g1m' && global.GRADE1M_BOOK_DATA) return global.GRADE1M_BOOK_DATA;
     if (id === 'g6' && global.GRADE6_BOOK_DATA) return global.GRADE6_BOOK_DATA;
+    if (global.GRADE3S_BOOK_DATA) return global.GRADE3S_BOOK_DATA;
     if (global.GRADE2S_BOOK_DATA) return global.GRADE2S_BOOK_DATA;
     if (global.GRADE1S_BOOK_DATA) return global.GRADE1S_BOOK_DATA;
     if (global.GRADE3M_BOOK_DATA) return global.GRADE3M_BOOK_DATA;
@@ -186,13 +194,15 @@
         <div class="qb-hero-banner">
           <div>
             <div class="qb-grade-switcher" role="group" aria-label="اختيار المرحلة الدراسية">
-              ${['g2s', 'g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
+              ${['g3s', 'g2s', 'g1s', 'g3m', 'g1m', 'g6'].map(function (bid) {
                 const cfg = BOOKS_CONFIG[bid];
-                const hasData = bid === 'g2s'
+                const hasData = bid === 'g3s'
+                  ? !!global.GRADE3S_BOOK_DATA
+                  : (bid === 'g2s'
                   ? !!global.GRADE2S_BOOK_DATA
                   : (bid === 'g1s'
                   ? !!global.GRADE1S_BOOK_DATA
-                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA)));
+                  : (bid === 'g3m' ? !!global.GRADE3M_BOOK_DATA : (bid === 'g1m' ? !!global.GRADE1M_BOOK_DATA : !!global.GRADE6_BOOK_DATA))));
                 if (!hasData) return '';
                 return '<button type="button" class="qb-grade-btn ' + (state.bookId === bid ? 'active' : '') +
                   '" onclick="window.QuestionBank.setBook(\'' + bid + '\')">📘 ' + utils.escapeHtml(cfg.label) + '</button>';

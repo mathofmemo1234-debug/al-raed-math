@@ -108,62 +108,83 @@ module.exports = async function handler(req, res) {
     generationConfig: {
       responseMimeType: 'application/json',
       temperature: 0.35,
-      maxOutputTokens: 1600
+      maxOutputTokens: 3072
     }
   };
 
   const cleanKey = String(apiKey).trim();
-  const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
-  const buildVertexUrl = (model) =>
-    'https://aiplatform.googleapis.com/v1/publishers/google/models/' + model + ':generateContent?key=' + encodeURIComponent(cleanKey);
-  const buildAiStudioUrl = (model) =>
-    'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(cleanKey);
+  const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
+  const providers = [
+    {
+      label: 'vertex',
+      buildUrl: (model) => 'https://aiplatform.googleapis.com/v1/publishers/google/models/' + model + ':generateContent'
+    },
+    {
+      label: 'aistudio',
+      buildUrl: (model) => 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent'
+    }
+  ];
 
   // Route AQ.* keys to Vertex AI Express Mode first, and AIza* keys to AI Studio first, with cross-fallback
-  const urlBuilders = cleanKey.startsWith('AQ.')
-    ? [buildVertexUrl, buildAiStudioUrl]
-    : [buildAiStudioUrl, buildVertexUrl];
+  const orderedProviders = cleanKey.startsWith('AQ.') ? [providers[0], providers[1]] : [providers[1], providers[0]];
+  const attempts = [];
 
-  let lastErrMsg = 'تعذر الاتصال بخدمة التوليد الذكي.';
+  function parseCandidateJson(text) {
+    const cleaned = String(text || '')
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      const start = cleaned.indexOf('{');
+      const end = cleaned.lastIndexOf('}');
+      if (start !== -1 && end > start) {
+        return JSON.parse(cleaned.slice(start, end + 1));
+      }
+      throw e;
+    }
+  }
 
-  for (let b = 0; b < urlBuilders.length; b++) {
+  for (let p = 0; p < orderedProviders.length; p++) {
+    const provider = orderedProviders[p];
     for (let i = 0; i < models.length; i++) {
       const model = models[i];
       try {
-        const url = urlBuilders[b](model);
+        const url = provider.buildUrl(model);
         const upstream = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': cleanKey
+          },
           body: JSON.stringify(payload)
         });
         if (!upstream.ok) {
-          lastErrMsg = 'HTTP ' + upstream.status + ' from ' + model;
+          let shortReason = '';
+          try {
+            const errBody = await upstream.text();
+            const errJson = JSON.parse(errBody);
+            shortReason = (errJson && errJson.error && errJson.error.message) ? String(errJson.error.message).slice(0, 90) : '';
+          } catch (e2) {}
+          shortReason = shortReason.split(cleanKey).join('[REDACTED]');
+          attempts.push(provider.label + '/' + model + ':' + upstream.status + (shortReason ? ' (' + shortReason + ')' : ''));
           continue;
         }
         const rawJson = await upstream.json();
-        const textOut =
-          rawJson &&
-          rawJson.candidates &&
-          rawJson.candidates[0] &&
-          rawJson.candidates[0].content &&
-          rawJson.candidates[0].content.parts &&
-          rawJson.candidates[0].content.parts[0] &&
-          rawJson.candidates[0].content.parts[0].text;
+        const parts = (rawJson && rawJson.candidates && rawJson.candidates[0] && rawJson.candidates[0].content && rawJson.candidates[0].content.parts) || [];
+        const nonThought = parts.filter(part => part && !part.thought && typeof part.text === 'string').map(part => part.text).join('\n').trim();
+        const textOut = nonThought || (parts.length && parts[parts.length - 1] && parts[parts.length - 1].text) || '';
 
         if (!textOut) {
-          lastErrMsg = 'Empty candidate from ' + model;
+          attempts.push(provider.label + '/' + model + ':empty');
           continue;
         }
 
-        const cleaned = String(textOut)
-          .replace(/^```json\s*/i, '')
-          .replace(/^```\s*/i, '')
-          .replace(/\s*```$/i, '')
-          .trim();
-
-        const parsed = JSON.parse(cleaned);
+        const parsed = parseCandidateJson(textOut);
         if (!parsed || typeof parsed !== 'object' || !parsed.summary || !parsed.workedExample) {
-          lastErrMsg = 'Invalid JSON structure from ' + model;
+          attempts.push(provider.label + '/' + model + ':bad-schema');
           continue;
         }
 
@@ -185,9 +206,10 @@ module.exports = async function handler(req, res) {
           }
         };
 
-        return res.status(200).json({ ok: true, source: 'ai', model: model, data: normalized });
+        return res.status(200).json({ ok: true, source: 'ai', model: model, provider: provider.label, data: normalized });
       } catch (err) {
-        lastErrMsg = (err && err.message) || lastErrMsg;
+        const msg = String((err && err.message) || 'err').slice(0, 60).split(cleanKey).join('[REDACTED]');
+        attempts.push(provider.label + '/' + model + ':' + msg);
       }
     }
   }
@@ -195,6 +217,6 @@ module.exports = async function handler(req, res) {
   return res.status(502).json({
     ok: false,
     code: 'AI_UPSTREAM_ERROR',
-    message: 'تعذر توليد الشرح حالياً عبر الذكاء الاصطناعي (' + lastErrMsg + ').'
+    message: 'تعذر توليد الشرح حالياً عبر الذكاء الاصطناعي (' + attempts.slice(0, 4).join(' | ') + ').'
   });
 };

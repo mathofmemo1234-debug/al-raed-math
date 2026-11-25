@@ -433,6 +433,7 @@
                 : (utils.escapeHtml(utils.toEasternDigits(q.chapterNumber || '')) + ' • ' + utils.escapeHtml(utils.toEasternDigits((q.lessonNumber || '') + ' ' + (q.lessonTitle || ''))));
 
               const capText = q.imageCaption ? dNum(q.imageCaption) : '';
+              const qImg = q.image || q.fig || '';
 
               return `
                 <div class="qb-question-card ${isSelected ? 'selected' : ''}">
@@ -445,16 +446,16 @@
                     <div class="qb-q-badges">
                       <span class="qb-pill chapter-pill">${chLessonPill}</span>
                       <span class="qb-pill ${typeBadgeClass}">${utils.escapeHtml(q.typeLabel)}</span>
-                      ${q.image ? '<span class="qb-pill" style="background:#e0f2fe;color:#0369a1;">🖼️ مصور</span>' : ''}
+                      ${qImg ? '<span class="qb-pill" style="background:#e0f2fe;color:#0369a1;">🖼️ مصور</span>' : ''}
                       <span class="qb-pill ${diffBadgeClass}">${utils.escapeHtml(q.difficulty)}</span>
                       <span class="qb-pill marks-pill">${utils.escapeHtml(utils.formatMark(q.marks, isSec))}</span>
                     </div>
                   </div>
 
                   <div class="qb-q-text">${utils.renderMathHtml(q.q, isSec)}</div>
-                  ${q.image ? (
+                  ${qImg ? (
                     '<div class="q-figure-box">' +
-                    '<img class="q-figure-img" src="' + utils.escapeHtml(q.image) + '" alt="' + utils.escapeHtml(capText || 'شكل السؤال') + '" loading="lazy" title="اضغط للتكبير" data-caption="' + utils.escapeHtml(capText) + '" onclick="if(window.Platform&&window.Platform.openImageLightbox){window.Platform.openImageLightbox(this.getAttribute(\'src\'),this.getAttribute(\'data-caption\'));}" />' +
+                    '<img class="q-figure-img" src="' + utils.escapeHtml(qImg) + '" alt="' + utils.escapeHtml(capText || 'شكل السؤال') + '" loading="lazy" title="اضغط للتكبير" data-caption="' + utils.escapeHtml(capText) + '" onclick="if(window.Platform&&window.Platform.openImageLightbox){window.Platform.openImageLightbox(this.getAttribute(\'src\'),this.getAttribute(\'data-caption\'));}" />' +
                     (capText ? '<div class="q-figure-caption">' + utils.escapeHtml(capText) + '</div>' : '') +
                     '</div>'
                   ) : ''}

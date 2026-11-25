@@ -466,7 +466,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "متوسط",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_1_1_intervals_line.png"
+            "fig": "assets/img/2s/fig_1_1_intervals_line.png",
+            "image": "assets/img/2s/fig_1_1_intervals_line.png"
           },
           {
             "id": "g2s-t1-c1-l1-mcq-10",
@@ -857,7 +858,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "متوسط",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_1_2_relation_mapping.png"
+            "fig": "assets/img/2s/fig_1_2_relation_mapping.png",
+            "image": "assets/img/2s/fig_1_2_relation_mapping.png"
           },
           {
             "id": "g2s-t1-c1-l2-mcq-6",
@@ -1293,7 +1295,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "متوسط",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_1_3_piecewise_func.png"
+            "fig": "assets/img/2s/fig_1_3_piecewise_func.png",
+            "image": "assets/img/2s/fig_1_3_piecewise_func.png"
           },
           {
             "id": "g2s-t1-c1-l3-mcq-5",
@@ -1724,7 +1727,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "متوسط",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_1_4_linear_inequality.png"
+            "fig": "assets/img/2s/fig_1_4_linear_inequality.png",
+            "image": "assets/img/2s/fig_1_4_linear_inequality.png"
           },
           {
             "id": "g2s-t1-c1-l4-mcq-4",
@@ -2160,7 +2164,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "متوسط",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_1_5_system_inequalities.png"
+            "fig": "assets/img/2s/fig_1_5_system_inequalities.png",
+            "image": "assets/img/2s/fig_1_5_system_inequalities.png"
           },
           {
             "id": "g2s-t1-c1-l5-mcq-4",
@@ -2596,7 +2601,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "متقدم",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_1_6_linear_programming.png"
+            "fig": "assets/img/2s/fig_1_6_linear_programming.png",
+            "image": "assets/img/2s/fig_1_6_linear_programming.png"
           },
           {
             "id": "g2s-t1-c1-l6-mcq-4",
@@ -3018,7 +3024,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "سهل",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_2_1_matrix_dimensions.png"
+            "fig": "assets/img/2s/fig_2_1_matrix_dimensions.png",
+            "image": "assets/img/2s/fig_2_1_matrix_dimensions.png"
           },
           {
             "id": "g2s-c2-l1-q2",
@@ -4332,7 +4339,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "سهل",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_2_4_determinant_rule.png"
+            "fig": "assets/img/2s/fig_2_4_determinant_rule.png",
+            "image": "assets/img/2s/fig_2_4_determinant_rule.png"
           },
           {
             "id": "g2s-c2-l4-q2",
@@ -5215,7 +5223,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "سهل",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_3_1_complex_plane.png"
+            "fig": "assets/img/2s/fig_3_1_complex_plane.png",
+            "image": "assets/img/2s/fig_3_1_complex_plane.png"
           },
           {
             "id": "g2s-c3-l1-q2",
@@ -5677,7 +5686,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "سهل",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_3_2_parabola_discriminant.png"
+            "fig": "assets/img/2s/fig_3_2_parabola_discriminant.png",
+            "image": "assets/img/2s/fig_3_2_parabola_discriminant.png"
           },
           {
             "id": "g2s-c3-l2-q3",
@@ -9166,7 +9176,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "سهل",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_4_2_inverse_reflection.png"
+            "fig": "assets/img/2s/fig_4_2_inverse_reflection.png",
+            "image": "assets/img/2s/fig_4_2_inverse_reflection.png"
           },
           {
             "id": "g2s-c4-l2-q4",
@@ -9558,7 +9569,8 @@ window.GRADE2S_BOOK_DATA = {
             "difficulty": "سهل",
             "marks": 1,
             "source": "كتاب الرياضيات 2-1 (الصف الثاني الثانوي)",
-            "fig": "assets/img/2s/fig_4_3_sqrt_parent_graph.png"
+            "fig": "assets/img/2s/fig_4_3_sqrt_parent_graph.png",
+            "image": "assets/img/2s/fig_4_3_sqrt_parent_graph.png"
           },
           {
             "id": "g2s-c4-l3-q2",

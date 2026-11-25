@@ -434,7 +434,7 @@
     }
     if (copy.marks === undefined) copy.marks = copy.type === 'essay' ? 2 : 1;
     if (!copy.q && copy.statement) copy.q = copy.statement;
-    if (copy.image === undefined) copy.image = '';
+    if (copy.image === undefined || !copy.image) copy.image = copy.fig || '';
     if (copy.imageCaption === undefined) copy.imageCaption = '';
     if (!copy.gradeId) copy.gradeId = inferQuestionBookId(copy);
     return copy;

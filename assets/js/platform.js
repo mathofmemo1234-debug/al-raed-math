@@ -219,14 +219,15 @@
   }
 
   function renderQuestionFigure(item) {
-    if (!item || !item.image) return '';
+    const imgSrc = item && (item.image || item.fig);
+    if (!imgSrc) return '';
     const cap = item.imageCaption ? fmtNum(item.imageCaption, true) : '';
     const altText = cap || 'شكل توضيحي للسؤال';
     return `
       <div class="q-figure-box">
         <img
           class="q-figure-img"
-          src="${escHtml(item.image)}"
+          src="${escHtml(imgSrc)}"
           alt="${escHtml(altText)}"
           loading="lazy"
           title="اضغط للتكبير"
@@ -894,7 +895,7 @@
         explanation: m.explanation,
         difficulty: m.difficulty || 'متوسط',
         marks: m.marks || 1,
-        image: m.image || '',
+        image: m.image || m.fig || '',
         imageCaption: m.imageCaption || ''
       };
     } else if (type === 'tf') {
@@ -917,7 +918,7 @@
         explanation: t.explanation,
         difficulty: t.difficulty || 'سهل',
         marks: t.marks || 1,
-        image: t.image || '',
+        image: t.image || t.fig || '',
         imageCaption: t.imageCaption || ''
       };
     } else if (type === 'essay') {
@@ -939,7 +940,7 @@
         difficulty: e.difficulty || 'متوسط',
         marks: e.marks || 2,
         lines: e.lines || 3,
-        image: e.image || '',
+        image: e.image || e.fig || '',
         imageCaption: e.imageCaption || ''
       };
     } else if (type === 'ws') {
@@ -961,7 +962,7 @@
         difficulty: 'متوسط',
         marks: 2,
         lines: 3,
-        image: w.image || '',
+        image: w.image || w.fig || '',
         imageCaption: w.imageCaption || ''
       };
     }

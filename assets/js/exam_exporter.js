@@ -98,11 +98,12 @@
     const includeAnswerKey = options.includeAnswerKey !== false;
 
     function renderA4Figure(q, extraClass) {
-      if (!q || !q.image) return '';
+      const imgSrc = q && (q.image || q.fig);
+      if (!imgSrc) return '';
       const cap = q.imageCaption ? utils.escapeHtml(dNum(q.imageCaption)) : '';
       return (
         '<div class="a4-q-fig ' + (extraClass || '') + '">' +
-        '<img src="' + utils.escapeHtml(q.image) + '" alt="' + (cap || 'شكل السؤال') + '" />' +
+        '<img src="' + utils.escapeHtml(imgSrc) + '" alt="' + (cap || 'شكل السؤال') + '" />' +
         (cap ? '<div class="a4-q-fig-cap">' + cap + '</div>' : '') +
         '</div>'
       );

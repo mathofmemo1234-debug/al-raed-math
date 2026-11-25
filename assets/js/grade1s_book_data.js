@@ -2916,7 +2916,9 @@ window.GRADE1S_BOOK_DATA = {
             "difficulty": "متوسط",
             "explanation": "<span class=\"sec-math ltr-math\" dir=\"ltr\">3x - 20 = 2x + 10 → x = 30</span>.",
             "marks": 1,
-            "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
+            "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)",
+            "image": "assets/img/1s/fig_1_8_angle_pairs.png",
+            "imageCaption": "الزاويتان المتقابلتان بالرأس متطابقتان"
           },
           {
             "q": "جميع الزوايا القائمة تكون:",
@@ -9804,7 +9806,9 @@ window.GRADE1S_BOOK_DATA = {
             "difficulty": "متوسط",
             "explanation": "أي زاوية داخلية في مثلث يجب أن تكون موجبة تماماً وأقل من 180° (0° < θ < 180°).",
             "marks": 1,
-            "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
+            "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)",
+            "image": "assets/img/1s/fig_4_6_hinge_theorem.png",
+            "imageCaption": "متباينة المفصلة وعكسها في مثلثين"
           },
           {
             "q": "إذا كان قياس الزاوية المحصورة معبراً عنه بـ <span class=\"sec-math ltr-math\" dir=\"ltr\">(3x - 12)°</span>، وكانت هذه الزاوية أكبر من 60°، فإن المتباينة التي تحدد قيمة <span class=\"sec-math ltr-math\" dir=\"ltr\">x</span> هي:",
@@ -12958,7 +12962,9 @@ window.GRADE1S_BOOK_DATA = {
       "difficulty": "متوسط",
       "explanation": "<span class=\"sec-math ltr-math\" dir=\"ltr\">3x - 20 = 2x + 10 → x = 30</span>.",
       "marks": 1,
-      "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
+      "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)",
+      "image": "assets/img/1s/fig_1_8_angle_pairs.png",
+      "imageCaption": "الزاويتان المتقابلتان بالرأس متطابقتان"
     },
     {
       "uid": "g1s-t1-c1-l8-mcq-10",
@@ -20218,7 +20224,9 @@ window.GRADE1S_BOOK_DATA = {
       "difficulty": "متوسط",
       "explanation": "أي زاوية داخلية في مثلث يجب أن تكون موجبة تماماً وأقل من 180° (0° < θ < 180°).",
       "marks": 1,
-      "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)"
+      "source": "تدريبات وتمارين كتاب الرياضيات 1-1 (الأول الثانوي)",
+      "image": "assets/img/1s/fig_4_6_hinge_theorem.png",
+      "imageCaption": "متباينة المفصلة وعكسها في مثلثين"
     },
     {
       "uid": "g1s-t1-c4-l6-mcq-6",

@@ -113,20 +113,55 @@ module.exports = async function handler(req, res) {
   };
 
   const cleanKey = String(apiKey).trim();
-  const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
+  const baseModels = [
+    'gemini-3.8-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
+    'gemini-3-flash-preview',
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite'
+  ];
   const providers = [
-    {
-      label: 'vertex',
-      buildUrl: (model) => 'https://aiplatform.googleapis.com/v1/publishers/google/models/' + model + ':generateContent'
-    },
     {
       label: 'aistudio',
       buildUrl: (model) => 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent'
+    },
+    {
+      label: 'vertex',
+      buildUrl: (model) => 'https://aiplatform.googleapis.com/v1/publishers/google/models/' + model + ':generateContent'
     }
   ];
 
-  // Route AQ.* keys to Vertex AI Express Mode first, and AIza* keys to AI Studio first, with cross-fallback
-  const orderedProviders = cleanKey.startsWith('AQ.') ? [providers[0], providers[1]] : [providers[1], providers[0]];
+  // Discover active flash models from AI Studio manifest when cached list is missing
+  async function discoverAiStudioModels() {
+    if (globalThis.__alraedCachedGeminiModels && Array.isArray(globalThis.__alraedCachedGeminiModels)) {
+      return globalThis.__alraedCachedGeminiModels;
+    }
+    try {
+      const listResp = await fetch('https://generativelanguage.googleapis.com/v1beta/models', {
+        method: 'GET',
+        headers: { 'x-goog-api-key': cleanKey }
+      });
+      if (!listResp.ok) return [];
+      const listData = await listResp.json();
+      const rawModels = Array.isArray(listData && listData.models) ? listData.models : [];
+      const names = rawModels
+        .filter(m => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+        .map(m => String(m.name || '').replace(/^models\//, ''))
+        .filter(name => /gemini/i.test(name) && !/embedding|imagen|veo|tts|audio|robotics/i.test(name));
+      names.sort((a, b) => {
+        const score = (n) => (/flash/i.test(n) ? 10 : 0) + (/lite/i.test(n) ? 2 : 0) - (/pro|exp|preview/i.test(n) ? 1 : 0);
+        return score(b) - score(a);
+      });
+      if (names.length) {
+        globalThis.__alraedCachedGeminiModels = names.slice(0, 6);
+      }
+      return names.slice(0, 6);
+    } catch (e) {
+      return [];
+    }
+  }
+
   const attempts = [];
 
   function parseCandidateJson(text) {
@@ -147,8 +182,11 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  for (let p = 0; p < orderedProviders.length; p++) {
-    const provider = orderedProviders[p];
+  const discovered = await discoverAiStudioModels();
+  const models = Array.from(new Set(discovered.concat(baseModels)));
+
+  for (let p = 0; p < providers.length; p++) {
+    const provider = providers[p];
     for (let i = 0; i < models.length; i++) {
       const model = models[i];
       try {
@@ -166,10 +204,12 @@ module.exports = async function handler(req, res) {
           try {
             const errBody = await upstream.text();
             const errJson = JSON.parse(errBody);
-            shortReason = (errJson && errJson.error && errJson.error.message) ? String(errJson.error.message).slice(0, 90) : '';
+            shortReason = (errJson && errJson.error && errJson.error.message) ? String(errJson.error.message).slice(0, 80) : '';
           } catch (e2) {}
           shortReason = shortReason.split(cleanKey).join('[REDACTED]');
           attempts.push(provider.label + '/' + model + ':' + upstream.status + (shortReason ? ' (' + shortReason + ')' : ''));
+          // Skip remaining models on same provider if project/auth is disabled (403/401)
+          if (upstream.status === 401 || upstream.status === 403) break;
           continue;
         }
         const rawJson = await upstream.json();

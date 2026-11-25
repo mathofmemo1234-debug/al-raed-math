@@ -5,7 +5,7 @@
  * ==========================================================================
  */
 
-const CACHE_NAME = 'alraed-platform-v5';
+const CACHE_NAME = 'alraed-platform-v6';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const CORE_ASSETS = [
   './assets/js/arabic_utils.js',
   './assets/js/pwa_manager.js',
   './assets/js/platform.js',
+  './assets/js/concept_explainer.js',
   './assets/js/lesson_prep_manager.js',
   './assets/js/question_bank.js',
   './assets/js/exam_builder.js',

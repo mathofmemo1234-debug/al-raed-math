@@ -5871,3 +5871,363 @@ html {
     font-size: 0.88em !important;
   }
 }
+
+/* ==========================================================================
+   Concept Explainer (الشارح التفصيلي التفاعلي للجزئيات بالأمثلة - النظام الهجين)
+   ========================================================================== */
+.ce-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  direction: rtl;
+  text-align: right;
+}
+.ce-hero {
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  border: 1.5px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.ce-hero-title {
+  font-size: clamp(1.02rem, 0.95rem + 0.35vw, 1.24rem);
+  font-weight: 800;
+  color: #1e3a8a;
+  margin-bottom: 4px;
+}
+.ce-hero-sub {
+  font-size: clamp(0.84rem, 0.8rem + 0.2vw, 0.96rem);
+  color: #475569;
+  line-height: 1.6;
+}
+.ce-query-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: var(--bg-card, #ffffff);
+  border: 1.5px solid var(--border-light, #cbd5e1);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+.ce-query-input {
+  flex: 1 1 280px;
+  min-width: 200px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border-light, #cbd5e1);
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 0.93rem;
+  background: var(--bg-surface, #f8fafc);
+  color: var(--text-main, #0f172a);
+}
+.ce-query-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+}
+.ce-level-select {
+  padding: 8px 10px;
+  border: 1.5px solid var(--border-light, #cbd5e1);
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: var(--bg-surface, #f8fafc);
+  color: var(--text-main, #0f172a);
+}
+.ce-submit-btn {
+  white-space: nowrap;
+}
+.ce-chips-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ce-chips-label {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-muted, #475569);
+}
+.ce-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ce-chip {
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1.5px solid #cbd5e1;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-main, #1e293b);
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.ce-chip:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.ce-chip.active {
+  background: #1e3a8a;
+  color: #ffffff;
+  border-color: #1e3a8a;
+  box-shadow: 0 3px 10px rgba(30, 58, 138, 0.22);
+}
+.ce-card {
+  background: var(--bg-card, #ffffff);
+  border: 1.5px solid var(--border-light, #cbd5e1);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+.ce-card.is-ai {
+  border-color: #93c5fd;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.1);
+}
+.ce-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
+  padding-bottom: 10px;
+}
+.ce-source-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  margin-bottom: 6px;
+}
+.ce-card-title {
+  margin: 0;
+  font-size: clamp(1.02rem, 0.96rem + 0.3vw, 1.2rem);
+  font-weight: 800;
+  color: var(--primary, #1e3a8a);
+  line-height: 1.5;
+}
+.ce-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ce-action-btn {
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light, #cbd5e1);
+  background: var(--bg-surface, #f8fafc);
+  color: var(--text-main, #1e293b);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ce-action-btn:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+.ce-action-btn.primary {
+  background: #1e3a8a;
+  color: #ffffff;
+  border-color: #1e3a8a;
+}
+.ce-action-btn.primary:hover {
+  background: #1d4ed8;
+}
+.ce-summary-box {
+  background: var(--bg-surface, #f8fafc);
+  border-right: 4px solid #2563eb;
+  border-radius: 10px;
+  padding: 12px 14px;
+  line-height: 1.8;
+  font-size: 0.96rem;
+}
+.ce-summary-text {
+  margin-top: 4px;
+}
+.ce-sec-title {
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--primary, #1e3a8a);
+}
+.ce-steps-list,
+.ce-ex-steps {
+  margin: 0 22px 0 0;
+  padding: 0;
+  line-height: 1.85;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.94rem;
+}
+.ce-example-box {
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-right: 4px solid #059669;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ce-example-hdr {
+  font-weight: 800;
+  font-size: 0.98rem;
+  color: #065f46;
+}
+.ce-ex-problem {
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.8;
+  color: #0f172a;
+}
+.ce-ex-fig {
+  text-align: center;
+  margin: 4px 0;
+}
+.ce-ex-fig img {
+  max-width: 340px;
+  width: 100%;
+  max-height: 210px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  cursor: zoom-in;
+}
+.ce-ex-final {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.92rem;
+  color: #064e3b;
+  line-height: 1.75;
+}
+.ce-mistake-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-right: 4px solid #d97706;
+  border-radius: 10px;
+  padding: 10px 14px;
+  line-height: 1.75;
+  font-size: 0.92rem;
+}
+.ce-mistake-hdr {
+  font-weight: 800;
+  color: #92400e;
+  margin-bottom: 4px;
+}
+.ce-check-box {
+  background: #f8fafc;
+  border: 1px dashed #94a3b8;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ce-check-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: #1e293b;
+}
+.ce-mini-btn {
+  padding: 4px 10px;
+  border-radius: 7px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1e3a8a;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ce-check-q {
+  font-size: 0.94rem;
+  line-height: 1.75;
+}
+.ce-check-ans {
+  background: #eff6ff;
+  border-right: 3px solid #2563eb;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: #1e3a8a;
+}
+.ce-teacher-form {
+  background: #f8fafc;
+  border: 1.5px solid #93c5fd;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ce-teacher-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1e3a8a;
+}
+.ce-teacher-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ce-teacher-grid input,
+.ce-teacher-grid textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.ce-admin-hint {
+  font-size: 0.82rem;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 7px 10px;
+  border-radius: 8px;
+}
+[data-theme="dark"] .ce-hero {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #334155;
+}
+[data-theme="dark"] .ce-hero-title { color: #93c5fd; }
+[data-theme="dark"] .ce-hero-sub { color: #cbd5e1; }
+[data-theme="dark"] .ce-example-box {
+  background: rgba(6, 78, 59, 0.28);
+  border-color: #059669;
+}
+[data-theme="dark"] .ce-example-hdr { color: #6ee7b7; }
+[data-theme="dark"] .ce-ex-problem { color: #f1f5f9; }
+[data-theme="dark"] .ce-ex-final { background: rgba(16, 185, 129, 0.2); color: #a7f3d0; }
+[data-theme="dark"] .ce-mistake-box { background: rgba(146, 64, 14, 0.25); color: #fde68a; }
+[data-theme="dark"] .ce-mistake-hdr { color: #fcd34d; }
+[data-theme="dark"] .ce-check-box { background: #1e293b; border-color: #475569; }
+[data-theme="dark"] .ce-check-hdr { color: #e2e8f0; }
+[data-theme="dark"] .ce-check-ans { background: rgba(30, 58, 138, 0.35); color: #bfdbfe; }

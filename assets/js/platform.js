@@ -1354,6 +1354,7 @@
               `))}
               <span class="meta-badge green">✓ ${lesson.badge || 'مكتمل وشامل'}</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('prep')" style="cursor:pointer;" title="الانتقال إلى التحضير الميداني الشامل">📋 التحضير الميداني المعتمد</span>
+              <span class="meta-badge" onclick="window.Platform.switchLessonTab('explain')" style="cursor:pointer; background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;" title="شرح تفصيلي بالأمثلة التوضيحية لأي جزئية في الدرس">🧠 الشارح التفصيلي بالأمثلة</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('socratic')" style="cursor:pointer;" title="الانتقال إلى منصة سقراط التوليدية">🏛️ منصة سقراط الحوارية</span>
               <span class="meta-badge" onclick="window.Platform.switchLessonTab('tools')" style="cursor:pointer;" title="الانتقال إلى الأدوات والمختبر التفاعلي">🛠️ ${(lesson.lesson_tools && lesson.lesson_tools.title) ? lesson.lesson_tools.title.split('(')[0].trim() : 'أدوات الدرس الذكية'}</span>
               <span class="meta-badge orange" onclick="window.Platform.switchLessonTab('quiz')" style="cursor:pointer;" title="انقر للانتقال المباشر وحل الاختبار المقنن">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
@@ -1376,6 +1377,9 @@
         </button>
         <button class="lesson-tab-button ${state.activeLessonTab === 'summary' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('summary')">
           📚 الملخص ومطوية المفاهيم
+        </button>
+        <button class="lesson-tab-button ${state.activeLessonTab === 'explain' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('explain')">
+          🧠 الشارح التفصيلي بالأمثلة
         </button>
         <button class="lesson-tab-button ${state.activeLessonTab === 'worksheet' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('worksheet')">
           📄 ورقة العمل الاستقصائية
@@ -1446,6 +1450,11 @@
             </div>
           ` : ''}
         </div>
+      </div>
+
+      <!-- Tab 2b: Hybrid Concept Explainer with Worked Examples -->
+      <div class="tab-pane-content ${state.activeLessonTab === 'explain' ? 'active' : ''}" id="tab-explain">
+        ${window.ConceptExplainer ? window.ConceptExplainer.renderPane(lesson) : ''}
       </div>
 
       <!-- Tab 4: Inquiry Worksheet -->

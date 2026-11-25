@@ -6,11 +6,28 @@
 @import "../vendor/katex/katex.min.css";
 
 /* KaTeX and 2D Matrix Typography Standards */
-.katex {
+.katex,
+.sec-math .katex,
+.ltr-math .katex {
   direction: ltr !important;
   unicode-bidi: isolate !important;
-  font-size: 1.05em !important;
+  font-size: 1.08em !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  font-family: KaTeX_Main, 'Times New Roman', serif !important;
+  vertical-align: middle !important;
   text-rendering: auto;
+  color: inherit;
+}
+.sec-math:has(.katex),
+.ltr-math:has(.katex),
+.sec-math:has(.sec-matrix-container),
+.ltr-math:has(.sec-matrix-container) {
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  gap: 3px;
+  margin: 2px 3px !important;
 }
 .katex-display {
   margin: 0.5em 0 !important;

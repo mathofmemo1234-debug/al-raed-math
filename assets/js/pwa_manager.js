@@ -150,16 +150,25 @@
   }
 
   // 4. Barcode / QR Code Modal
+  const PLATFORM_PUBLIC_URL = 'https://mjumaa-math.vercel.app/';
+
+  function getShareUrl() {
+    if (window.location && /^https?:\/\//i.test(window.location.href) && !/localhost|127\.0\.0\.1/i.test(window.location.hostname)) {
+      return window.location.origin + '/';
+    }
+    return PLATFORM_PUBLIC_URL;
+  }
+
   function openBarcodeModal() {
     let modal = document.getElementById('raed-barcode-modal');
-    const currentUrl = window.location.href.split('#')[0];
-    
+    const shareUrl = PLATFORM_PUBLIC_URL;
+
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'raed-barcode-modal';
       modal.className = 'raed-modal-backdrop';
       modal.innerHTML = `
-        <div class="raed-auth-dialog" style="max-width:420px; text-align:center;">
+        <div class="raed-auth-dialog" style="max-width:440px; text-align:center;">
           <div class="raed-auth-header">
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:1.6rem;">📱</span>
@@ -172,21 +181,24 @@
               امسح الباركود بكاميرا الجوال للدخول الفوري والمباشر إلى المنصة:
             </p>
             <div style="background:#ffffff; border:2px solid #e2e8f0; border-radius:16px; padding:16px; display:inline-block; box-shadow:0 6px 20px rgba(0,0,0,0.06);">
-              <img src="assets/img/platform_qr.png" alt="باركود المنصة" style="width:230px; height:230px; display:block; object-fit:contain; border-radius:8px;">
+              <img src="assets/img/platform_qr.png?v=20261125_v6" alt="باركود منصة الرائد التعليمية" style="width:240px; height:240px; display:block; object-fit:contain; border-radius:8px;">
             </div>
-            <div style="margin-top:12px; font-weight:800; font-size:1rem; color:#1e3a8a;">
+            <div style="margin-top:12px; font-weight:800; font-size:1.05rem; color:#1e3a8a;">
               منصة الرائد التعليمية الذكية
             </div>
-            <div style="font-size:0.8rem; color:#64748b; margin-top:2px;">
+            <div style="font-size:0.82rem; color:#64748b; margin-top:2px;">
               إعداد خبير الرياضيات: أ. محمد عبدالله جمعة
+            </div>
+            <div style="margin-top:10px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:10px; padding:7px 12px; display:inline-block; direction:ltr;">
+              <a href="${shareUrl}" target="_blank" rel="noopener noreferrer" style="color:#1d4ed8; font-weight:700; font-size:0.9rem; text-decoration:none; font-family:monospace;">${shareUrl}</a>
             </div>
 
             <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
               <button type="button" class="nav-btn primary" onclick="window.PWAManager.copyPlatformLink()">
                 📋 <span>نسخ الرابط</span>
               </button>
-              <button type="button" class="nav-btn" onclick="window.print()">
-                🖨️ <span>طباعة الباركود</span>
+              <button type="button" class="nav-btn" onclick="window.PWAManager.printBarcodeCard()">
+                🖨️ <span>طباعة بطاقة الباركود</span>
               </button>
             </div>
           </div>
@@ -197,14 +209,60 @@
     modal.style.display = 'flex';
   }
 
+  function printBarcodeCard() {
+    const shareUrl = PLATFORM_PUBLIC_URL;
+    const win = window.open('', '_blank', 'width=640,height=820');
+    if (!win) {
+      window.print();
+      return;
+    }
+    const baseHref = window.location.href.replace(/[^/]*$/, '');
+    win.document.open();
+    win.document.write(`<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <base href="${baseHref}">
+  <title>باركود منصة الرائد التعليمية</title>
+  <style>
+    @page { size: A4 portrait; margin: 18mm; }
+    body { font-family: 'Cairo', 'Tajawal', 'Segoe UI', Arial, sans-serif; display:flex; justify-content:center; align-items:center; min-height:92vh; margin:0; background:#fff; color:#0f172a; }
+    .card { border: 3px solid #1e3a8a; border-radius: 24px; padding: 36px 40px; text-align: center; max-width: 480px; width: 100%; box-shadow: 0 10px 30px rgba(30,58,138,0.08); }
+    .logo { width: 72px; height: 72px; object-fit: contain; margin-bottom: 10px; }
+    h1 { font-size: 26px; color: #1e3a8a; margin: 0 0 6px; font-weight: 900; }
+    .sub { font-size: 16px; color: #475569; margin-bottom: 22px; font-weight: 600; }
+    .qr-box { border: 2px solid #cbd5e1; border-radius: 18px; padding: 18px; display: inline-block; background: #fff; }
+    .qr-box img { width: 290px; height: 290px; display: block; }
+    .url { margin-top: 18px; font-family: monospace; font-size: 17px; font-weight: 700; color: #1d4ed8; direction: ltr; background: #eff6ff; padding: 8px 16px; border-radius: 10px; display: inline-block; }
+    .hint { margin-top: 16px; font-size: 15px; color: #334155; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img class="logo" src="assets/img/my_logo.png" alt="شعار المنصة">
+    <h1>منصة الرائد التعليمية الذكية</h1>
+    <div class="sub">إعداد خبير الرياضيات: أ. محمد عبدالله جمعة</div>
+    <div class="qr-box">
+      <img src="assets/img/platform_qr.png?v=20261125_v6" alt="باركود المنصة">
+    </div>
+    <div><span class="url">${shareUrl}</span></div>
+    <div class="hint">📱 امسح الباركود بكاميرا الجوال للدخول المباشر إلى المنصة</div>
+  </div>
+  <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 350); };<\/script>
+</body>
+</html>`);
+    win.document.close();
+  }
+
   function copyPlatformLink() {
-    const url = window.location.href.split('#')[0];
+    const url = PLATFORM_PUBLIC_URL;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url).then(() => {
         if (global.ArabicUtils && global.ArabicUtils.showToast) {
-          global.ArabicUtils.showToast('✓ تم نسخ رابط المنصة إلى الحافظة بنجاح.');
+          global.ArabicUtils.showToast('✓ تم نسخ رابط المنصة (' + url + ') بنجاح.');
         } else {
-          alert('تم نسخ الرابط بنجاح.');
+          alert('تم نسخ الرابط بنجاح: ' + url);
         }
       });
     } else {
@@ -213,8 +271,10 @@
   }
 
   global.PWAManager = {
+    PLATFORM_URL: PLATFORM_PUBLIC_URL,
     installPWA: installPWA,
     openBarcodeModal: openBarcodeModal,
+    printBarcodeCard: printBarcodeCard,
     copyPlatformLink: copyPlatformLink
   };
 

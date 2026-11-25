@@ -265,7 +265,7 @@
       ? '<div class="a4-inst-box"><strong>تعليمات:</strong> ' + utils.escapeHtml(dNum(instructions)) + '</div>'
       : '';
 
-    const logoSrc = (header.customLogoDataUrl || '').trim() || 'assets/img/logo.png';
+    const logoSrc = (header.customLogoDataUrl || '').trim() || 'assets/img/my_logo.png';
     const logoHtml = includeLogo
       ? '<img src="' + utils.escapeHtml(logoSrc) + '" alt="شعار المدرسة" class="a4-doc-school-logo" onerror="this.style.display=\'none\'">'
       : '';
@@ -335,8 +335,17 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <title>${utils.escapeHtml(dNum(header.examTitle || 'اختبار الرياضيات'))}</title>
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
 <style>
+  .katex, .sec-math .katex, .ltr-math .katex { direction: ltr !important; unicode-bidi: isolate !important; font-style: normal !important; font-weight: 400 !important; font-family: KaTeX_Main, 'Times New Roman', serif !important; vertical-align: middle !important; }
+  .sec-matrix-container { display: inline-flex; align-items: stretch; vertical-align: middle; margin: 0 4px; direction: ltr !important; unicode-bidi: isolate; font-family: 'Cambria Math', 'Times New Roman', serif; line-height: 1.2; }
+  .sec-det-container { border-left: 1.8px solid #000; border-right: 1.8px solid #000; padding: 2px 6px; }
+  .sec-bracket-container { border-left: 1.8px solid #000; border-right: 1.8px solid #000; position: relative; padding: 2px 6px; }
+  .sec-matrix-table { display: inline-flex; flex-direction: column; justify-content: center; gap: 3px; padding: 1px; }
+  .sec-matrix-row { display: flex; justify-content: space-around; gap: 10px; }
+  .sec-matrix-cell { min-width: 16px; text-align: center; font-size: 0.95em; white-space: nowrap; }
   @page { size: A4 portrait; margin: 8mm; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Cairo', 'Tajawal', 'Segoe UI', 'Arial', sans-serif; direction: rtl; text-align: right; background: #fff; color: #000; font-size: 11px; line-height: 1.4; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -588,6 +597,47 @@
     const utils = getUtils();
     const o = Object.assign({ sizePt: 14, bold: false, color: '0F172A', sup: false, isSecondary: false, ltr: false }, opts || {});
     let textStr = String(text || '');
+    // Normalize LaTeX / legacy / bracket matrices cleanly before Word XML run serialization
+    // so formatMathExponents never injects KaTeX HTML/MathML into DOCX XML runs
+    const _cleanRowSpan = function (html) {
+      return String(html || '')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&nbsp;|\u00a0/g, '  ')
+        .replace(/&minus;|−/g, '-')
+        .trim();
+    };
+    textStr = textStr
+      .replace(/\\begin\{(vmatrix|matrix)\}([\s\S]*?)\\end\{\1\}/g, function (_, env, body) {
+        const rows = body.trim().split('\\\\').map(function (r) {
+          return r.split('&').map(function (c) { return c.trim(); }).join('  ');
+        });
+        return '| ' + rows.join(' ; ') + ' |';
+      })
+      .replace(/\\begin\{(bmatrix|pmatrix)\}([\s\S]*?)\\end\{\1\}/g, function (_, env, body) {
+        const rows = body.trim().split('\\\\').map(function (r) {
+          return r.split('&').map(function (c) { return c.trim(); }).join('  ');
+        });
+        return '[ ' + rows.join(' ; ') + ' ]';
+      })
+      .replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)*)\s*\|/gi, function (_, body) {
+        const rows = (body.match(/<span\s+class=["']sec-row["']>[\s\S]*?<\/span>/gi) || []).map(_cleanRowSpan);
+        return rows.length ? ('| ' + rows.join(' ; ') + ' |') : _;
+      })
+      .replace(/<span\s+class=["']sec-brack["']>\[<\/span>\s*([\s\S]*?)\s*<span\s+class=["']sec-brack["']>\]<\/span>/gi, function (_, body) {
+        const rowSpans = body.match(/<span\s+class=["']sec-row["']>[\s\S]*?<\/span>/gi);
+        if (rowSpans && rowSpans.length) {
+          return '[ ' + rowSpans.map(_cleanRowSpan).join(' ; ') + ' ]';
+        }
+        return '[ ' + _cleanRowSpan(body) + ' ]';
+      })
+      .replace(/\|\s*\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]\s*\|/g, function (_, body) {
+        const rows = (body.match(/\[([^\[\]]+)\]/g) || []).map(function (r) { return r.slice(1, -1).split(',').map(function (c) { return c.trim(); }).join('  '); });
+        return rows.length ? ('| ' + rows.join(' ; ') + ' |') : _;
+      })
+      .replace(/\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]/g, function (_, body) {
+        const rows = (body.match(/\[([^\[\]]+)\]/g) || []).map(function (r) { return r.slice(1, -1).split(',').map(function (c) { return c.trim(); }).join('  '); });
+        return rows.length ? ('[ ' + rows.join(' ; ') + ' ]') : _;
+      });
     if (utils && utils.formatMathExponents) {
       textStr = utils.formatMathExponents(textStr, !!o.isSecondary);
     }
@@ -1382,7 +1432,7 @@
     }));
 
     const existingAssets = Object.assign({}, examData._offlineAssets || {});
-    const logoSrc = (header.customLogoDataUrl || '').trim() || 'assets/img/logo.png';
+    const logoSrc = (header.customLogoDataUrl || '').trim() || 'assets/img/my_logo.png';
     const assetFetches = await Promise.all([
       existingAssets.topRibbon ? Promise.resolve(existingAssets.topRibbon) : fetchImageAsset('assets/img/exam_top_ribbon.png'),
       existingAssets.moeLogo ? Promise.resolve(existingAssets.moeLogo) : fetchImageAsset('assets/img/moe_logo.png'),

@@ -19,7 +19,12 @@
   }
 
   function isSecLesson(lesson) {
-    return !!(lesson && ((lesson.id && lesson.id.startsWith('g1s')) || lesson.gradeId === 'g1s' || lesson.stageId === 'secondary'));
+    if (!lesson) return false;
+    const utils = getUtils();
+    if (utils && typeof utils.isSecondaryStage === 'function' && utils.isSecondaryStage(lesson)) return true;
+    const lid = String(lesson.id || '').toLowerCase();
+    const gid = String(lesson.gradeId || '').toLowerCase();
+    return !!(lid.startsWith('g1s') || lid.startsWith('g2s') || lid.startsWith('g3s') || gid === 'g1s' || gid === 'g2s' || gid === 'g3s' || lesson.stageId === 'secondary');
   }
 
   function dNum(val, mode) {

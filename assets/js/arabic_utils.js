@@ -182,17 +182,36 @@
   /**
    * صياغة وتصيير المصفوفات والمحددات ثنائية الأبعاد (2D) بدقة بصرية ورياضية فائقة
    */
+  function splitMatrixRowCells(rawRow) {
+    if (!rawRow) return [];
+    let s = String(rawRow)
+      .replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, '_{$1}')
+      .replace(/<sup\b[^>]*>([\s\S]*?)<\/sup>/gi, '^{$1}')
+      .replace(/<\/?span\b[^>]*>/gi, '')
+      .replace(/&minus;|−/g, '-')
+      .replace(/&times;/g, '×')
+      .replace(/&divide;/g, '÷')
+      .trim();
+    if (/&nbsp;|\u00a0/.test(s)) {
+      return s.split(/\s*(?:&nbsp;|\u00a0)+\s*/).map(function (c) { return c.trim(); }).filter(Boolean);
+    }
+    return s.split(/\s+/).filter(Boolean);
+  }
+
   function parseLegacyMatrixRows(content) {
     if (!content) return null;
     const str = String(content);
     const rowMatches = str.match(/<span\s+class=["']sec-row["']>([\s\S]*?)<\/span>/gi);
     if (rowMatches && rowMatches.length > 0) {
       return rowMatches.map(function (rHtml) {
-        const inner = rHtml.replace(/<\/?span\b[^>]*>/gi, '').replace(/&nbsp;/g, ' ').replace(/&minus;/g, '-').trim();
-        return inner.split(/\s+/).filter(Boolean);
+        return splitMatrixRowCells(rHtml);
       });
     }
-    const clean = str.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&minus;/g, '-').trim();
+    if (/&nbsp;|\u00a0/.test(str)) {
+      const cells = splitMatrixRowCells(str);
+      if (cells.length > 0) return [cells];
+    }
+    const clean = str.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&minus;|−/g, '-').trim();
     if (clean.indexOf(';') !== -1 || clean.indexOf(',') !== -1) {
       const sep = clean.indexOf(';') !== -1 ? ';' : ',';
       const rawRows = clean.split(sep);
@@ -202,7 +221,44 @@
         });
       }
     }
+    if (clean && !/[\u0600-\u06FF]/.test(clean) && clean.length <= 24) {
+      return [splitMatrixRowCells(str)];
+    }
     return null;
+  }
+
+  function parseBracketMatrixRows(body) {
+    if (!body) return null;
+    const rowMatches = String(body).match(/\[([^\[\]]+)\]/g);
+    if (!rowMatches || !rowMatches.length) return null;
+    const rows = [];
+    for (let i = 0; i < rowMatches.length; i++) {
+      const inner = rowMatches[i].slice(1, -1).trim();
+      if (!inner || /[\u0600-\u06FF]/.test(inner)) return null;
+      const cells = inner.split(',').map(function (c) { return c.trim(); }).filter(Boolean);
+      if (!cells.length) return null;
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].length > 32) return null;
+      }
+      rows.push(cells);
+    }
+    return rows.length ? rows : null;
+  }
+
+  function cleanTexCell(cell) {
+    return String(cell != null ? cell : '')
+      .replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, '_{$1}')
+      .replace(/<sup\b[^>]*>([\s\S]*?)<\/sup>/gi, '^{$1}')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;|\u00a0/g, ' ')
+      .replace(/&minus;|−/g, '-')
+      .replace(/&times;|×/g, '\\times ')
+      .replace(/·/g, '\\cdot ')
+      .replace(/&divide;|÷/g, '\\div ')
+      .replace(/([A-Za-z])_([A-Za-z0-9]{2,})/g, '$1_{$2}')
+      .replace(/([A-Za-z0-9)])\^([+\-]?[A-Za-z0-9]{2,})/g, '$1^{$2}')
+      .replace(/²/g, '^2').replace(/³/g, '^3')
+      .trim();
   }
 
   function formatWordMatrixTable(rows, isDet, isSec) {
@@ -215,7 +271,7 @@
     });
     const borderStyle = isDet
       ? 'border-left: 2pt solid #000; border-right: 2pt solid #000; border-top: none; border-bottom: none;'
-      : 'border-left: 2pt solid #000; border-right: 2pt solid #000; border-top: none; border-bottom: none;';
+      : 'border-left: 2pt solid #000; border-right: 2pt solid #000; border-top: 1.5pt solid #000; border-bottom: 1.5pt solid #000;';
     const rowsHtml = cleanRows.map(function (r) {
       const cellsHtml = r.map(function (c) {
         return '<td style="padding: 2pt 8pt; text-align: center; font-size: 11pt; font-family: \'Times New Roman\', serif; font-weight: bold; border: none;">' + c + '</td>';
@@ -240,9 +296,7 @@
       try {
         const env = isDet ? 'vmatrix' : 'bmatrix';
         const texBody = cleanRows.map(function (r) {
-          return r.map(function (c) {
-            return c.replace(/<[^>]+>/g, '').trim();
-          }).join(' & ');
+          return r.map(cleanTexCell).join(' & ');
         }).join(' \\\\ ');
         const tex = '\\begin{' + env + '} ' + texBody + ' \\end{' + env + '}';
         return katexLib.renderToString(tex, { throwOnError: false, displayMode: false });
@@ -305,6 +359,12 @@
     });
     s = s.replace(/(^|[^A-Za-z0-9_\-<\/"'=])([xym])([0-9])(?![A-Za-z0-9])/g, '$1$2_$3');
     const innerSaved = [];
+    // حفظ أي placeholders قادمة من renderMathHtml
+    s = s.replace(/___(?:KTXPH|SECTAG|CHKTAG|WORDMAT)[A-Z]+___/g, function (phMatch) {
+      const ph = '___SECINNER' + numToAlpha(innerSaved.length) + '___';
+      innerSaved.push(phMatch);
+      return ph;
+    });
     s = s.replace(/<span\s+class=["'][^"']*sec-pow[^"']*["'][^>]*>[\s\S]*?<\/span>|<sub\b[^>]*>[\s\S]*?<\/sub>/gi, function (tag) {
       const ph = '___SECINNER' + numToAlpha(innerSaved.length) + '___';
       innerSaved.push(tag);
@@ -319,7 +379,7 @@
     });
 
     // 2. تصيير المحددات في التنسيق الموروث | <span class="sec-row">...</span> | وحفظها
-    s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*\|/gi, function (_, body) {
+    s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)*)\s*\|/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
       if (rows) {
         const ph = '___SECINNER' + numToAlpha(innerSaved.length) + '___';
@@ -329,9 +389,38 @@
       return _;
     });
 
-    // 3. تصيير المصفوفات في التنسيق الموروث وحفظها
-    s = s.replace(/(?:<span\s+class=["']sec-brack["']>\[<\/span>|\[)\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*(?:<span\s+class=["']sec-brack["']>\]<\/span>|\])/gi, function (_, body) {
+    // 3. تصيير المصفوفات في التنسيق الموروث (متعددة الصفوف وأحادية الصف) وحفظها
+    s = s.replace(/<span\s+class=["']sec-brack["']>\[<\/span>\s*([\s\S]*?)\s*<span\s+class=["']sec-brack["']>\]<\/span>/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
+      if (rows) {
+        const ph = '___SECINNER' + numToAlpha(innerSaved.length) + '___';
+        innerSaved.push(format2DMatrixHtml(rows, false, true));
+        return ph;
+      }
+      return _;
+    });
+    s = s.replace(/\[\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*\]/gi, function (_, body) {
+      const rows = parseLegacyMatrixRows(body);
+      if (rows) {
+        const ph = '___SECINNER' + numToAlpha(innerSaved.length) + '___';
+        innerSaved.push(format2DMatrixHtml(rows, false, true));
+        return ph;
+      }
+      return _;
+    });
+
+    // 4. تصيير المحددات والمصفوفات المسطحة |[[...]]| و [[...]]
+    s = s.replace(/\|\s*\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]\s*\|/g, function (_, body) {
+      const rows = parseBracketMatrixRows(body);
+      if (rows) {
+        const ph = '___SECINNER' + numToAlpha(innerSaved.length) + '___';
+        innerSaved.push(format2DMatrixHtml(rows, true, true));
+        return ph;
+      }
+      return _;
+    });
+    s = s.replace(/\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]/g, function (_, body) {
+      const rows = parseBracketMatrixRows(body);
       if (rows) {
         const ph = '___SECINNER' + numToAlpha(innerSaved.length) + '___';
         innerSaved.push(format2DMatrixHtml(rows, false, true));
@@ -428,23 +517,52 @@
       s = s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
     }
 
-    // استبدال المحددات والمصفوفات بجداول Word المتوافقة
+    // استبدال المحددات والمصفوفات بجداول Word المتوافقة مع حفظها بعلامات آمنة
+    const wordMats = [];
+    const stashWordMat = function (tblHtml) {
+      const ph = '___WORDMAT' + numToAlpha(wordMats.length) + '___';
+      wordMats.push(tblHtml);
+      return ph;
+    };
+    const restoreWordMats = function (txt) {
+      for (let i = wordMats.length - 1; i >= 0; i--) {
+        const ph = '___WORDMAT' + numToAlpha(i) + '___';
+        txt = txt.split(ph).join(wordMats[i]);
+      }
+      return txt;
+    };
+
     s = s.replace(/\\begin\{(vmatrix|bmatrix|pmatrix|matrix)\}([\s\S]*?)\\end\{\1\}/g, function (_, env, body) {
       const isDet = env === 'vmatrix';
       const rows = body.trim().split('\\\\').map(function (r) {
         return r.split('&').map(function (c) { return c.trim(); });
       });
-      return formatWordMatrixTable(rows, isDet, sec);
+      return stashWordMat(formatWordMatrixTable(rows, isDet, sec));
     });
 
-    s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*\|/gi, function (_, body) {
+    s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)*)\s*\|/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
-      return rows ? formatWordMatrixTable(rows, true, sec) : _;
+      return rows ? stashWordMat(formatWordMatrixTable(rows, true, sec)) : _;
     });
 
-    s = s.replace(/(?:<span\s+class=["']sec-brack["']>\[<\/span>|\[)\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*(?:<span\s+class=["']sec-brack["']>\]<\/span>|\])/gi, function (_, body) {
+    s = s.replace(/<span\s+class=["']sec-brack["']>\[<\/span>\s*([\s\S]*?)\s*<span\s+class=["']sec-brack["']>\]<\/span>/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
-      return rows ? formatWordMatrixTable(rows, false, sec) : _;
+      return rows ? stashWordMat(formatWordMatrixTable(rows, false, sec)) : _;
+    });
+
+    s = s.replace(/\[\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*\]/gi, function (_, body) {
+      const rows = parseLegacyMatrixRows(body);
+      return rows ? stashWordMat(formatWordMatrixTable(rows, false, sec)) : _;
+    });
+
+    s = s.replace(/\|\s*\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]\s*\|/g, function (_, body) {
+      const rows = parseBracketMatrixRows(body);
+      return rows ? stashWordMat(formatWordMatrixTable(rows, true, sec)) : _;
+    });
+
+    s = s.replace(/\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]/g, function (_, body) {
+      const rows = parseBracketMatrixRows(body);
+      return rows ? stashWordMat(formatWordMatrixTable(rows, false, sec)) : _;
     });
 
     if (sec) {
@@ -461,7 +579,7 @@
       s = s.replace(/<sub\b[^>]*>([\s\S]*?)<\/sub>/gi, function (_, subTxt) {
         return '<sub style="font-size:75%; vertical-align:sub;">' + subTxt + '</sub>';
       });
-      return s;
+      return restoreWordMats(s);
     }
 
     const powers = [];
@@ -476,7 +594,7 @@
       const ph = '___ARPOW' + numToAlpha(i) + '___';
       s = s.split(ph).join('<span dir="rtl" style="direction:rtl; unicode-bidi:isolate;">' + p.base + '<sup style="font-size:75%; vertical-align:super; font-weight:bold;">' + p.exp + '</sup></span>');
     });
-    return s;
+    return restoreWordMats(s);
   }
 
   /**
@@ -587,15 +705,56 @@
     });
 
     // 2. تصيير المحددات في التنسيق الموروث | <span class="sec-row">...</span> |
-    s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*\|/gi, function (_, body) {
+    s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)*)\s*\|/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
       return rows ? stashKtx(format2DMatrixHtml(rows, true, sec)) : _;
     });
 
-    // 3. تصيير المصفوفات في التنسيق الموروث [ <span class="sec-row">...</span> ]
-    s = s.replace(/(?:<span\s+class=["']sec-brack["']>\[<\/span>|\[)\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*(?:<span\s+class=["']sec-brack["']>\]<\/span>|\])/gi, function (_, body) {
+    // 3. تصيير المصفوفات في التنسيق الموروث (متعددة الصفوف وأحادية الصف)
+    s = s.replace(/<span\s+class=["']sec-brack["']>\[<\/span>\s*([\s\S]*?)\s*<span\s+class=["']sec-brack["']>\]<\/span>/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
       return rows ? stashKtx(format2DMatrixHtml(rows, false, sec)) : _;
+    });
+    s = s.replace(/\[\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*\]/gi, function (_, body) {
+      const rows = parseLegacyMatrixRows(body);
+      return rows ? stashKtx(format2DMatrixHtml(rows, false, sec)) : _;
+    });
+
+    // 3ب. تصيير المحددات والمصفوفات المكتوبة بصيغة |[[...]]| و [[...]] في الشروح والتدريبات
+    // مع دمج رمز المصفوفة السابق مثل (A = ، |A| = ، X =) داخل نفس سياق KaTeX LTR لمنع الانعكاس
+    s = s.replace(/(?:(\|[A-Za-z][A-Za-z0-9_]*\||[A-Za-z][A-Za-z0-9_]*(?:\^-1|⁻¹)?)\s*=\s*)?\|\s*\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]\s*\|/g, function (full, lhs, body) {
+      const rows = parseBracketMatrixRows(body);
+      if (!rows) return full;
+      const matHtml = format2DMatrixHtml(rows, true, sec);
+      if (lhs) {
+        const k = getKatex();
+        if (k && typeof k.renderToString === 'function') {
+          try {
+            const cleanLhs = lhs.replace(/⁻¹/g, '^{-1}').replace(/\^-1/g, '^{-1}');
+            const texBody = rows.map(function (r) { return r.map(cleanTexCell).join(' & '); }).join(' \\\\ ');
+            return stashKtx(k.renderToString(cleanLhs + ' = \\begin{vmatrix} ' + texBody + ' \\end{vmatrix}', { throwOnError: false, displayMode: false }));
+          } catch (e) {}
+        }
+        return stashKtx('<span class="sec-math ltr-math" dir="ltr">' + lhs + ' = ' + matHtml + '</span>');
+      }
+      return stashKtx(matHtml);
+    });
+    s = s.replace(/(?:([A-Za-z][A-Za-z0-9_]*(?:\^-1|⁻¹)?)\s*=\s*)?\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]/g, function (full, lhs, body) {
+      const rows = parseBracketMatrixRows(body);
+      if (!rows) return full;
+      const matHtml = format2DMatrixHtml(rows, false, sec);
+      if (lhs) {
+        const k = getKatex();
+        if (k && typeof k.renderToString === 'function') {
+          try {
+            const cleanLhs = lhs.replace(/⁻¹/g, '^{-1}').replace(/\^-1/g, '^{-1}');
+            const texBody = rows.map(function (r) { return r.map(cleanTexCell).join(' & '); }).join(' \\\\ ');
+            return stashKtx(k.renderToString(cleanLhs + ' = \\begin{bmatrix} ' + texBody + ' \\end{bmatrix}', { throwOnError: false, displayMode: false }));
+          } catch (e) {}
+        }
+        return stashKtx('<span class="sec-math ltr-math" dir="ltr">' + lhs + ' = ' + matHtml + '</span>');
+      }
+      return stashKtx(matHtml);
     });
 
     // 4. تصيير صيغ LaTeX المحصورة بين علامات $ أو \( \) أو $$ أو \[ \]
@@ -671,10 +830,10 @@
         rebuilt += s.substring(cursor);
       }
 
-      // معالجة النصوص خارج الوسوم فقط
-      const segs = rebuilt.split(/(___SECTAG[A-Z]+___)/);
+      // معالجة النصوص خارج الوسوم فقط مع حماية كاملة لعناصر KaTeX المخزنة
+      const segs = rebuilt.split(/(___SECTAG[A-Z]+___|___KTXPH[A-Z]+___)/);
       s = segs.map(function (seg) {
-        if (!seg || /^___SECTAG[A-Z]+___$/.test(seg)) return seg;
+        if (!seg || /^___(?:SECTAG|KTXPH)[A-Z]+___$/.test(seg)) return seg;
         let chunk = convertSecInnerMath(seg);
         // حفظ sec-pow / sec-sub الناتجة عن التحويل حتى لا تمسها تعبيرات المقارنة التالية
         const innerTags = [];
@@ -684,7 +843,7 @@
           return ph;
         });
         chunk = chunk.replace(/(?<![\w\>])([A-Za-z][a-zA-Z0-9_\'\^\*\+\-\/\s\=∠≅△°~><]{2,}[A-Za-z0-9°])(?![\w\<])/g, function (match) {
-          if (match.indexOf('___CHKTAG') !== -1) return match;
+          if (match.indexOf('___') !== -1) return match;
           if (/[=\+\-∠≅△°~><^]/.test(match) && !/[أ-ي]/.test(match)) {
             return '<span class="sec-math ltr-math" dir="ltr">' + match + '</span>';
           }
@@ -768,12 +927,24 @@
       });
       return '[ ' + rows.join(' ; ') + ' ]';
     });
-    s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*\|/gi, function (_, body) {
+    s = s.replace(/\|\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)*)\s*\|/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
       return rows ? ('| ' + rows.map(function (r) { return r.join('  '); }).join(' ; ') + ' |') : _;
     });
-    s = s.replace(/(?:<span\s+class=["']sec-brack["']>\[<\/span>|\[)\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*(?:<span\s+class=["']sec-brack["']>\]<\/span>|\])/gi, function (_, body) {
+    s = s.replace(/<span\s+class=["']sec-brack["']>\[<\/span>\s*([\s\S]*?)\s*<span\s+class=["']sec-brack["']>\]<\/span>/gi, function (_, body) {
       const rows = parseLegacyMatrixRows(body);
+      return rows ? ('[ ' + rows.map(function (r) { return r.join('  '); }).join(' ; ') + ' ]') : _;
+    });
+    s = s.replace(/\[\s*(<span\s+class=["']sec-row["']>[\s\S]*?<\/span>(?:\s*,\s*<span\s+class=["']sec-row["']>[\s\S]*?<\/span>)+)\s*\]/gi, function (_, body) {
+      const rows = parseLegacyMatrixRows(body);
+      return rows ? ('[ ' + rows.map(function (r) { return r.join('  '); }).join(' ; ') + ' ]') : _;
+    });
+    s = s.replace(/\|\s*\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]\s*\|/g, function (_, body) {
+      const rows = parseBracketMatrixRows(body);
+      return rows ? ('| ' + rows.map(function (r) { return r.join('  '); }).join(' ; ') + ' |') : _;
+    });
+    s = s.replace(/\[(\[[^\[\]]+\](?:\s*,\s*\[[^\[\]]+\])*)\]/g, function (_, body) {
+      const rows = parseBracketMatrixRows(body);
       return rows ? ('[ ' + rows.map(function (r) { return r.join('  '); }).join(' ; ') + ' ]') : _;
     });
     s = s.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '($1/$2)');

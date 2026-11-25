@@ -58,7 +58,7 @@
   // Check whether lesson belongs to primary or intermediate (requires Eastern Arabic numerals)
   function isArabicStageLesson(lesson) {
     if (!lesson) return true;
-    if (lesson.gradeId === 'g1s' || lesson.stageId === 'secondary') return false;
+    if (lesson.gradeId === 'g1s' || lesson.gradeId === 'g2s' || lesson.gradeId === 'g3s' || lesson.stageId === 'secondary') return false;
     if (global.ArabicUtils && typeof global.ArabicUtils.isSecondaryStage === 'function' && global.ArabicUtils.isSecondaryStage(lesson)) {
       return false;
     }
@@ -133,8 +133,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <title>الدرس ${lessonNumber}: ${lessonTitle} | منصة الرائد التعليمية</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <style>
+    .katex, .sec-math .katex, .ltr-math .katex { direction: ltr !important; unicode-bidi: isolate !important; font-style: normal !important; font-weight: 400 !important; vertical-align: middle !important; }
+    .sec-matrix-container { display: inline-flex; align-items: stretch; vertical-align: middle; margin: 0 4px; direction: ltr !important; unicode-bidi: isolate; font-family: 'Cambria Math', 'Times New Roman', serif; line-height: 1.2; }
+    .sec-det-container { border-left: 2px solid currentColor; border-right: 2px solid currentColor; padding: 2px 6px; }
+    .sec-bracket-container { border-left: 2px solid currentColor; border-right: 2px solid currentColor; position: relative; padding: 2px 6px; }
+    .sec-matrix-table { display: inline-flex; flex-direction: column; justify-content: center; gap: 4px; padding: 2px; }
+    .sec-matrix-row { display: flex; justify-content: space-around; gap: 12px; }
+    .sec-matrix-cell { min-width: 18px; text-align: center; white-space: nowrap; }
     :root {
       --primary: #1d4ed8;
       --primary-hover: #1e40af;

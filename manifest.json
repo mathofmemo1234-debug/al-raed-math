@@ -1,0 +1,33 @@
+{
+  "name": "منصة الرائد التعليمية الذكية للرياضيات",
+  "short_name": "منصة الرائد",
+  "description": "البوابة التعليمية الذكية الشاملة لمناهج الرياضيات وبنك الأسئلة والتحضير الميداني والاستقصاء السقراطي",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e3a8a",
+  "orientation": "any",
+  "dir": "rtl",
+  "lang": "ar",
+  "categories": ["education", "books", "productivity"],
+  "icons": [
+    {
+      "src": "assets/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/img/my_logo.png",
+      "sizes": "2048x2048",
+      "type": "image/png"
+    }
+  ]
+}

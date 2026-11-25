@@ -3,7 +3,7 @@
 Script to build the comprehensive Master HTML suite for Math 3M (pages 130-147).
 Features:
 - 100% Valid LaTeX Math without escape corruption (fixes Math input error).
-- School logo & name: المدارس المتقدمة للتعلم الذكي بجدة on every worksheet and student summary.
+- School logo & name: منصة الرائد التعليمية on every worksheet and student summary.
 - Dedicated 'إظهار الحل النموذجي' button on each worksheet with interactive toggle.
 - Teacher name & signature at the bottom left of every sheet and summary.
 - Sequential layout: Plans together, Summaries together, Worksheets together.
@@ -20,7 +20,7 @@ parts.append(r'''<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الحقيبة الشاملة: المتباينات الخطية | المدارس المتقدمة للتعلم الذكي بجدة</title>
+    <title>الحقيبة الشاملة: المتباينات الخطية | منصة الرائد التعليمية</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -664,7 +664,7 @@ parts.append(r'''<!DOCTYPE html>
 <!-- Navigation Bar -->
 <nav class="sticky-nav">
     <div class="nav-brand">
-        🏫 المدارس المتقدمة للتعلم الذكي بجدة | المتباينات الخطية (ص 130 - 147)
+        🏫 منصة الرائد التعليمية | المتباينات الخطية (ص 130 - 147)
     </div>
     <ul class="nav-links">
         <li><a href="#plans-section">📑 خطط التحضير (STEM)</a></li>
@@ -681,7 +681,7 @@ parts.append(r'''<!DOCTYPE html>
         <span class="hero-tag">المملكة العربية السعودية | وزارة التعليم 2026</span>
         <h1 class="hero-title">الحقيبة التعليمية والتدريسية الشاملة: المتباينات الخطية</h1>
         <p class="hero-subtitle">
-            <strong>المدارس المتقدمة للتعلم الذكي بجدة</strong> — حقيبة موحدة تضم: خطط التدريس وفق معايير STEM السبعة متتالية، تليها الملخصات الشاملة للطلاب متتالية، تليها أوراق العمل والاختبارات التطبيقية بأزرار إظهار الحل النموذجي، مع التغطية التامة للصفحات 130 إلى 147 من كتاب الرياضيات للصف الثالث المتوسط.
+            <strong>منصة الرائد التعليمية</strong> — حقيبة موحدة تضم: خطط التدريس وفق معايير STEM السبعة متتالية، تليها الملخصات الشاملة للطلاب متتالية، تليها أوراق العمل والاختبارات التطبيقية بأزرار إظهار الحل النموذجي، مع التغطية التامة للصفحات 130 إلى 147 من كتاب الرياضيات للصف الثالث المتوسط.
         </p>
     </header>
 ''')
@@ -692,7 +692,7 @@ school_header_html = r'''
     <div class="sch-info-right">
         <div class="ministry-name">المملكة العربية السعودية</div>
         <div class="ministry-name">وزارة التعليم - الإدارة العامة للتعليم بجدة</div>
-        <div class="school-highlight">المدارس المتقدمة للتعلم الذكي بجدة</div>
+        <div class="school-highlight">منصة الرائد التعليمية</div>
         <div>قسم الرياضيات | المرحلة المتوسطة</div>
     </div>
     <div class="sch-logo-center">
@@ -728,13 +728,13 @@ def make_footer_signature():
     return r'''
 <div class="sheet-footer-bar">
     <div class="sheet-footer-right">
-        <span>المدارس المتقدمة للتعلم الذكي بجدة | رؤية المملكة 2030</span>
+        <span>منصة الرائد التعليمية | رؤية المملكة 2030</span>
     </div>
     <div class="sheet-footer-left">
         <div class="teacher-signature-card">
             <span class="teacher-sig-label">إعداد معلم المادة / الأستاذ:</span>
             <span class="teacher-sig-name" contenteditable="true" title="انقر لتعديل الاسم مباشرة">....................................................</span>
-            <div class="teacher-school-subtext">المدارس المتقدمة للتعلم الذكي بجدة</div>
+            <div class="teacher-school-subtext">منصة الرائد التعليمية</div>
         </div>
     </div>
 </div>
@@ -750,7 +750,7 @@ parts.append(r'''
     <section id="plans-section" class="master-section">
         <div class="section-header-banner plans">
             <h2>📑 القسم الأول: خطط التدريس والتحضير وفق معايير STEM السبعة (متتالية)</h2>
-            <span class="section-badge">المدارس المتقدمة للتعلم الذكي بجدة</span>
+            <span class="section-badge">منصة الرائد التعليمية</span>
         </div>
 
         <!-- الخطة 1: الدرس 4-2 -->
@@ -1057,7 +1057,7 @@ parts.append(r'''
     <section id="summaries-section" class="master-section page-break">
         <div class="section-header-banner summaries">
             <h2>📚 القسم الثاني: الملخصات الشاملة للطلاب (متتالية)</h2>
-            <span class="section-badge">المدارس المتقدمة للتعلم الذكي بجدة</span>
+            <span class="section-badge">منصة الرائد التعليمية</span>
         </div>
 ''')
 
@@ -1261,7 +1261,7 @@ parts.append(r'''
     <section id="worksheets-section" class="master-section page-break">
         <div class="section-header-banner worksheets">
             <h2>📝 القسم الثالث: أوراق العمل والاختبارات التطبيقية (متتالية)</h2>
-            <span class="section-badge">المدارس المتقدمة للتعلم الذكي بجدة</span>
+            <span class="section-badge">منصة الرائد التعليمية</span>
         </div>
 ''')
 
@@ -1673,7 +1673,7 @@ parts.append(r'''
 </script>
 
 <footer style="text-align:center; padding:24px; color:var(--gray-600); font-size:0.9rem; border-top:1px solid var(--gray-200); background:white;">
-    المدارس المتقدمة للتعلم الذكي بجدة | تصميم خبير التعليم وفق منهجية STEM والمعايير المعتمدة لوزارة التعليم 2026
+    منصة الرائد التعليمية | تصميم خبير التعليم وفق منهجية STEM والمعايير المعتمدة لوزارة التعليم 2026
 </footer>
 
 </body>

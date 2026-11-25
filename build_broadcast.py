@@ -18,7 +18,7 @@ html_content = f"""<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الإذاعة المدرسية المتميزة: قيمة التعاون (12 دقيقة) | المدارس المتقدمة للتعلم الذكي</title>
+    <title>الإذاعة المدرسية المتميزة: قيمة التعاون (12 دقيقة) | منصة الرائد التعليمية</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -459,11 +459,11 @@ html_content = f"""<!DOCTYPE html>
             <div>المملكة العربية السعودية</div>
             <div class="main-title">وزارة التعليم</div>
             <div>الإدارة العامة للتعليم بمحافظة جدة</div>
-            <div class="school-name">المدارس المتقدمة للتعلم الذكي</div>
+            <div class="school-name">منصة الرائد التعليمية</div>
         </div>
 
         <div class="header-logo-center">
-            {f'<img src="{logo_data_uri}" alt="شعار المدارس المتقدمة للتعلم الذكي">' if logo_data_uri else '<div style="font-weight:900; font-size:1.1rem; color:#1e3a8a;">[شعار المدارس المتقدمة]</div>'}
+            {f'<img src="{logo_data_uri}" alt="شعار منصة الرائد التعليمية">' if logo_data_uri else '<div style="font-weight:900; font-size:1.1rem; color:#1e3a8a;">[شعار المنصة]</div>'}
         </div>
 
         <div class="header-side-left">
@@ -578,7 +578,7 @@ html_content = f"""<!DOCTYPE html>
         <div class="dialogue-turn">
             <span class="speaker-name">المقدم 2:</span>
             <span class="stage-direction">(بنبرة ترحيبية مفعمة بالحيوية والاعتزاز):</span>
-            سَعَادَةَ مُدِيرِ المَدْرَسَةِ الفَاضِل، أَعْزَاءَنَا المُعَلِّمِينَ الكِرَام، إِخْوَانَنَا الطُّلابَ النُّجَبَاء؛ مَعَ إِشْرَاقَةِ هَذَا الصَّبَاحِ المُتَجَدِّد، فِي صَرْحِنَا التَّعْلِيمِيِّ الرَّائِد <strong>«المدارس المتقدمة للتعلم الذكي»</strong>، نُهْدِيكُمْ تَحِيَّةَ الإِسْلامِ الخَالِدَة: فالسَّلامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ تَعَالَى وَبَرَكَاتُه، وَأَسْعَدَ اللهُ صَبَاحَكُمْ بِكُلِّ خَيْرٍ وَفَلاح.
+            سَعَادَةَ مُدِيرِ المَدْرَسَةِ الفَاضِل، أَعْزَاءَنَا المُعَلِّمِينَ الكِرَام، إِخْوَانَنَا الطُّلابَ النُّجَبَاء؛ مَعَ إِشْرَاقَةِ هَذَا الصَّبَاحِ المُتَجَدِّد، فِي صَرْحِنَا التَّعْلِيمِيِّ الرَّائِد <strong>«منصة الرائد التعليمية»</strong>، نُهْدِيكُمْ تَحِيَّةَ الإِسْلامِ الخَالِدَة: فالسَّلامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ تَعَالَى وَبَرَكَاتُه، وَأَسْعَدَ اللهُ صَبَاحَكُمْ بِكُلِّ خَيْرٍ وَفَلاح.
         </div>
         <div class="dialogue-turn">
             <span class="speaker-name">المقدم 1:</span>

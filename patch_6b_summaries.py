@@ -69,8 +69,8 @@ else:
     print("Replaced Summary 5 remainder via regex")
 
 # School name replacement
-text = text.replace('مدارس التعلم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
-text = text.replace('مدارس التعلّم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
+text = text.replace('مدارس التعلم الذكي', 'منصة الرائد التعليمية بجدة')
+text = text.replace('مدارس التعلّم الذكي', 'منصة الرائد التعليمية بجدة')
 
 with open('generator_6b_summaries.py', 'w', encoding='utf-8') as f:
     f.write(text)

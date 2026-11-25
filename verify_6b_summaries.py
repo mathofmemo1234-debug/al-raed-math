@@ -11,6 +11,6 @@ summaries = re.findall(r'<article class="student-summary-card" id="(summary-[^"]
 print(f"Total student summaries found: {len(summaries)}")
 for sid, scontent in summaries:
     print(f"\n{sid}: length={len(scontent)}")
-    print(f"  Header with School: {'المدارس المتقدمة للتعلم الذكي بجدة' in scontent}")
+    print(f"  Header with School: {'منصة الرائد التعليمية' in scontent}")
     print(f"  Logo Base64: {'data:image/png;base64,' in scontent}")
     print(f"  Teacher Signature: {'محمد عبدالله جمعة' in scontent}")

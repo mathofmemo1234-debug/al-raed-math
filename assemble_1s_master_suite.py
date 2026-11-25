@@ -58,7 +58,7 @@ logo_count = full_html.count('data:image/png;base64,')
 print(f"3. Official Logo embedded: {has_logo} (appears {logo_count} times) {'[PASS]' if logo_count >= 8 else '[FAIL]'}")
 
 # 4. School Name check
-school_name = "المدارس المتقدمة للتعلم الذكي بجدة"
+school_name = "منصة الرائد التعليمية"
 school_count = full_html.count(school_name)
 print(f"4. School Name ('{school_name}'): appears {school_count} times {'[PASS]' if school_count >= 10 else '[FAIL]'}")
 

@@ -704,11 +704,11 @@ html_content = f'''<!DOCTYPE html>
           <!-- Left: Al-Motaqadimah Schools -->
           <div class="header-entity left-side">
             <div class="entity-text" style="text-align: right;">
-              <span class="entity-main">شركة المدارس المتقدمة</span>
-              <span class="entity-sub">مدارس المتقدمة للتعلم الذكي</span>
+              <span class="entity-main">منصة الرائد التعليمية</span>
+              <span class="entity-sub">منصة الرائد التعليمية</span>
               <span class="entity-dept">قسم الرياضيات</span>
             </div>
-            <img class="logo-school" src="data:image/png;base64,{motaqadimah_b64}" alt="شعار شركة المدارس المتقدمة">
+            <img class="logo-school" src="data:image/png;base64,{motaqadimah_b64}" alt="شعار منصة الرائد التعليمية">
           </div>
         </div>
 

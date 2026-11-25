@@ -10,7 +10,7 @@ with open('الحقيبة_الشاملة_سادس_ابتدائي_ص135_151.html'
 print("--- QA VERIFICATION FOR 6B ---")
 print("1. 'مدارس التعلم الذكي' count:", text.count('مدارس التعلم الذكي'))
 print("2. 'مدارس التعلّم الذكي' count:", text.count('مدارس التعلّم الذكي'))
-print("3. 'مدارس المتقدمة للتعلم الذكي بجدة' count:", text.count('مدارس المتقدمة للتعلم الذكي بجدة'))
+print("3. 'منصة الرائد التعليمية بجدة' count:", text.count('منصة الرائد التعليمية بجدة'))
 print("4. LaTeX array count:", text.count(r'\begin{array}'))
 print("5. Arabic vert table count:", text.count('arabic-vert-table'))
 

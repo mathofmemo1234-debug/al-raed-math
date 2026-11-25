@@ -8,8 +8,8 @@ sys.stdout.reconfigure(encoding='utf-8')
 with open('generator_header_styles.py', 'r', encoding='utf-8') as f:
     text = f.read()
 
-text = text.replace('مدارس التعلم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
-text = text.replace('مدارس التعلّم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
+text = text.replace('مدارس التعلم الذكي', 'منصة الرائد التعليمية بجدة')
+text = text.replace('مدارس التعلّم الذكي', 'منصة الرائد التعليمية بجدة')
 
 old_mj = r"""inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],"""
@@ -26,8 +26,8 @@ print("generator_header_styles.py updated successfully.")
 
 # 2. Function to clean math in 3m sections
 def clean_3m_content(html):
-    html = html.replace('مدارس التعلم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
-    html = html.replace('مدارس التعلّم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
+    html = html.replace('مدارس التعلم الذكي', 'منصة الرائد التعليمية بجدة')
+    html = html.replace('مدارس التعلّم الذكي', 'منصة الرائد التعليمية بجدة')
     
     # Fix the specific paragraph in Think-Pair-Share on negative inequalities where dollars were broken
     # (الحالة الثانية: المعامل عدد سالب ($< ٠$) ... تصبح ... تصبح ...)

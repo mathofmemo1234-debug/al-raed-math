@@ -566,7 +566,7 @@ def build_docx_bytes(payload):
         (header.get("ministry") or "المملكة العربية السعودية", 12, True),
         (header.get("district") or "الإدارة العامة للتعليم بمحافظة جدة", 11.5, True),
         (header.get("schoolCompany") or "", 11.5, True),
-        (header.get("school") or "مدارس المتقدمة – للتعلم الذكي (جدة)", 11.5, True),
+        (header.get("school") or "منصة الرائد التعليمية", 11.5, True),
         (header.get("stage") or "", 11.5, True),
     ]
     non_empty_lines = [ln for ln in hdr_right_lines if (ln[0] or "").strip()]
@@ -865,7 +865,7 @@ def build_docx_bytes(payload):
     set_table_rtl(sig_tbl, borders=False, col_widths_cm=sig_widths)
     prevent_row_split(sig_tbl.rows[0])
     teacher_name = header.get("teacher") or "أ. محمد عبدالله جمعة"
-    principal_name = header.get("principal") or "حسين عبد الله أزيبي"
+    principal_name = header.get("principal") or ""
 
     for s_i, (role_lbl, person_name) in enumerate([("معلم المادة", teacher_name), ("مدير المدرسة", principal_name)]):
         c_sig = sig_tbl.rows[0].cells[s_i]
@@ -1177,14 +1177,14 @@ def build_exam_html(payload):
             header.get("ministry") or "المملكة العربية السعودية",
             header.get("district") or "الإدارة العامة للتعليم بمحافظة جدة",
             header.get("schoolCompany") or "",
-            header.get("school") or "مدارس المتقدمة – للتعلم الذكي (جدة)",
+            header.get("school") or "منصة الرائد التعليمية",
             header.get("stage") or "",
         ]
         if (val or "").strip()
     )
 
     teacher_name = _esc_html(header.get("teacher") or "أ. محمد عبدالله جمعة")
-    principal_name = _esc_html(header.get("principal") or "حسين عبد الله أزيبي")
+    principal_name = _esc_html(header.get("principal") or "")
 
     return f"""<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -1541,7 +1541,7 @@ def start_server(port=PORT, open_browser=True):
         url = f"http://localhost:{port}/index.html"
         print("=" * 70)
         print("🚀 منصة الرائد التعليمية الذكية للرياضيات | أ. محمد عبدالله جمعة")
-        print("   المدارس المتقدمة للتعلم الذكي بجدة")
+        print("   منصة الرائد التعليمية")
         print("=" * 70)
         print(f"📡 السيرفر يعمل الآن على الرابط: {url}")
         print("   ميزة تصدير الاختبارات (Word .docx و PDF) مفعلة عبر API المحلي.")

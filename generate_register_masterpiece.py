@@ -192,7 +192,7 @@ def create_register_masterpiece(output_path="سجل_متابعة_الرياضي�
         pr.paragraph_format.line_spacing = 1.0
         set_bidi(pr)
         add_run(pr, "المملكة العربية السعودية\n", bold=True, size=8, color="1E3A8A")
-        add_run(pr, "وزارة التعليم  •  المدارس المتقدمة للتعلم الذكي\n", bold=True, size=7.5, color="334155")
+        add_run(pr, "وزارة التعليم  •  منصة الرائد التعليمية\n", bold=True, size=7.5, color="334155")
         add_run(pr, "المرحلة المتوسطة  —  بنين", size=7, color="64748B")
         
         # Center info

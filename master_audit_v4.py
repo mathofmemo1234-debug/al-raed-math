@@ -27,10 +27,10 @@ for label, filename in suites:
         content = f.read()
         
     # 1. School name check
-    al_mutaqadima = content.count('المدارس المتقدمة للتعلم الذكي بجدة')
-    mutaqadima = content.count('مدارس المتقدمة للتعلم الذكي بجدة')
+    al_mutaqadima = content.count('منصة الرائد التعليمية')
+    mutaqadima = content.count('منصة الرائد التعليمية بجدة')
     old_school = len(re.findall(r'مدارس\s+التعلم\s+الذكي(?!.*المتقدمة)', content))
-    print(f"1. School Names: 'المدارس المتقدمة...' ({al_mutaqadima}) | 'مدارس المتقدمة...' ({mutaqadima}) | Old: {old_school}")
+    print(f"1. School Names: 'منصة الرائد...' ({al_mutaqadima}) | 'منصة الرائد...' ({mutaqadima}) | Old: {old_school}")
     if old_school > 0 or al_mutaqadima == 0:
         print("   ❌ FAIL: School name issue!")
         all_passed = False

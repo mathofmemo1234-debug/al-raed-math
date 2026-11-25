@@ -10,7 +10,7 @@ generator_6b_worksheets.py: Interactive Worksheets and Tests for Grade 6 Element
 Includes:
 - Dedicated top toolbar button [ 👁️ إظهار الإجابة على المسائل ] with .no-print
 - Inline solutions directly on each question (correct option highlighted, step-by-step solution box)
-- Official school header with Base64 logo and school name: المدارس المتقدمة للتعلم الذكي بجدة
+- Official school header with Base64 logo and school name: منصة الرائد التعليمية
 - Teacher signature card at bottom-left: أ. محمد عبدالله جمعة
 - Strictly Eastern Arabic numerals (٠-٩)
 """

@@ -5,14 +5,14 @@ import os
 with open('شعار المتقدمة.png', 'rb') as f:
     logo_b64 = base64.b64encode(f.read()).decode('utf-8')
 
-logo_html = f'<img src="data:image/png;base64,{logo_b64}" alt="شعار المدارس المتقدمة" style="height: 75px; width: auto; object-fit: contain;">'
+logo_html = f'<img src="data:image/png;base64,{logo_b64}" alt="شعار المنصة" style="height: 75px; width: auto; object-fit: contain;">'
 
 header_html = f'''
 <div class="school-official-header">
     <div class="sch-info-right">
         <div class="ministry-name">المملكة العربية السعودية</div>
         <div class="ministry-name">وزارة التعليم - الإدارة العامة للتعليم بمحافظة جدة</div>
-        <div class="school-highlight">المدارس المتقدمة للتعلم الذكي بجدة</div>
+        <div class="school-highlight">منصة الرائد التعليمية</div>
         <div>قسم الرياضيات | المرحلة المتوسطة</div>
     </div>
     <div class="sch-logo-center">
@@ -30,13 +30,13 @@ header_html = f'''
 footer_sig_html = '''
 <div class="sheet-footer-bar">
     <div class="sheet-footer-right">
-        <span>المدارس المتقدمة للتعلم الذكي بجدة | رؤية المملكة ٢٠٣٠</span>
+        <span>منصة الرائد التعليمية | رؤية المملكة ٢٠٣٠</span>
     </div>
     <div class="sheet-footer-left">
         <div class="teacher-signature-card">
             <span class="teacher-sig-label">معلم المادة:</span>
             <span class="teacher-sig-name">أ. محمد عبدالله جمعة</span>
-            <div class="teacher-school-subtext">المدارس المتقدمة للتعلم الذكي بجدة</div>
+            <div class="teacher-school-subtext">منصة الرائد التعليمية</div>
         </div>
     </div>
 </div>
@@ -60,14 +60,14 @@ import os
 with open('شعار المتقدمة.png', 'rb') as f:
     logo_b64 = base64.b64encode(f.read()).decode('utf-8')
 
-logo_html = '<img src="data:image/png;base64,' + logo_b64 + '" alt="شعار المدارس المتقدمة" style="height: 75px; width: auto; object-fit: contain;">'
+logo_html = '<img src="data:image/png;base64,' + logo_b64 + '" alt="شعار المنصة" style="height: 75px; width: auto; object-fit: contain;">'
 
 header_html = """
 <div class="school-official-header">
     <div class="sch-info-right">
         <div class="ministry-name">المملكة العربية السعودية</div>
         <div class="ministry-name">وزارة التعليم - الإدارة العامة للتعليم بمحافظة جدة</div>
-        <div class="school-highlight">المدارس المتقدمة للتعلم الذكي بجدة</div>
+        <div class="school-highlight">منصة الرائد التعليمية</div>
         <div>قسم الرياضيات | المرحلة المتوسطة</div>
     </div>
     <div class="sch-logo-center">
@@ -85,13 +85,13 @@ header_html = """
 footer_sig_html = """
 <div class="sheet-footer-bar">
     <div class="sheet-footer-right">
-        <span>المدارس المتقدمة للتعلم الذكي بجدة | رؤية المملكة ٢٠٣٠</span>
+        <span>منصة الرائد التعليمية | رؤية المملكة ٢٠٣٠</span>
     </div>
     <div class="sheet-footer-left">
         <div class="teacher-signature-card">
             <span class="teacher-sig-label">معلم المادة:</span>
             <span class="teacher-sig-name">أ. محمد عبدالله جمعة</span>
-            <div class="teacher-school-subtext">المدارس المتقدمة للتعلم الذكي بجدة</div>
+            <div class="teacher-school-subtext">منصة الرائد التعليمية</div>
         </div>
     </div>
 </div>
@@ -114,7 +114,7 @@ parts.append(r"""<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الحقيبة الشاملة: المتباينات الخطية | أ. محمد عبدالله جمعة | المدارس المتقدمة للتعلم الذكي بجدة</title>
+    <title>الحقيبة الشاملة: المتباينات الخطية | أ. محمد عبدالله جمعة | منصة الرائد التعليمية</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -777,7 +777,7 @@ parts.append(r"""<!DOCTYPE html>
 <!-- Navigation Bar -->
 <nav class="sticky-nav">
     <div class="nav-brand">
-        🏫 المدارس المتقدمة للتعلم الذكي بجدة | المتباينات الخطية (ص ١٣٠ - ١٤٧)
+        🏫 منصة الرائد التعليمية | المتباينات الخطية (ص ١٣٠ - ١٤٧)
     </div>
     <ul class="nav-links">
         <li><a href="#plans-section">📑 خطط التحضير (STEM)</a></li>
@@ -794,7 +794,7 @@ parts.append(r"""<!DOCTYPE html>
         <span class="hero-tag">المملكة العربية السعودية | وزارة التعليم ٢٠٢٦م</span>
         <h1 class="hero-title">الحقيبة التعليمية والتدريسية الشاملة: المتباينات الخطية</h1>
         <p class="hero-subtitle">
-            <strong>المدارس المتقدمة للتعلم الذكي بجدة</strong> — إعداد المعلم: <strong>أ. محمد عبدالله جمعة</strong>. حقيبة موحدة تضم: خطط التدريس وفق معايير STEM السبعة متتالية، تليها الملخصات الشاملة للطلاب متتالية، تليها أوراق العمل والاختبارات التطبيقية بأزرار إظهار الحل النموذجي أعلى كل ورقة مع ظهور الإجابة على نفس المسألة، ومكتوبة بالكامل بالأرقام العربية المعتمدة، وشاملة الصفحات من ١٣٠ إلى ١٤٧ من كتاب الرياضيات للصف الثالث المتوسط.
+            <strong>منصة الرائد التعليمية</strong> — إعداد المعلم: <strong>أ. محمد عبدالله جمعة</strong>. حقيبة موحدة تضم: خطط التدريس وفق معايير STEM السبعة متتالية، تليها الملخصات الشاملة للطلاب متتالية، تليها أوراق العمل والاختبارات التطبيقية بأزرار إظهار الحل النموذجي أعلى كل ورقة مع ظهور الإجابة على نفس المسألة، ومكتوبة بالكامل بالأرقام العربية المعتمدة، وشاملة الصفحات من ١٣٠ إلى ١٤٧ من كتاب الرياضيات للصف الثالث المتوسط.
         </p>
     </header>
 """)

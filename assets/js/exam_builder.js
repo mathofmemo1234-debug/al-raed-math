@@ -170,8 +170,8 @@
     const base = {
       ministry: 'المملكة العربية السعودية',
       district: 'الإدارة العامة للتعليم بمحافظة جدة',
-      schoolCompany: 'شركة المدارس المتقدمة',
-      school: 'مدارس المتقدمة – للتعلم الذكي (جدة)',
+      schoolCompany: '',
+      school: 'المدرسة: ................................',
       stage: preset.stage || 'المرحلة المتوسطة',
       examTitle: isFinal ? preset.finalTitle : preset.periodTitle,
       subject: 'الرياضيات',
@@ -179,7 +179,7 @@
       term: 'الأول',
       year: isSec ? '1448 هـ' : '١٤٤٨ هـ',
       teacher: 'أ. محمد عبدالله جمعة',
-      principal: 'حسين عبد الله أزيبي',
+      principal: '',
       duration: isFinal ? 'ساعتان' : (isSec ? '45 دقيقة' : '٤٥ دقيقة'),
       instructions: isSec
         ? 'أجب عن جميع الأسئلة التالية مستعملاً الأرقام الإنجليزية المعتمدة في المرحلة الثانوية (0-9)، وتأكد من مراجعة إجاباتك قبل التسليم.'
@@ -1191,7 +1191,7 @@
           </div>
 
           <div class="eb-logo-picker">
-            <img class="eb-logo-preview" src="${utils.escapeHtml(state.header.customLogoDataUrl || 'assets/img/logo.png')}" alt="شعار المدرسة المعتمد">
+            <img class="eb-logo-preview" src="${utils.escapeHtml(state.header.customLogoDataUrl || 'assets/img/my_logo.png')}" alt="شعار المدرسة المعتمد">
             <div class="eb-logo-picker-info">
               <strong>شعار المدرسة في الترويسة الرسمية:</strong>
               <span>${state.header.customLogoDataUrl ? 'شعار مخصص مرفوع من المستخدم (محفوظ تلقائياً)' : 'الشعار الافتراضي للمنصة — يمكنك رفع شعار مدرستك الخاص'}</span>

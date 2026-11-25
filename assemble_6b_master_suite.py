@@ -42,7 +42,7 @@ mie_count = master_html.count('Math input error')
 print(f"2. 'Math input error' text occurrences: {mie_count} {'[PASS]' if mie_count == 0 else '[FAIL]'}")
 
 # 3. Check for School Name
-school_count = master_html.count('المدارس المتقدمة للتعلم الذكي بجدة')
+school_count = master_html.count('منصة الرائد التعليمية')
 print(f"3. School Name occurrences: {school_count} {'[PASS]' if school_count >= 10 else '[FAIL]'}")
 
 # 4. Check for Teacher Name

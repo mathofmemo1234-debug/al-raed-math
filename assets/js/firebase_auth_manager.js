@@ -4,7 +4,7 @@
  * نظام المصادقة وإدارة المستخدمين واعتماد المدير (Role-Based Access Control)
  * مع حماية الحساب من المشاركة عبر الجلسة النشطة الواحدة (Single Active Session)
  * Firebase Auth & Single Active Session Security Manager
- * إعداد خبير الرياضيات: أ. محمد عبدالله جمعة | المدارس المتقدمة للتعلم الذكي بجدة
+ * إعداد خبير الرياضيات: أ. محمد عبدالله جمعة
  * ==========================================================================
  */
 
@@ -387,7 +387,7 @@
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </span>
-          <span class="nav-chip-label" style="white-space: nowrap; flex-shrink: 0;">دخول / اعتماد</span>
+          <span class="nav-chip-label" style="white-space: nowrap; flex-shrink: 0;">دخول / طلب العضوية</span>
         </button>
       `;
     }
@@ -906,8 +906,39 @@
               <strong>📢 سياسة وصول الزوار والمعاينة النموذجية:</strong>
               <p style="margin-top:4px; font-size:0.88rem; line-height:1.6;">
                 يُتاح للزوار استعراض <strong>أول درسين من كل فصل دراسي مجاناً</strong> للمعاينة.
-                لفتح كامل دروس وفصول المنهج وميزات النسخ، يُرجى تسجيل الدخول بحساب Google أو الجوال ليتم اعتماد حسابك من قبل المدير العام.
+                لفتح كامل دروس وفصول المنهج وميزات النسخ لجميع المناهج المتاحة، يُرجى تسجيل الدخول بحساب Google أو الجوال ليتم اعتماد حسابك من قبل المدير العام.
               </p>
+            </div>
+
+            <!-- بطاقة التواصل المباشر وطلب العضوية عبر واتساب وهاتف -->
+            <div class="membership-direct-contact-card" style="margin:16px 0; background:linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border:2px solid #86efac; border-radius:14px; padding:16px 18px; text-align:center; box-shadow:0 4px 14px rgba(16, 185, 129, 0.08);">
+              <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px;">
+                <span style="font-size:1.6rem;">💬</span>
+                <h4 style="font-size:1.05rem; font-weight:800; color:#065f46; margin:0;">طلب تفعيل العضوية والتواصل المباشر</h4>
+              </div>
+              <p style="font-size:0.86rem; color:#047857; margin-bottom:10px; line-height:1.6;">
+                لطلب تفعيل واعتماد العضوية الكاملة لكافة المناهج الدراسية المتاحة، تواصل مباشرة مع <strong>أ. محمد عبدالله جمعة</strong>:
+              </p>
+              <div style="display:inline-flex; align-items:center; justify-content:center; gap:8px; background:#ffffff; border:1.5px dashed #10b981; border-radius:10px; padding:6px 14px; margin-bottom:12px; font-size:1.1rem; font-weight:800; color:#065f46; direction:ltr;">
+                <span>📱 0545841974</span>
+                <span style="color:#cbd5e1; font-weight:normal;">|</span>
+                <span style="color:#047857;">+966545841974</span>
+              </div>
+              <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <a href="https://wa.me/966545841974?text=${encodeURIComponent('السلام عليكم ورحمة الله وبركاته، أستاذ محمد عبدالله جمعة، أود طلب تفعيل واعتماد العضوية الكاملة لجميع المناهج المتاحة في منصة الرائد التعليمية للرياضيات.')}" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   style="display:inline-flex; align-items:center; justify-content:center; gap:8px; background:#25D366; color:#ffffff; font-weight:800; font-size:0.92rem; padding:10px 18px; border-radius:10px; text-decoration:none; box-shadow:0 3px 10px rgba(37, 211, 102, 0.35);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.04 14.69 2 12.04 2M12.04 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.81 13.47 3.81 11.91C3.81 7.37 7.5 3.67 12.04 3.67M9.53 7.35C9.34 7.35 9.04 7.42 8.78 7.7C8.53 7.97 7.82 8.63 7.82 10C7.82 11.37 8.82 12.69 8.96 12.87C9.1 13.06 10.93 15.87 13.73 17.08C14.4 17.36 14.92 17.54 15.33 17.67C16 17.88 16.63 17.85 17.12 17.78C17.67 17.7 18.8 17.09 19.04 16.42C19.28 15.75 19.28 15.17 19.21 15.06C19.14 14.94 18.95 14.87 18.66 14.73C18.38 14.59 17.01 13.91 16.75 13.82C16.5 13.72 16.31 13.68 16.12 13.96C15.93 14.24 15.39 14.87 15.22 15.06C15.06 15.25 14.89 15.27 14.61 15.13C14.33 14.99 13.42 14.69 12.35 13.74C11.51 13 10.95 12.08 10.78 11.8C10.62 11.52 10.76 11.37 10.9 11.23C11.03 11.1 11.19 10.89 11.33 10.73C11.47 10.56 11.52 10.45 11.61 10.26C11.71 10.07 11.66 9.91 11.59 9.77C11.52 9.63 10.95 8.24 10.72 7.68C10.49 7.13 10.26 7.21 10.09 7.2C9.93 7.2 9.74 7.2 9.55 7.2L9.53 7.35Z"/>
+                  </svg>
+                  <span>تواصل عبر واتساب لطلب العضوية</span>
+                </a>
+                <a href="tel:+966545841974" 
+                   style="display:inline-flex; align-items:center; justify-content:center; gap:6px; background:#ffffff; color:#065f46; border:1.5px solid #10b981; font-weight:700; font-size:0.9rem; padding:10px 16px; border-radius:10px; text-decoration:none;">
+                  <span>📞 اتصال هاتفي</span>
+                </a>
+              </div>
             </div>
 
             <div class="single-session-badge">

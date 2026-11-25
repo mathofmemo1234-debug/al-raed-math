@@ -33,5 +33,5 @@ print(f"4. 'والباقي' inside math: {text.count(r'\\text{ والباقي }'
 print(f"   'والباقي' in HTML: {text.count('والباقي')}")
 
 # 5. Check school name
-print(f"5. 'مدارس المتقدمة للتعلم الذكي بجدة': {text.count('مدارس المتقدمة للتعلم الذكي بجدة')}")
+print(f"5. 'منصة الرائد التعليمية بجدة': {text.count('منصة الرائد التعليمية بجدة')}")
 print(f"   Old variations: {text.count('مدارس التعلّم الذكي') + text.count('مدارس التعلم الذكي')}")

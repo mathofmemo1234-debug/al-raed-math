@@ -168,7 +168,7 @@ def create_register_document(output_path="سجل_متابعة_الرياضيات
         pr.paragraph_format.line_spacing = 1.0
         set_bidi(pr)
         add_run(pr, "المملكة العربية السعودية  |  وزارة التعليم\n", bold=True, size=8, color="1E3A8A")
-        add_run(pr, "المدارس المتقدمة للتعلم الذكي — المرحلة المتوسطة", size=7.5, color="475569")
+        add_run(pr, "منصة الرائد التعليمية — المرحلة المتوسطة", size=7.5, color="475569")
         
         # Center info
         pc = c_center.paragraphs[0]

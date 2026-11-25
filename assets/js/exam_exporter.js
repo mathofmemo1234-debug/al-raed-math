@@ -274,14 +274,14 @@
       header.ministry || 'المملكة العربية السعودية',
       header.district || 'الإدارة العامة للتعليم بمحافظة جدة',
       header.schoolCompany || '',
-      header.school || 'مدارس المتقدمة – للتعلم الذكي (جدة)',
+      header.school || 'منصة الرائد التعليمية',
       header.stage || ''
     ].filter(function (v) { return (v || '').trim(); }).map(function (v) {
       return '<div>' + utils.escapeHtml(dNum(v)) + '</div>';
     }).join('');
 
     const teacherName = utils.escapeHtml(dNum(header.teacher || 'أ. محمد عبدالله جمعة'));
-    const principalName = utils.escapeHtml(dNum(header.principal || 'حسين عبد الله أزيبي'));
+    const principalName = utils.escapeHtml(dNum(header.principal || ''));
 
     const docBodyContent = `
       <img src="assets/img/exam_top_ribbon.png" alt="" class="a4-doc-top-ribbon" onerror="this.style.display='none'">
@@ -993,7 +993,7 @@
       header.ministry || 'المملكة العربية السعودية',
       header.district || 'الإدارة العامة للتعليم بمحافظة جدة',
       header.schoolCompany || '',
-      header.school || 'مدارس المتقدمة – للتعلم الذكي (جدة)',
+      header.school || 'منصة الرائد التعليمية',
       header.stage || ''
     ].filter(function (v) { return (v || '').trim(); }).map(function (v, idx) {
       return wPara(secRun(ed(v), { sizePt: idx === 0 ? 12 : 11.5, bold: true, color: '000000' }), { align: 'center', before: 0, after: 15 });
@@ -1167,7 +1167,7 @@
 
     const sigWidths = [5244, 5244];
     const teacherName = header.teacher || 'أ. محمد عبدالله جمعة';
-    const principalName = header.principal || 'حسين عبد الله أزيبي';
+    const principalName = header.principal || '';
     const sigRow =
       '<w:tr><w:trPr><w:cantSplit/></w:trPr>' +
       wCell(wPara(secRun('معلم المادة', { sizePt: 12, bold: true, color: '000000' }), { align: 'center', before: 0, after: 15 }) + wPara(secRun(ed(teacherName), { sizePt: 12, bold: true, color: '0F172A' }), { align: 'center', before: 0, after: 0 }), sigWidths[0], { borders: noBdr }) +

@@ -12,7 +12,7 @@ print(f"Total worksheets found: {len(worksheets)}")
 for wid, wcontent in worksheets:
     print(f"\n{wid}: length={len(wcontent)}")
     print(f"  Toolbar with toggle: {'toggleWorksheetAnswers' in wcontent}")
-    print(f"  Header with School: {'المدارس المتقدمة للتعلم الذكي بجدة' in wcontent}")
+    print(f"  Header with School: {'منصة الرائد التعليمية' in wcontent}")
     print(f"  Logo Base64: {'data:image/png;base64,' in wcontent}")
     print(f"  Teacher Signature: {'محمد عبدالله جمعة' in wcontent}")
     print(f"  Inline solutions: {'inline-solution-block' in wcontent}")

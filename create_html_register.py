@@ -403,7 +403,7 @@ def generate_html_register(output_html="سجل_متابعة_الرياضيات_�
     <div class="hdr-right">
       <strong>المملكة العربية السعودية</strong><br>
       وزارة التعليم — الإدارة العامة للتعليم<br>
-      المدارس المتقدمة للتعلم الذكي<br>
+      منصة الرائد التعليمية<br>
       المرحلة المتوسطة (بنين)
     </div>
     <div class="hdr-center">

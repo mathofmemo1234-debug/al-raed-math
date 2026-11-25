@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <meta name="bingbot" content="noindex, nofollow">
   <title>الجلسة السقراطية التفاعلية للطالب | منصة الرائد التعليمية الذكية للرياضيات</title>
   <meta name="description" content="بيئة حوارية تفاعلية قائمة على المنهج السقراطي لبناء التفكير الرياضي وتفكيك المفاهيم البديلة - إعداد أ. محمد عبدالله جمعة">
 
@@ -10,6 +13,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- KaTeX Typography & Specialized Math Rendering -->
+  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+  <script src="assets/vendor/katex/katex.min.js"></script>
+  <script src="assets/vendor/katex/auto-render.min.js"></script>
 
   <style>
     :root {
@@ -840,7 +848,7 @@
         </div>
         <div style="flex:1; min-width:200px;">
           <label style="display:block; font-size:0.88rem; font-weight:700; margin-bottom:4px;">🏫 المدرسة / الصف:</label>
-          <input type="text" id="cert-school-input" class="student-textarea" style="min-height:auto; height:44px;" value="المدارس المتقدمة للتعلم الذكي بجدة" oninput="updateCertSchool()">
+          <input type="text" id="cert-school-input" class="student-textarea" style="min-height:auto; height:44px;" placeholder="اكتب اسم مدرستك هنا..." value="" oninput="updateCertSchool()">
         </div>
       </div>
 
@@ -868,8 +876,8 @@
           </div>
           <div style="font-size:2.4rem;">🌟</div>
           <div class="sig-box">
-            <div style="font-size:0.8rem; color:var(--text-muted);">الاعتماد الأكاديمي</div>
-            <div class="sig-name">المدارس المتقدمة للتعلم الذكي</div>
+            <div style="font-size:0.8rem; color:var(--text-muted);">الاعتماد والتوثيق</div>
+            <div class="sig-name">منصة الرائد التعليمية</div>
           </div>
         </div>
       </div>

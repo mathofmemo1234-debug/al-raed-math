@@ -105,7 +105,7 @@ def create_full_document(filename="سجل_متابعة_الرياضيات_ثال
         set_bidi(p_r)
         add_run(p_r, "المملكة العربية السعودية\n", bold=True, size=9, color="1E3A8A")
         add_run(p_r, "وزارة التعليم\n", bold=True, size=8.5, color="334155")
-        add_run(p_r, "المدارس المتقدمة للتعلم الذكي\n", bold=True, size=8.5, color="1E3A8A")
+        add_run(p_r, "منصة الرائد التعليمية\n", bold=True, size=8.5, color="1E3A8A")
         add_run(p_r, "المرحلة المتوسطة", size=8, color="64748B")
         
         # Center cell: Title banner

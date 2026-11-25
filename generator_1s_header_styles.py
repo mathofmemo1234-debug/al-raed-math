@@ -21,7 +21,7 @@ HTML_START = r"""<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الحقيبة التعليمية والتدريسية الشاملة: المثلثات المتطابقة (ص 146 – 200) | الصف الأول الثانوي | أ. محمد عبدالله جمعة | المدارس المتقدمة للتعلم الذكي بجدة</title>
+    <title>الحقيبة التعليمية والتدريسية الشاملة: المثلثات المتطابقة (ص 146 – 200) | الصف الأول الثانوي | أ. محمد عبدالله جمعة | منصة الرائد التعليمية</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1136,7 +1136,7 @@ HTML_START = r"""<!DOCTYPE html>
         <span class="hero-tag">المملكة العربية السعودية | وزارة التعليم 2026م</span>
         <h1 class="hero-title">الحقيبة التعليمية والتدريسية الشاملة: المثلثات المتطابقة</h1>
         <p class="hero-subtitle">
-            <strong>الصف الأول الثانوي (مسارات) — الفصل الدراسي الأول</strong> | <strong>المدارس المتقدمة للتعلم الذكي بجدة</strong> — إعداد المعلم: <strong>أ. محمد عبدالله جمعة</strong>. حقيبة تدريسية وتطبيقية موحدة ومتسلسلة بالكامل تشمل: خطط التحضير وفق معايير STEM السبعة متتالية، تليها الملخصات الشاملة ومطويات المفاهيم للطلاب متتالية، تليها أوراق العمل والاختبارات التطبيقية المجهزة بأزرار إظهار الحل النموذجي للمعلم (محجوبة تلقائياً عند الطباعة)، مع التزام تام بالرموز الرياضية الإنجليزية LTR والشرح العربي RTL، والرسومات الهندسية المعتمدة والمحررة بدقة بالغة، لكامل كتاب الطالب من ص 146 إلى ص 200.
+            <strong>الصف الأول الثانوي (مسارات) — الفصل الدراسي الأول</strong> | <strong>منصة الرائد التعليمية</strong> — إعداد المعلم: <strong>أ. محمد عبدالله جمعة</strong>. حقيبة تدريسية وتطبيقية موحدة ومتسلسلة بالكامل تشمل: خطط التحضير وفق معايير STEM السبعة متتالية، تليها الملخصات الشاملة ومطويات المفاهيم للطلاب متتالية، تليها أوراق العمل والاختبارات التطبيقية المجهزة بأزرار إظهار الحل النموذجي للمعلم (محجوبة تلقائياً عند الطباعة)، مع التزام تام بالرموز الرياضية الإنجليزية LTR والشرح العربي RTL، والرسومات الهندسية المعتمدة والمحررة بدقة بالغة، لكامل كتاب الطالب من ص 146 إلى ص 200.
         </p>
         <div class="hero-meta-pills">
             <span class="meta-pill">📘 الفصل الثالث: المثلثات المتطابقة</span>
@@ -1150,7 +1150,7 @@ HTML_START = r"""<!DOCTYPE html>
     <!-- Sticky Navigation Bar -->
     <nav class="sticky-nav no-print">
         <div class="nav-brand">
-            🏫 المدارس المتقدمة للتعلم الذكي بجدة | رياضيات 1 ثانوي مسارات (ص 146 – 200)
+            🏫 منصة الرائد التعليمية | رياضيات 1 ثانوي مسارات (ص 146 – 200)
         </div>
         <ul class="nav-links">
             <li><a href="#plans-section">📑 خطط التحضير (STEM)</a></li>
@@ -1167,10 +1167,10 @@ def make_school_header(sheet_title, subtitle, sheet_number=""):
         <div class="header-ministry">
             المملكة العربية السعودية<br>
             وزارة التعليم 2026م<br>
-            المدارس المتقدمة للتعلم الذكي بجدة
+            منصة الرائد التعليمية
         </div>
         <div class="header-logo-box">
-            {f'<img src="{LOGO_DATA_URI}" alt="شعار المتقدمة" class="header-logo-img">' if LOGO_DATA_URI else '<strong>المدارس المتقدمة للتعلم الذكي</strong>'}
+            {f'<img src="{LOGO_DATA_URI}" alt="شعار المتقدمة" class="header-logo-img">' if LOGO_DATA_URI else '<strong>منصة الرائد التعليمية</strong>'}
         </div>
         <div class="header-sheet-info">
             <span><strong>المادة:</strong> الرياضيات 1-1 مسارات</span>
@@ -1216,13 +1216,13 @@ def make_teacher_footer():
     return """
     <div class="sheet-footer-bar">
         <div class="sheet-footer-right">
-            <span>المدارس المتقدمة للتعلم الذكي بجدة | تعليم رقمي ومهارات المستقبل وفق رؤية المملكة 2030</span>
+            <span>منصة الرائد التعليمية | تعليم رقمي ومهارات المستقبل وفق رؤية المملكة 2030</span>
         </div>
         <div class="sheet-footer-left">
             <div class="teacher-signature-card">
                 <span class="teacher-sig-label">معلم المادة:</span>
                 <span class="teacher-sig-name">أ. محمد عبدالله جمعة</span>
-                <div class="teacher-school-subtext">المدارس المتقدمة للتعلم الذكي بجدة</div>
+                <div class="teacher-school-subtext">منصة الرائد التعليمية</div>
             </div>
         </div>
     </div>

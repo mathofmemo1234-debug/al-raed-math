@@ -7,8 +7,8 @@ with open('generator_1m_header_styles.py', 'r', encoding='utf-8') as f:
     text = f.read()
 
 # 1. Update school name
-text = text.replace('مدارس التعلم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
-text = text.replace('مدارس التعلّم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
+text = text.replace('مدارس التعلم الذكي', 'منصة الرائد التعليمية بجدة')
+text = text.replace('مدارس التعلّم الذكي', 'منصة الرائد التعليمية بجدة')
 
 # 2. Update MathJax config (remove '$')
 old_mj = r"""inlineMath: [['$', '$'], ['\\(', '\\)']],

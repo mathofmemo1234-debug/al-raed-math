@@ -8,9 +8,9 @@ print("=== DEEP AUDIT FOR 1M ===")
 print("File length:", len(text), "chars, lines:", len(text.splitlines()))
 
 # 1. School name check
-school_corr = text.count('مدارس المتقدمة للتعلم الذكي بجدة')
-school_corr_al = text.count('المدارس المتقدمة للتعلم الذكي بجدة')
-print(f"School names: 'مدارس المتقدمة...' = {school_corr}, 'المدارس المتقدمة...' = {school_corr_al}")
+school_corr = text.count('منصة الرائد التعليمية بجدة')
+school_corr_al = text.count('منصة الرائد التعليمية')
+print(f"School names: 'منصة الرائد...' = {school_corr}, 'منصة الرائد...' = {school_corr_al}")
 old_schools = re.findall(r'مدارس التعلم الذكي(?! بجدة)', text)
 print(f"Old school names found: {len(old_schools)}")
 

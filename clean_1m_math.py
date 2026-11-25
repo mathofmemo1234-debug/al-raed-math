@@ -6,8 +6,8 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 def clean_arabic_math_content(html):
     # 1. Update school name
-    html = html.replace('مدارس التعلم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
-    html = html.replace('مدارس التعلّم الذكي', 'مدارس المتقدمة للتعلم الذكي بجدة')
+    html = html.replace('مدارس التعلم الذكي', 'منصة الرائد التعليمية بجدة')
+    html = html.replace('مدارس التعلّم الذكي', 'منصة الرائد التعليمية بجدة')
     
     # 2. Fix the specific paragraph in Think-Pair-Share where dollars were broken
     broken_dollar_pattern = re.compile(

@@ -6,30 +6,46 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>منصة الرائد التعليمية الذكية للرياضيات | أ. محمد عبدالله جمعة | المدارس المتقدمة للتعلم الذكي</title>
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <meta name="bingbot" content="noindex, nofollow">
+  <title>منصة الرائد التعليمية الذكية للرياضيات | أ. محمد عبدالله جمعة</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Readex+Pro:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261125_v2">
+  <!-- KaTeX Typography & Specialized Math Rendering -->
+  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+  <script src="assets/vendor/katex/katex.min.js"></script>
+  <script src="assets/vendor/katex/auto-render.min.js"></script>
   
-  <link rel="icon" type="image/png" href="assets/img/logo.png">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261125_v5">
+  
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="الرائد">
+  <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+  <link rel="icon" type="image/png" href="assets/img/my_logo.png">
 </head>
 <body>
 
   <!-- ================= Top Navigation Bar ================= -->
   <header class="platform-navbar">
     <div class="nav-brand" onclick="window.Platform.switchView('cockpit')">
-      <img src="assets/img/logo.png" alt="شعار المدارس المتقدمة" class="nav-logo" onerror="this.style.display='none'">
+      <img src="assets/img/my_logo.png" alt="شعار المنصة" class="nav-logo" onerror="this.style.display='none'">
       <div class="nav-titles">
         <div class="nav-title-row">
           <span class="nav-title-text">منصة الرائد التعليمية</span>
           <span class="nav-badge-pill">الإصدار ٢.٠</span>
         </div>
-        <p class="nav-teacher-tag">أ. محمد عبدالله جمعة • المدارس المتقدمة الذكية</p>
+        <p class="nav-teacher-tag">أ. محمد عبدالله جمعة • خبير تدريس الرياضيات</p>
       </div>
     </div>
 
@@ -107,6 +123,18 @@
         <span class="nav-chip-label">إضافة درس</span>
       </button>
 
+      <!-- Barcode / QR Code Quick Trigger -->
+      <button class="nav-chip-btn barcode-btn" onclick="window.PWAManager && window.PWAManager.openBarcodeModal()" title="باركود المنصة لمسحه بالجوال">
+        <span class="nav-chip-icon">📱</span>
+        <span class="nav-chip-label">باركود المنصة</span>
+      </button>
+
+      <!-- PWA Install App Trigger -->
+      <button class="nav-chip-btn pwa-install-btn pulse" onclick="window.PWAManager && window.PWAManager.installPWA()" title="تثبيت المنصة كتطبيق على جهازك">
+        <span class="nav-chip-icon">📥</span>
+        <span class="nav-chip-label">تثبيت التطبيق</span>
+      </button>
+
       <!-- User Profile & Single Active Session Widget -->
       <div id="nav-auth-container" class="nav-auth-container"></div>
 
@@ -133,7 +161,7 @@
     <div class="mobile-nav-content">
       <div class="mobile-nav-header">
         <div class="mobile-nav-title">
-          <img src="assets/images/logo.png" alt="الرائد" class="mobile-nav-logo">
+          <img src="assets/img/my_logo.png" alt="الرائد" class="mobile-nav-logo" onerror="this.style.display='none'">
           <div>
             <div style="font-weight:900; font-size:1rem; color:#fff;">منصة الرائد التعليمية</div>
             <div style="font-size:0.75rem; color:#94a3b8;">أ. محمد عبدالله جمعة</div>
@@ -179,6 +207,14 @@
         <button class="mobile-nav-item" onclick="window.Platform.toggleSidebar(); window.Platform.closeMobileNav();">
           <span class="m-icon">📚</span>
           <span class="m-label">دليل المناهج (تصفح الفصول)</span>
+        </button>
+        <button class="mobile-nav-item" onclick="window.PWAManager && window.PWAManager.installPWA(); window.Platform.closeMobileNav();" style="background:rgba(16,185,129,0.2); color:#4ade80; font-weight:800;">
+          <span class="m-icon">📥</span>
+          <span class="m-label">تثبيت المنصة كتطبيق (PWA)</span>
+        </button>
+        <button class="mobile-nav-item" onclick="window.PWAManager && window.PWAManager.openBarcodeModal(); window.Platform.closeMobileNav();" style="background:rgba(59,130,246,0.2); color:#93c5fd; font-weight:800;">
+          <span class="m-icon">📱</span>
+          <span class="m-label">باركود المنصة لمسحه بالجوال</span>
         </button>
         <button class="mobile-nav-item" onclick="document.getElementById('btn-theme-toggle').click();">
           <span class="m-icon">🌙</span>
@@ -285,6 +321,7 @@
   <script src="assets/js/question_bank.js?v=20261125_v3"></script>
   <script src="assets/js/exam_builder.js?v=20261125_v3"></script>
   <script src="assets/js/interactive_html_generator.js?v=20261125_v3"></script>
+  <script src="assets/js/pwa_manager.js?v=20261125_v1"></script>
   <script src="assets/js/platform.js?v=20261125_v3"></script>
 
 </body>

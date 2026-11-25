@@ -10,7 +10,7 @@ with open('الحقيبة_الشاملة_المتباينات_الخطية_3م.h
 print("--- QA VERIFICATION FOR 3M ---")
 print("1. 'مدارس التعلم الذكي' count:", text.count('مدارس التعلم الذكي'))
 print("2. 'مدارس التعلّم الذكي' count:", text.count('مدارس التعلّم الذكي'))
-print("3. 'مدارس المتقدمة للتعلم الذكي بجدة' count:", text.count('مدارس المتقدمة للتعلم الذكي بجدة'))
+print("3. 'منصة الرائد التعليمية بجدة' count:", text.count('منصة الرائد التعليمية بجدة'))
 print("4. Remaining $ count:", text.count('$'))
 
 math_blocks = re.findall(r'(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\])', text)

@@ -1319,7 +1319,7 @@ HTML_START = r"""<!DOCTYPE html>
         <h1 class="hero-title">الحقيبة التعليمية والتدريسية الشاملة: الرياضيات (٦ ب)</h1>
         <p class="hero-subtitle">تغطي اختبار الفصل ٣ والتراكمي ٣، وتهيئة الفصل ٤، والدرس (٤-١) ق.م.أ، ومعمل الكسور المتكافئة، والدرس (٤-٢) تبسيط الكسور ومعمل الأعداد الكسرية (ص ١٣٥ - ١٥١)</p>
         <div class="hero-meta-bar">
-            <div class="hero-meta-item"><strong>المدرسة:</strong> المدارس المتقدمة للتعلم الذكي بجدة</div>
+            <div class="hero-meta-item"><strong>المدرسة:</strong> منصة الرائد التعليمية</div>
             <div class="hero-meta-item"><strong>إعداد المعلم:</strong> أ. محمد عبدالله جمعة</div>
             <div class="hero-meta-item"><strong>الصف:</strong> السادس الابتدائي</div>
             <div class="hero-meta-item"><strong>المنهج:</strong> رياضيات الفصل الدراسي الثاني</div>
@@ -1333,12 +1333,12 @@ def make_school_header(title_right, sheet_type="ورقة عمل وتقويم"):
     <div class="sch-info-right">
         <div class="ministry-name">المملكة العربية السعودية</div>
         <div class="ministry-name">وزارة التعليم - الإدارة العامة للتعليم بمحافظة جدة</div>
-        <div class="school-highlight">المدارس المتقدمة للتعلم الذكي بجدة</div>
+        <div class="school-highlight">منصة الرائد التعليمية</div>
         <div>قسم الرياضيات | المرحلة الابتدائية (الصفوف العليا)</div>
     </div>
     <div class="sch-logo-center">
-        <img src="{LOGO_DATA_URI}" alt="شعار المدارس المتقدمة" style="height: 72px; width: auto; object-fit: contain;">
-        <span style="font-size:0.78rem; font-weight:800; color:#1e3a8a;">مدارس المتقدمة للتعلم الذكي بجدة</span>
+        <img src="{LOGO_DATA_URI}" alt="شعار المنصة" style="height: 72px; width: auto; object-fit: contain;">
+        <span style="font-size:0.78rem; font-weight:800; color:#1e3a8a;">منصة الرائد التعليمية بجدة</span>
     </div>
     <div class="sch-info-left-ar">
         <div>مادة: الرياضيات (الصف السادس الابتدائي)</div>
@@ -1352,13 +1352,13 @@ def make_teacher_footer():
     return '''
 <div class="sheet-footer-bar">
     <div class="sheet-footer-right">
-        <span>المدارس المتقدمة للتعلم الذكي بجدة | تعليم ذكي ورؤية طموحة | رؤية المملكة ٢٠٣٠</span>
+        <span>منصة الرائد التعليمية | تعليم ذكي ورؤية طموحة | رؤية المملكة ٢٠٣٠</span>
     </div>
     <div class="sheet-footer-left">
         <div class="teacher-signature-card">
             <span class="teacher-sig-label">معلم المادة:</span>
             <span class="teacher-sig-name">أ. محمد عبدالله جمعة</span>
-            <div class="teacher-school-subtext">المدارس المتقدمة للتعلم الذكي بجدة</div>
+            <div class="teacher-school-subtext">منصة الرائد التعليمية</div>
         </div>
     </div>
 </div>

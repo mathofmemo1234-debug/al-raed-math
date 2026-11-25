@@ -25,7 +25,7 @@ for label, fname in suites:
     # 1. School name check
     old_sch1 = content.count('مدارس التعلم الذكي')
     old_sch2 = content.count('مدارس التعلّم الذكي')
-    new_sch = content.count('مدارس المتقدمة للتعلم الذكي بجدة')
+    new_sch = content.count('منصة الرائد التعليمية بجدة')
     pass_sch = (old_sch1 == 0 and old_sch2 == 0 and new_sch >= 10)
     print(f"1. School Name Update: {new_sch} occurrences | Old variations: {old_sch1 + old_sch2} -> {'[PASS]' if pass_sch else '[FAIL]'}")
     if not pass_sch: all_passed = False

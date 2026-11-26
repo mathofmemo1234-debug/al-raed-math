@@ -338,13 +338,15 @@ body {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 228px;
+  right: auto;
+  min-width: 252px;
+  direction: rtl;
   background: #ffffff;
   color: #0f172a;
   border: 1.5px solid #cbd5e1;
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
-  padding: 6px;
+  padding: 8px;
   z-index: 1200;
   flex-direction: column;
   gap: 4px;
@@ -357,8 +359,11 @@ body {
 .nav-more-item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
   width: 100%;
+  min-height: 38px;
+  height: auto;
   padding: 9px 12px;
   border: none;
   border-radius: 8px;
@@ -367,9 +372,28 @@ body {
   font-family: inherit;
   font-size: 0.85rem;
   font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
   text-align: right;
+  box-sizing: border-box;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-more-item > span:first-child {
+  width: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.nav-more-item.pwa-install-btn {
+  margin-top: 4px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  justify-content: center;
 }
 
 .nav-more-item:hover {
@@ -553,15 +577,15 @@ body {
   }
   /* Collapse secondary chips to icon-only buttons with clean tooltips */
   #btn-theme-toggle .nav-chip-label,
-  button[onclick*="'suites'"] .nav-chip-label,
-  button[onclick*="'vault'"] .nav-chip-label,
-  button[onclick*="'builder'"] .nav-chip-label {
+  .platform-navbar .nav-chip-btn[onclick*="'suites'"] .nav-chip-label,
+  .platform-navbar .nav-chip-btn[onclick*="'vault'"] .nav-chip-label,
+  .platform-navbar .nav-chip-btn[onclick*="'builder'"] .nav-chip-label {
     display: none;
   }
   #btn-theme-toggle,
-  button[onclick*="'suites'"],
-  button[onclick*="'vault'"],
-  button[onclick*="'builder'"] {
+  .platform-navbar .nav-chip-btn[onclick*="'suites'"],
+  .platform-navbar .nav-chip-btn[onclick*="'vault'"],
+  .platform-navbar .nav-chip-btn[onclick*="'builder'"] {
     padding: 0 10px;
     border-radius: 50%;
     width: 36px;
@@ -583,10 +607,10 @@ body {
     max-width: 160px;
   }
   /* Also collapse question-bank to icon only */
-  button[onclick*="'question-bank'"] .nav-chip-label {
+  .platform-navbar .nav-chip-btn[onclick*="'question-bank'"] .nav-chip-label {
     display: none;
   }
-  button[onclick*="'question-bank'"] {
+  .platform-navbar .nav-chip-btn[onclick*="'question-bank'"] {
     padding: 0 10px;
     border-radius: 50%;
     width: 36px;
@@ -604,6 +628,7 @@ body {
 
 /* Breakpoint 4: Tablets Portrait & Mobile (< 860px) */
 @media (max-width: 860px) {
+  .nav-more-wrap,
   .nav-chip-btn:not(.mobile-menu-toggle) {
     display: none !important;
   }

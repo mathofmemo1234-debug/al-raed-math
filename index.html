@@ -17,12 +17,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Readex+Pro:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   
   <!-- KaTeX Typography & Specialized Math Rendering -->
-  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css?v=20261126_v11">
-  <script src="assets/vendor/katex/katex.min.js?v=20261126_v11"></script>
-  <script src="assets/vendor/katex/auto-render.min.js?v=20261126_v11"></script>
+  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css?v=20261126_v12">
+  <script src="assets/vendor/katex/katex.min.js?v=20261126_v12"></script>
+  <script src="assets/vendor/katex/auto-render.min.js?v=20261126_v12"></script>
   
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261126_v11">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261126_v12">
   
   <!-- PWA & Mobile Web App Meta -->
   <link rel="manifest" href="manifest.json">
@@ -59,7 +59,7 @@
       <span class="nav-search-kbd">Ctrl K</span>
     </div>
 
-    <!-- Quick Navigation Actions (Creative SVG Chips) -->
+    <!-- Quick Navigation Actions (Streamlined: Core Actions + Organized Dropdown) -->
     <div class="nav-actions">
       <button class="nav-chip-btn" id="btn-theme-toggle" title="تبديل الوضع الليلي والنهاري">
         <span class="nav-chip-icon">
@@ -92,48 +92,37 @@
         <span class="nav-chip-label">منشئ الاختبارات</span>
       </button>
 
-      <button class="nav-chip-btn" onclick="window.Platform.switchView('suites')" title="الأجنحة والمختبرات التفاعلية">
-        <span class="nav-chip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-          </svg>
-        </span>
-        <span class="nav-chip-label">الأجنحة التفاعلية</span>
-      </button>
-
-      <button class="nav-chip-btn" onclick="window.Platform.switchView('vault')" title="مركز التحميل">
-        <span class="nav-chip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-        </span>
-        <span class="nav-chip-label">مركز التحميل</span>
-      </button>
-
-      <button class="nav-chip-btn" onclick="window.Platform.switchView('builder')" title="إضافة درس">
-        <span class="nav-chip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="16"></line>
-            <line x1="8" y1="12" x2="16" y2="12"></line>
-          </svg>
-        </span>
-        <span class="nav-chip-label">إضافة درس</span>
-      </button>
-
       <!-- Barcode / QR Code Quick Trigger -->
       <button class="nav-chip-btn barcode-btn" onclick="window.PWAManager && window.PWAManager.openBarcodeModal()" title="باركود المنصة لمسحه بالجوال">
         <span class="nav-chip-icon">📱</span>
-        <span class="nav-chip-label">باركود المنصة</span>
+        <span class="nav-chip-label">باركود</span>
       </button>
 
-      <!-- PWA Install App Trigger -->
-      <button class="nav-chip-btn pwa-install-btn pulse" onclick="window.PWAManager && window.PWAManager.installPWA()" title="تثبيت المنصة كتطبيق على جهازك">
-        <span class="nav-chip-icon">📥</span>
-        <span class="nav-chip-label">تثبيت التطبيق</span>
-      </button>
+      <!-- Secondary & Supervisory Tools Dropdown -->
+      <div class="nav-more-wrap" id="nav-more-wrap">
+        <button type="button" class="nav-chip-btn nav-more-trigger" onclick="window.Platform.toggleMoreMenu(event)" title="أدوات ومختبرات المنصة الإضافية">
+          <span class="nav-chip-icon">⚡</span>
+          <span class="nav-chip-label">الأدوات ▾</span>
+        </button>
+        <div class="nav-more-dropdown" id="nav-more-menu" role="menu">
+          <button type="button" class="nav-more-item" onclick="window.Platform.switchView('suites'); window.Platform.toggleMoreMenu();">
+            <span>⭐</span>
+            <span>الأجنحة والمختبرات التفاعلية</span>
+          </button>
+          <button type="button" class="nav-more-item" onclick="window.Platform.switchView('vault'); window.Platform.toggleMoreMenu();">
+            <span>📥</span>
+            <span>مركز التحميل والطباعة (PDF)</span>
+          </button>
+          <button type="button" class="nav-more-item" onclick="window.Platform.switchView('builder'); window.Platform.toggleMoreMenu();">
+            <span>➕</span>
+            <span>استوديو إضافة درس</span>
+          </button>
+          <button type="button" class="nav-more-item pwa-install-btn" onclick="window.PWAManager && window.PWAManager.installPWA(); window.Platform.toggleMoreMenu();">
+            <span>📲</span>
+            <span>تثبيت المنصة كتطبيق</span>
+          </button>
+        </div>
+      </div>
 
       <!-- User Profile & Single Active Session Widget -->
       <div id="nav-auth-container" class="nav-auth-container"></div>
@@ -177,7 +166,11 @@
         </button>
         <button class="mobile-nav-item" onclick="window.Platform.switchView('cockpit'); window.Platform.switchLessonTab('prep'); window.Platform.closeMobileNav();">
           <span class="m-icon">📋</span>
-          <span class="m-label">التحضير الميداني الشامل المعتمد</span>
+          <span class="m-label">التحضير الميداني الشامل</span>
+        </button>
+        <button class="mobile-nav-item" onclick="window.Platform.switchView('cockpit'); window.Platform.switchLessonTab('socratic'); window.Platform.closeMobileNav();">
+          <span class="m-icon">🏛️</span>
+          <span class="m-label">منصة سقراط التوليدية</span>
         </button>
         <button class="mobile-nav-item" onclick="window.Platform.openCurrentLessonHtmlGenerator(); window.Platform.closeMobileNav();">
           <span class="m-icon">🌐</span>
@@ -267,27 +260,27 @@
           <button class="view-tab-btn active" data-view="cockpit">
             🎯 مركز الدرس التفاعلي
           </button>
-          <button class="view-tab-btn" data-view="question-bank">
-            🏦 بنك الأسئلة الشامل (٣ م / ١ م / ٦ ب)
+          <button class="view-tab-btn" data-view="question-bank" title="بنك الأسئلة الشامل لجميع المراحل الدراسية الست">
+            🏦 بنك الأسئلة الشامل
           </button>
-          <button class="view-tab-btn" data-view="exam-builder">
-            📝 منشئ الاختبارات (فترة / نهائي) <span class="exam-count-badge" id="exam-count-badge">٠</span>
+          <button class="view-tab-btn" data-view="exam-builder" title="منشئ الاختبارات (فترة / نهائي)">
+            📝 منشئ الاختبارات <span class="exam-count-badge" id="exam-count-badge">٠</span>
           </button>
           <button class="view-tab-btn" data-view="visual-tree">
-            🗺️ خريطة المناهج الدراسية
+            🗺️ خريطة المناهج
           </button>
           <button class="view-tab-btn" data-view="suites">
-            🌟 الأجنحة والمختبرات الذكية
+            🌟 الأجنحة التفاعلية
           </button>
           <button class="view-tab-btn" data-view="vault">
-            📥 مركز التحميل والطباعة (PDF)
+            📥 مركز التحميل (PDF)
           </button>
           <button class="view-tab-btn" data-view="builder">
-            ➕ استوديو توسيع المناهج
+            ➕ إضافة درس
           </button>
         </div>
-        <div>
-          <button class="nav-btn" onclick="window.print()">🖨️ طباعة الصفحة الحالية</button>
+        <div class="viewport-print-wrap">
+          <button class="nav-btn viewport-print-btn" onclick="window.print()">🖨️ طباعة الصفحة الحالية</button>
         </div>
       </div>
 
@@ -308,23 +301,23 @@
   <script src="assets/js/firebase_config.js"></script>
 
   <!-- Scripts -->
-  <script src="assets/js/arabic_utils.js?v=20261126_v11"></script>
-  <script src="assets/js/firebase_auth_manager.js?v=20261126_v11"></script>
-  <script src="assets/js/lesson_prep_manager.js?v=20261126_v11"></script>
-  <script src="assets/js/grade6_book_data.js?v=20261126_v11"></script>
-  <script src="assets/js/grade1m_book_data.js?v=20261126_v11"></script>
-  <script src="assets/js/grade3m_book_data.js?v=20261126_v11"></script>
-  <script src="assets/js/grade1s_book_data.js?v=20261126_v11"></script>
-  <script src="assets/js/grade2s_book_data.js?v=20261126_v11"></script>
-  <script src="assets/js/grade3s_book_data.js?v=20261126_v11"></script>
-  <script src="assets/js/curriculum_tree.js?v=20261126_v11"></script>
-  <script src="assets/js/exam_exporter.js?v=20261126_v11"></script>
-  <script src="assets/js/question_bank.js?v=20261126_v11"></script>
-  <script src="assets/js/exam_builder.js?v=20261126_v11"></script>
-  <script src="assets/js/interactive_html_generator.js?v=20261126_v11"></script>
-  <script src="assets/js/concept_explainer.js?v=20261126_v11"></script>
-  <script src="assets/js/pwa_manager.js?v=20261126_v11"></script>
-  <script src="assets/js/platform.js?v=20261126_v11"></script>
+  <script src="assets/js/arabic_utils.js?v=20261126_v12"></script>
+  <script src="assets/js/firebase_auth_manager.js?v=20261126_v12"></script>
+  <script src="assets/js/lesson_prep_manager.js?v=20261126_v12"></script>
+  <script src="assets/js/grade6_book_data.js?v=20261126_v12"></script>
+  <script src="assets/js/grade1m_book_data.js?v=20261126_v12"></script>
+  <script src="assets/js/grade3m_book_data.js?v=20261126_v12"></script>
+  <script src="assets/js/grade1s_book_data.js?v=20261126_v12"></script>
+  <script src="assets/js/grade2s_book_data.js?v=20261126_v12"></script>
+  <script src="assets/js/grade3s_book_data.js?v=20261126_v12"></script>
+  <script src="assets/js/curriculum_tree.js?v=20261126_v12"></script>
+  <script src="assets/js/exam_exporter.js?v=20261126_v12"></script>
+  <script src="assets/js/question_bank.js?v=20261126_v12"></script>
+  <script src="assets/js/exam_builder.js?v=20261126_v12"></script>
+  <script src="assets/js/interactive_html_generator.js?v=20261126_v12"></script>
+  <script src="assets/js/concept_explainer.js?v=20261126_v12"></script>
+  <script src="assets/js/pwa_manager.js?v=20261126_v12"></script>
+  <script src="assets/js/platform.js?v=20261126_v12"></script>
 
 </body>
 </html>

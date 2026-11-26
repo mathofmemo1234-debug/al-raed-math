@@ -49,6 +49,8 @@
     }
   };
 
+  const QB_STATE_KEY = 'alraed_qb_state_v1';
+
   const state = {
     bookId: global.GRADE3S_BOOK_DATA ? 'g3s' : (global.GRADE2S_BOOK_DATA ? 'g2s' : (global.GRADE1S_BOOK_DATA ? 'g1s' : (global.GRADE3M_BOOK_DATA ? 'g3m' : (global.GRADE1M_BOOK_DATA ? 'g1m' : 'g6')))),
     chapterId: 'all',
@@ -63,6 +65,48 @@
     revealedAnswers: new Set(),
     container: null
   };
+
+  function saveBankState() {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      localStorage.setItem(QB_STATE_KEY, JSON.stringify({
+        bookId: state.bookId,
+        chapterId: state.chapterId,
+        lessonId: state.lessonId,
+        type: state.type,
+        difficulty: state.difficulty,
+        onlyImages: !!state.onlyImages,
+        search: state.search || '',
+        includeAnswersOnCopy: !!state.includeAnswersOnCopy,
+        page: state.page || 1,
+        revealedAnswers: Array.from(state.revealedAnswers)
+      }));
+    } catch (e) {}
+  }
+
+  function restoreBankState() {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      const raw = localStorage.getItem(QB_STATE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (!saved || typeof saved !== 'object') return;
+      if (saved.bookId && BOOKS_CONFIG[saved.bookId]) state.bookId = saved.bookId;
+      if (typeof saved.chapterId === 'string') state.chapterId = saved.chapterId;
+      if (typeof saved.lessonId === 'string') state.lessonId = saved.lessonId;
+      if (typeof saved.type === 'string') state.type = saved.type;
+      if (typeof saved.difficulty === 'string') state.difficulty = saved.difficulty;
+      state.onlyImages = !!saved.onlyImages;
+      if (typeof saved.search === 'string') state.search = saved.search;
+      state.includeAnswersOnCopy = !!saved.includeAnswersOnCopy;
+      state.page = Math.max(1, parseInt(saved.page, 10) || 1);
+      if (Array.isArray(saved.revealedAnswers)) {
+        state.revealedAnswers = new Set(saved.revealedAnswers);
+      }
+    } catch (e) {}
+  }
+
+  restoreBankState();
 
   function getUtils() {
     return global.ArabicUtils;
@@ -169,10 +213,11 @@
 
     const filtered = getFilteredQuestions();
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-    if (state.page > totalPages) state.page = totalPages;
-    if (state.page < 1) state.page = 1;
+    const approved = isUserApproved();
+    const activePage = Math.max(1, Math.min(state.page || 1, totalPages));
+    if (approved) state.page = activePage;
 
-    const startIdx = (state.page - 1) * PAGE_SIZE;
+    const startIdx = (activePage - 1) * PAGE_SIZE;
     const pageItems = filtered.slice(startIdx, startIdx + PAGE_SIZE);
 
     // قائمة الدروس المتاحة حسب الفصل المختار
@@ -500,7 +545,7 @@
         ` : ''}
 
         <!-- الترقيم والتنقل بين الصفحات -->
-        ${renderPagination(totalPages)}
+        ${renderPagination(totalPages, activePage)}
       </div>
     `;
 
@@ -516,30 +561,31 @@
     }
   }
 
-  function renderPagination(totalPages) {
+  function renderPagination(totalPages, curPage) {
     if (totalPages <= 1) return '';
+    const pageNow = curPage || state.page || 1;
     const utils = getUtils();
     const isSec = isSecondaryBook();
     let pagesHtml = '';
     const maxButtons = 7;
-    let startP = Math.max(1, state.page - 3);
+    let startP = Math.max(1, pageNow - 3);
     let endP = Math.min(totalPages, startP + maxButtons - 1);
     if (endP - startP + 1 < maxButtons) {
       startP = Math.max(1, endP - maxButtons + 1);
     }
 
     for (let p = startP; p <= endP; p++) {
-      pagesHtml += '<button type="button" class="qb-page-btn ' + (p === state.page ? 'active' : '') +
+      pagesHtml += '<button type="button" class="qb-page-btn ' + (p === pageNow ? 'active' : '') +
         '" onclick="window.QuestionBank.goToPage(' + p + ')">' + (isSec ? String(p) : utils.toEasternDigits(p)) + '</button>';
     }
 
     return `
       <div class="qb-pagination">
-        <button type="button" class="qb-page-btn" ${state.page <= 1 ? 'disabled' : ''}
-          onclick="window.QuestionBank.goToPage(${state.page - 1})">◀ السابق</button>
+        <button type="button" class="qb-page-btn" ${pageNow <= 1 ? 'disabled' : ''}
+          onclick="window.QuestionBank.goToPage(${pageNow - 1})">◀ السابق</button>
         ${pagesHtml}
-        <button type="button" class="qb-page-btn" ${state.page >= totalPages ? 'disabled' : ''}
-          onclick="window.QuestionBank.goToPage(${state.page + 1})">التالي ▶</button>
+        <button type="button" class="qb-page-btn" ${pageNow >= totalPages ? 'disabled' : ''}
+          onclick="window.QuestionBank.goToPage(${pageNow + 1})">التالي ▶</button>
       </div>
     `;
   }
@@ -552,12 +598,14 @@
     state.onlyImages = false;
     state.page = 1;
     state.selectedUids.clear();
+    saveBankState();
     render();
   }
 
   function toggleOnlyImages(checked) {
     state.onlyImages = !!checked;
     state.page = 1;
+    saveBankState();
     render();
   }
 
@@ -567,6 +615,7 @@
       state.lessonId = 'all';
     }
     state.page = 1;
+    saveBankState();
     render();
   }
 
@@ -574,6 +623,7 @@
     state.search = val;
     state.page = 1;
     state._keepSearchFocus = true;
+    saveBankState();
     render();
   }
 
@@ -585,11 +635,13 @@
     state.onlyImages = false;
     state.search = '';
     state.page = 1;
+    saveBankState();
     render();
   }
 
   function goToPage(p) {
     state.page = p;
+    saveBankState();
     render();
     if (state.container) state.container.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -617,11 +669,13 @@
 
   function toggleIncludeAnswers(checked) {
     state.includeAnswersOnCopy = !!checked;
+    saveBankState();
   }
 
   function toggleRevealAnswer(uid) {
     if (state.revealedAnswers.has(uid)) state.revealedAnswers.delete(uid);
     else state.revealedAnswers.add(uid);
+    saveBankState();
     render();
   }
 
@@ -701,6 +755,19 @@
     render: render,
     setBook: setBook,
     getBookData: getBookData,
+    getCurrentBookId: function () { return state.bookId; },
+    getState: function () {
+      return {
+        bookId: state.bookId,
+        chapterId: state.chapterId,
+        lessonId: state.lessonId,
+        type: state.type,
+        difficulty: state.difficulty,
+        onlyImages: !!state.onlyImages,
+        search: state.search || '',
+        page: state.page || 1
+      };
+    },
     isUserApproved: isUserApproved,
     toggleOnlyImages: toggleOnlyImages,
     setFilter: setFilter,

@@ -8,16 +8,222 @@
 (function () {
   'use strict';
 
+  const NAV_STORAGE_KEY = 'alraed_platform_nav_v1';
+  const QUIZ_SESSION_KEY = 'alraed_platform_quiz_v1';
+  const VALID_VIEWS = new Set(['cockpit', 'question-bank', 'exam-builder', 'visual-tree', 'suites', 'vault', 'builder']);
+  const VALID_TABS = new Set(['prep', 'summary', 'explain', 'worksheet', 'socratic', 'tools', 'quiz', 'downloads']);
+
+  let pendingScrollRestore = null;
+  let scrollSaveTimer = null;
+
   // Global State
   const state = {
     currentLessonId: 'g6-t1-c1-l1',
     activeView: 'cockpit', // 'cockpit' | 'question-bank' | 'exam-builder' | 'visual-tree' | 'suites' | 'vault' | 'builder'
-    activeLessonTab: 'prep', // 'prep' | 'summary' | 'worksheet' | 'socratic' | 'tools' | 'quiz' | 'downloads'
+    activeLessonTab: 'prep', // 'prep' | 'summary' | 'explain' | 'worksheet' | 'socratic' | 'tools' | 'quiz' | 'downloads'
     termFilter: 'all',
     searchQuery: '',
     quizScores: {}, // lessonId -> { answeredCount, correctCount, userAnswers: {} }
     expandedNodes: new Set(['elementary', 'g6', 'g6-term1', 'g6-t1-c1', 'intermediate', 'g1m', 'g1m-term1', 'g1m-t1-c1', 'g3m', 'g3m-term1', 'secondary', 'g1s', 'g1s-term1', 'g2s', 'g2s-term1', 'g3s', 'g3s-term1'])
   };
+
+  function getCurrentScrollY() {
+    try {
+      const winY = (typeof window !== 'undefined' && typeof window.scrollY === 'number') ? window.scrollY : 0;
+      const docY = (typeof document !== 'undefined' && document.documentElement && typeof document.documentElement.scrollTop === 'number')
+        ? document.documentElement.scrollTop
+        : 0;
+      return Math.max(0, Math.round(Math.max(winY, docY)));
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  function parseHashState() {
+    const out = {};
+    try {
+      if (typeof window === 'undefined' || !window.location || !window.location.hash) return out;
+      const raw = String(window.location.hash || '').replace(/^#/, '').trim();
+      if (!raw || raw.indexOf('=') === -1) return out;
+      const params = new URLSearchParams(raw);
+      const v = params.get('view');
+      const l = params.get('lesson');
+      const t = params.get('tab');
+      if (v && VALID_VIEWS.has(v)) out.activeView = v;
+      if (l) out.currentLessonId = l;
+      if (t && VALID_TABS.has(t)) out.activeLessonTab = t;
+    } catch (e) {}
+    return out;
+  }
+
+  function syncUrlHash() {
+    try {
+      if (typeof window === 'undefined' || !window.location) return;
+      const params = new URLSearchParams();
+      params.set('view', state.activeView || 'cockpit');
+      if (state.activeView === 'cockpit') {
+        if (state.currentLessonId) params.set('lesson', state.currentLessonId);
+        if (state.activeLessonTab) params.set('tab', state.activeLessonTab);
+      }
+      const nextHash = '#' + params.toString();
+      if (window.location.hash === nextHash) return;
+      if (window.history && typeof window.history.replaceState === 'function') {
+        window.history.replaceState(null, '', nextHash);
+      } else {
+        window.location.hash = nextHash;
+      }
+    } catch (e) {}
+  }
+
+  function savePlatformState(opts) {
+    const options = opts || {};
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const y = typeof options.scrollY === 'number' ? options.scrollY : getCurrentScrollY();
+        const isDark = (typeof document !== 'undefined' && document.body && document.body.getAttribute('data-theme') === 'dark');
+        const payload = {
+          activeView: state.activeView,
+          currentLessonId: state.currentLessonId,
+          activeLessonTab: state.activeLessonTab,
+          termFilter: state.termFilter,
+          expandedNodes: Array.from(state.expandedNodes),
+          theme: isDark ? 'dark' : 'light',
+          scrollY: y,
+          savedAt: Date.now()
+        };
+        localStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(payload));
+      }
+    } catch (e) {}
+    if (options.updateHash !== false) {
+      syncUrlHash();
+    }
+  }
+
+  function saveQuizScores() {
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(QUIZ_SESSION_KEY, JSON.stringify(state.quizScores || {}));
+      }
+    } catch (e) {}
+  }
+
+  function restoreQuizScores() {
+    try {
+      if (typeof sessionStorage === 'undefined') return;
+      const raw = sessionStorage.getItem(QUIZ_SESSION_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        state.quizScores = parsed;
+      }
+    } catch (e) {}
+  }
+
+  function syncNavDomClasses() {
+    if (typeof document === 'undefined') return;
+    document.querySelectorAll('.view-tab-btn').forEach(b => {
+      if (b && b.dataset) {
+        b.classList.toggle('active', b.dataset.view === state.activeView);
+      }
+    });
+    document.querySelectorAll('.term-tab-btn').forEach(b => {
+      if (b && b.dataset) {
+        b.classList.toggle('active', b.dataset.term === state.termFilter);
+      }
+    });
+  }
+
+  function restorePlatformState() {
+    restoreQuizScores();
+    let saved = null;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const raw = localStorage.getItem(NAV_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') saved = parsed;
+        }
+      }
+    } catch (e) {}
+
+    const hashState = parseHashState();
+    const lessonsMap = (window.CURRICULUM_DATA && window.CURRICULUM_DATA.lessons) || {};
+
+    if (saved) {
+      if (saved.activeView && VALID_VIEWS.has(saved.activeView)) {
+        state.activeView = saved.activeView;
+      }
+      if (saved.currentLessonId && lessonsMap[saved.currentLessonId]) {
+        state.currentLessonId = saved.currentLessonId;
+      }
+      if (saved.activeLessonTab && VALID_TABS.has(saved.activeLessonTab)) {
+        state.activeLessonTab = saved.activeLessonTab;
+      }
+      if (saved.termFilter && (saved.termFilter === 'all' || saved.termFilter === 'term1' || saved.termFilter === 'term2')) {
+        state.termFilter = saved.termFilter;
+      }
+      if (Array.isArray(saved.expandedNodes) && saved.expandedNodes.length) {
+        state.expandedNodes = new Set(saved.expandedNodes);
+      }
+      if (saved.theme === 'dark' && typeof document !== 'undefined' && document.body) {
+        document.body.setAttribute('data-theme', 'dark');
+      } else if (saved.theme === 'light' && typeof document !== 'undefined' && document.body) {
+        document.body.removeAttribute('data-theme');
+      }
+    }
+
+    // URL hash takes precedence for deep links / browser navigation
+    let hashChangedLocation = false;
+    if (hashState.activeView && VALID_VIEWS.has(hashState.activeView)) {
+      if (saved && saved.activeView !== hashState.activeView) hashChangedLocation = true;
+      state.activeView = hashState.activeView;
+    }
+    if (hashState.currentLessonId && lessonsMap[hashState.currentLessonId]) {
+      if (saved && saved.currentLessonId !== hashState.currentLessonId) hashChangedLocation = true;
+      state.currentLessonId = hashState.currentLessonId;
+    }
+    if (hashState.activeLessonTab && VALID_TABS.has(hashState.activeLessonTab)) {
+      if (saved && saved.activeLessonTab !== hashState.activeLessonTab) hashChangedLocation = true;
+      state.activeLessonTab = hashState.activeLessonTab;
+    }
+
+    // Always ensure ancestors of currentLessonId are expanded in the sidebar tree
+    const p = findLessonPath(state.currentLessonId);
+    if (p) {
+      state.expandedNodes.add(p.stage.id);
+      state.expandedNodes.add(p.grade.id);
+      state.expandedNodes.add(p.termKey);
+      state.expandedNodes.add(p.chapter.id);
+    }
+
+    if (!hashChangedLocation && saved && typeof saved.scrollY === 'number' && saved.scrollY > 40) {
+      pendingScrollRestore = saved.scrollY;
+    } else {
+      pendingScrollRestore = null;
+    }
+
+    syncNavDomClasses();
+  }
+
+  function applyPendingScrollRestore(keepPendingIfGated) {
+    if (typeof pendingScrollRestore !== 'number' || pendingScrollRestore <= 0) return;
+    if (typeof window === 'undefined' || typeof window.scrollTo !== 'function') return;
+    const targetY = pendingScrollRestore;
+    const doScroll = () => {
+      try { window.scrollTo(0, targetY); } catch (e) {}
+    };
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(doScroll);
+    } else {
+      doScroll();
+    }
+    setTimeout(() => {
+      doScroll();
+      if (!keepPendingIfGated) {
+        pendingScrollRestore = null;
+      }
+    }, 120);
+  }
 
   function isCurrentSecondary() {
     if (state.currentLessonId && (state.currentLessonId.startsWith('g1s') || state.currentLessonId.startsWith('g2s') || state.currentLessonId.startsWith('g3s'))) return true;
@@ -256,20 +462,29 @@
         return;
       }
       mergeBookData();
+      restorePlatformState();
       if (window.ExamBuilder && window.ExamBuilder.updateBadge) {
         window.ExamBuilder.updateBadge();
       }
 
       if (window.FirebaseAuthManager) {
         window.FirebaseAuthManager.onAuthStateChanged(() => {
+          const prevY = getCurrentScrollY();
           renderTree();
           renderCurrentView();
+          if (pendingScrollRestore) {
+            applyPendingScrollRestore(false);
+          } else if (prevY > 0 && typeof window.scrollTo === 'function') {
+            setTimeout(() => { try { window.scrollTo(0, prevY); } catch (e) {} }, 60);
+          }
         });
       }
 
       setupEventListeners();
       renderTree();
       renderCurrentView();
+      applyPendingScrollRestore(true);
+      syncUrlHash();
     }
 
     startPlatform();
@@ -283,6 +498,7 @@
         document.querySelectorAll('.term-tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.termFilter = btn.dataset.term;
+        savePlatformState({ updateHash: false });
         renderTree();
         if (state.activeView === 'visual-tree') renderVisualTree();
       });
@@ -309,12 +525,57 @@
     // View switcher tabs
     document.querySelectorAll('.view-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.view-tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.activeView = btn.dataset.view;
-        renderCurrentView();
+        switchView(btn.dataset.view);
       });
     });
+
+    // Persist scroll position smoothly & flush on page hide / beforeunload (F5)
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener('scroll', () => {
+        if (scrollSaveTimer) clearTimeout(scrollSaveTimer);
+        scrollSaveTimer = setTimeout(() => {
+          savePlatformState({ updateHash: false });
+        }, 240);
+      }, { passive: true });
+
+      const flushOnUnload = () => {
+        savePlatformState({ updateHash: true });
+        saveQuizScores();
+      };
+      window.addEventListener('beforeunload', flushOnUnload);
+      window.addEventListener('pagehide', flushOnUnload);
+
+      window.addEventListener('hashchange', () => {
+        const h = parseHashState();
+        const lessonsMap = (window.CURRICULUM_DATA && window.CURRICULUM_DATA.lessons) || {};
+        let changed = false;
+        if (h.activeView && VALID_VIEWS.has(h.activeView) && h.activeView !== state.activeView) {
+          state.activeView = h.activeView;
+          changed = true;
+        }
+        if (h.currentLessonId && lessonsMap[h.currentLessonId] && h.currentLessonId !== state.currentLessonId) {
+          state.currentLessonId = h.currentLessonId;
+          const p = findLessonPath(state.currentLessonId);
+          if (p) {
+            state.expandedNodes.add(p.stage.id);
+            state.expandedNodes.add(p.grade.id);
+            state.expandedNodes.add(p.termKey);
+            state.expandedNodes.add(p.chapter.id);
+          }
+          changed = true;
+        }
+        if (h.activeLessonTab && VALID_TABS.has(h.activeLessonTab) && h.activeLessonTab !== state.activeLessonTab) {
+          state.activeLessonTab = h.activeLessonTab;
+          changed = true;
+        }
+        if (changed) {
+          syncNavDomClasses();
+          renderTree();
+          renderCurrentView();
+          savePlatformState({ updateHash: false });
+        }
+      });
+    }
 
     // Dark Mode Toggle
     const themeBtn = document.getElementById('btn-theme-toggle');
@@ -349,6 +610,7 @@
       }
     }
     if (themeBtn) {
+      updateThemeBtn(document.body && document.body.getAttribute('data-theme') === 'dark');
       themeBtn.addEventListener('click', () => {
         const isDark = document.body.getAttribute('data-theme') === 'dark';
         if (isDark) {
@@ -358,16 +620,27 @@
           document.body.setAttribute('data-theme', 'dark');
           updateThemeBtn(true);
         }
+        savePlatformState({ updateHash: false });
       });
     }
 
-    // Close crumb dropdowns when clicking outside
+    // Close crumb & navbar dropdowns when clicking outside
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.tree-crumb-item')) {
         document.querySelectorAll('.crumb-dropdown.open').forEach(el => el.classList.remove('open'));
         document.querySelectorAll('.tree-crumb-item.active-menu').forEach(el => el.classList.remove('active-menu'));
       }
+      if (!e.target.closest('#nav-more-wrap')) {
+        const moreMenu = document.getElementById('nav-more-menu');
+        if (moreMenu) moreMenu.classList.remove('open');
+      }
     });
+  }
+
+  function toggleMoreMenu(event) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById('nav-more-menu');
+    if (menu) menu.classList.toggle('open');
   }
 
   // Find ancestor IDs for a lesson: [stage, grade, term, termKey, chapter, lesson]
@@ -523,11 +796,13 @@
       });
     });
     renderTree();
+    savePlatformState({ updateHash: false });
   }
 
   function collapseAll() {
     state.expandedNodes.clear();
     renderTree();
+    savePlatformState({ updateHash: false });
   }
 
   function toggleSidebar() {
@@ -704,14 +979,14 @@
 
                 lessonsHtml += `
                   <div class="tree-lesson-item ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked-lesson' : ''}" onclick="window.Platform.selectLesson('${lesson.id}')" title="${escHtml(title)}${!isUnlocked ? ' (مخصص للأعضاء المعتمدين - المعاينة لدرسين)' : ''}">
-                    <span style="display:flex; align-items:center; gap:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    <span class="tree-lesson-main">
                       <span class="lesson-status-dot ${isCompleted ? 'completed' : 'roadmap'}"></span>
-                      ${lessonNum ? `<span style="font-weight:700; color:${isActive ? '#ffffff' : (isCompleted ? '#e2e8f0' : '#cbd5e1')}">${escHtml(lessonNum)}</span>` : ''}
-                      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escHtml(title || '')}</span>
+                      ${lessonNum ? `<span class="tree-lesson-num">${escHtml(lessonNum)}</span>` : ''}
+                      <span class="tree-lesson-title">${escHtml(title || '')}</span>
                     </span>
-                    <span style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                    <span class="tree-lesson-meta">
                       ${isUnlocked ? (isApproved ? '<span class="tree-unlocked-star" title="عضو معتمد: وصول كامل ومفتوح">🌟</span>' : '') : '<span class="tree-lock-badge" title="هذا الدرس متاح للأعضاء المعتمدين والمدير">🔒</span>'}
-                      <span style="font-size:0.62rem; color:${isActive ? '#ffffff' : (isCompleted ? '#86efac' : '#fcd34d')};">
+                      <span class="tree-lesson-status ${isCompleted ? 'completed' : 'roadmap'}">
                         ${isCompleted ? '✓' : 'قيد الإدراج'}
                       </span>
                     </span>
@@ -726,17 +1001,17 @@
               chaptersHtml += `
                 <div class="tree-chapter-node">
                   <div class="tree-chapter-header" onclick="window.Platform.toggleNode('${chapter.id}')">
-                    <span style="display:flex; align-items:center; gap:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    <span class="tree-chapter-main">
                       <span>📖</span>
-                      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${chapter.number}: ${chapter.title}</span>
+                      <span class="tree-chapter-title">${chapter.number}: ${chapter.title}</span>
                     </span>
-                    <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-                      <span style="font-size:0.6rem; color:#94a3b8;">(${lessonCount})</span>
+                    <div class="tree-chapter-meta">
+                      <span class="tree-chapter-count">(${lessonCount})</span>
                       <span class="node-arrow ${isChapterOpen ? 'open' : ''}">◀</span>
                     </div>
                   </div>
                   <div class="tree-chapter-children" style="display:${isChapterOpen ? 'block' : 'none'};">
-                    ${lessonsHtml || '<div style="padding:4px 8px; font-size:0.7rem; color:#64748b;">قيد الإدراج</div>'}
+                    ${lessonsHtml || '<div style="padding:4px 8px; font-size:0.75rem; color:#475569;">قيد الإدراج</div>'}
                   </div>
                 </div>
               `;
@@ -812,12 +1087,14 @@
       state.expandedNodes.add(nodeId);
     }
     renderTree();
+    savePlatformState({ updateHash: false });
   }
 
   // Select Lesson
   function selectLesson(lessonId) {
     state.currentLessonId = lessonId;
     state.activeView = 'cockpit';
+    pendingScrollRestore = null;
     
     // Auto-expand all parent ancestors so current lesson is visible in tree
     const p = findLessonPath(lessonId);
@@ -833,6 +1110,7 @@
       b.classList.toggle('active', b.dataset.view === 'cockpit');
     });
 
+    savePlatformState({ scrollY: 0, updateHash: true });
     renderTree();
     triggerFlashTransition();
     renderCurrentView();
@@ -1347,52 +1625,47 @@
               ${isAdmin ? `
                 <span class="meta-badge admin-member" title="حساب المدير العام">👑 الحساب: المدير العام (أ. محمد عبدالله جمعة)</span>
               ` : (isApproved ? `
-                <span class="meta-badge verified-member" title="عضوية معتمدة رسمياً">🌟 العضوية: معتمد رسمي (وصول كامل للمحتوى، التحضير، الطباعة، وبنك الأسئلة) ✓</span>
+                <span class="meta-badge verified-member" title="عضوية معتمدة رسمياً">🌟 العضوية: معتمد رسمي ✓</span>
               ` : (isPending ? `
-                <span class="meta-badge pending-member" title="الحساب قيد مراجعة واعتماد المدير العام">⏳ العضوية: قيد المراجعة (معاينة أول درسين • الحد الأقصى ${fmtNum(5, true)} أسئلة للنوع)</span>
+                <span class="meta-badge pending-member" title="الحساب قيد مراجعة واعتماد المدير العام">⏳ العضوية: قيد المراجعة</span>
               ` : `
-                <span class="meta-badge visitor-member" onclick="window.FirebaseAuthManager.openAuthModal()" style="cursor:pointer;" title="انقر لتسجيل الدخول وطلب الاعتماد">🔒 العضوية: نسخة تجريبية (الحد الأقصى ${fmtNum(5, true)} أسئلة للنوع • اطلب الاعتماد) ↗</span>
+                <span class="meta-badge visitor-member" onclick="window.FirebaseAuthManager.openAuthModal()" style="cursor:pointer;" title="انقر لتسجيل الدخول وطلب الاعتماد">🔒 نسخة تجريبية (اطلب الاعتماد) ↗</span>
               `))}
               <span class="meta-badge green">✓ ${lesson.badge || 'مكتمل وشامل'}</span>
-              <span class="meta-badge" onclick="window.Platform.switchLessonTab('prep')" style="cursor:pointer;" title="الانتقال إلى التحضير الميداني الشامل">📋 التحضير الميداني المعتمد</span>
-              <span class="meta-badge" onclick="window.Platform.switchLessonTab('explain')" style="cursor:pointer; background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;" title="شرح تفصيلي بالأمثلة التوضيحية لأي جزئية في الدرس">🧠 الشارح التفصيلي بالأمثلة</span>
-              <span class="meta-badge" onclick="window.Platform.switchLessonTab('socratic')" style="cursor:pointer;" title="الانتقال إلى منصة سقراط التوليدية">🏛️ منصة سقراط الحوارية</span>
-              <span class="meta-badge" onclick="window.Platform.switchLessonTab('tools')" style="cursor:pointer;" title="الانتقال إلى الأدوات والمختبر التفاعلي">🛠️ ${(lesson.lesson_tools && lesson.lesson_tools.title) ? lesson.lesson_tools.title.split('(')[0].trim() : 'أدوات الدرس الذكية'}</span>
-              <span class="meta-badge orange" onclick="window.Platform.switchLessonTab('quiz')" style="cursor:pointer;" title="انقر للانتقال المباشر وحل الاختبار المقنن">📝 الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
-              <span class="meta-badge" onclick="window.Platform.openCurrentLessonHtmlGenerator()" style="cursor:pointer; background:#ecfdf5; color:#065f46; border-color:#a7f3d0;" title="توليد صفحة تفاعلية مستقلة بصيغة HTML">🌐 مولد HTML التفاعلي</span>
+              <span class="meta-badge orange" onclick="window.Platform.switchLessonTab('quiz')" style="cursor:pointer;" title="انقر للانتقال المباشر وحل الاختبار المقنن">📝 الاختبار: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} ص/خ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}</span>
               <span class="meta-badge">💡 إشراف: أ. محمد عبدالله جمعة</span>
             </div>
           </div>
           <div class="lesson-header-actions">
             <button class="nav-btn success" onclick="window.Platform.openCurrentLessonHtmlGenerator()" title="توليد وتصدير صفحة تفاعلية مستقلة بصيغة HTML للدرس تعمل دون إنترنت">🌐 صفحة تفاعلية (HTML)</button>
             ${isG6 ? `<button class="nav-btn" onclick="window.Platform.addAllLessonQuestionsToExam('${lesson.id}')">➕ أضف أسئلة الدرس للاختبار</button>` : ''}
-            <button class="nav-btn primary" onclick="window.print()">🖨️ طباعة كامل الدرس</button>
+            <button class="nav-btn primary" onclick="window.print()">🖨️ طباعة الدرس</button>
           </div>
         </div>
       </div>
 
       <!-- Navigation Tabs for the Lesson -->
-      <div class="lesson-nav-tabs">
-        <button class="lesson-tab-button ${state.activeLessonTab === 'prep' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('prep')">
-          📋 التحضير الميداني الشامل المعتمد
+      <div class="lesson-nav-tabs" role="tablist" aria-label="أقسام الدرس">
+        <button class="lesson-tab-button ${state.activeLessonTab === 'prep' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('prep')" title="التحضير الميداني الشامل المعتمد">
+          📋 التحضير الميداني الشامل
         </button>
-        <button class="lesson-tab-button ${state.activeLessonTab === 'summary' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('summary')">
-          📚 الملخص ومطوية المفاهيم
+        <button class="lesson-tab-button ${state.activeLessonTab === 'summary' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('summary')" title="الملخص ومطوية المفاهيم والقوانين">
+          📚 الملخص والمفاهيم
         </button>
-        <button class="lesson-tab-button ${state.activeLessonTab === 'explain' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('explain')">
-          🧠 الشارح التفصيلي بالأمثلة
+        <button class="lesson-tab-button ${state.activeLessonTab === 'explain' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('explain')" title="الشارح التفصيلي للجزئيات بالأمثلة التوضيحية">
+          🧠 الشارح بالأمثلة
         </button>
-        <button class="lesson-tab-button ${state.activeLessonTab === 'worksheet' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('worksheet')">
-          📄 ورقة العمل الاستقصائية
+        <button class="lesson-tab-button ${state.activeLessonTab === 'worksheet' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('worksheet')" title="ورقة العمل الاستقصائية">
+          📄 ورقة العمل
         </button>
-        <button class="lesson-tab-button ${state.activeLessonTab === 'socratic' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('socratic')">
-          🏛️ منصة سقراط التوليدية (الحوار والاستقصاء)
+        <button class="lesson-tab-button ${state.activeLessonTab === 'socratic' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('socratic')" title="منصة سقراط التوليدية للحوار والاستقصاء المعرفي">
+          🏛️ منصة سقراط التوليدية
         </button>
-        <button class="lesson-tab-button ${state.activeLessonTab === 'tools' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('tools')">
-          🖥️ المختبر والأدوات التفاعلية
+        <button class="lesson-tab-button ${state.activeLessonTab === 'tools' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('tools')" title="${escHtml((lesson.lesson_tools && lesson.lesson_tools.title) || 'المختبر والأدوات التفاعلية')}">
+          🖥️ المختبر التفاعلي
         </button>
-        <button class="lesson-tab-button ${state.activeLessonTab === 'quiz' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('quiz')">
-          📝 الاختبار المقنن (${fmtNum(quiz.mcq.length, true)} اختيارات + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''})
+        <button class="lesson-tab-button ${state.activeLessonTab === 'quiz' ? 'active' : ''}" onclick="window.Platform.switchLessonTab('quiz')" title="الاختبار المقنن: ${fmtNum(quiz.mcq.length, true)} اختيار + ${fmtNum(quiz.tf.length, true)} صواب وخطأ${essays.length ? (' + ' + fmtNum(essays.length, true) + ' مقالي') : ''}">
+          📝 الاختبار المقنن (${fmtNum(totalAutoQ + essays.length, true)})
         </button>
       </div>
 
@@ -1981,6 +2254,8 @@
       qState.correctCount++;
     }
 
+    saveQuizScores();
+    savePlatformState({ updateHash: false });
     renderLessonCockpit();
   }
 
@@ -2011,6 +2286,8 @@
       qState.correctCount++;
     }
 
+    saveQuizScores();
+    savePlatformState({ updateHash: false });
     renderLessonCockpit();
   }
 
@@ -2018,6 +2295,7 @@
     if (state.quizScores[lessonId]) {
       delete state.quizScores[lessonId];
     }
+    saveQuizScores();
     renderLessonCockpit();
   }
 
@@ -2050,6 +2328,8 @@
 
   function switchLessonTab(tabName) {
     state.activeLessonTab = tabName;
+    pendingScrollRestore = null;
+    savePlatformState({ scrollY: 0, updateHash: true });
     triggerFlashTransition();
     renderLessonCockpit();
     setTimeout(() => {
@@ -2062,9 +2342,11 @@
 
   function switchView(viewName) {
     state.activeView = viewName;
+    pendingScrollRestore = null;
     document.querySelectorAll('.view-tab-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.view === viewName);
     });
+    savePlatformState({ scrollY: 0, updateHash: true });
     triggerFlashTransition();
     renderCurrentView();
   }
@@ -2308,7 +2590,16 @@
 
   function toggleTheme() {
     const themeBtn = document.getElementById('btn-theme-toggle');
-    if (themeBtn) themeBtn.click();
+    if (themeBtn && typeof themeBtn.click === 'function') {
+      themeBtn.click();
+      return;
+    }
+    if (typeof document !== 'undefined' && document.body) {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      if (isDark) document.body.removeAttribute('data-theme');
+      else document.body.setAttribute('data-theme', 'dark');
+      savePlatformState({ updateHash: false });
+    }
   }
 
   // Export Platform API
@@ -2321,6 +2612,7 @@
     closeSidebarMobile,
     toggleMobileNav,
     closeMobileNav,
+    toggleMoreMenu,
     openCurrentLessonHtmlGenerator,
     toggleTheme,
     goToPrevLesson,
@@ -2346,7 +2638,16 @@
     closeImageLightbox,
     runToolAction,
     findLessonPath,
-    renderCurrentView
+    renderCurrentView,
+    restorePlatformState,
+    savePlatformState,
+    syncUrlHash,
+    getState: () => ({
+      activeView: state.activeView,
+      currentLessonId: state.currentLessonId,
+      activeLessonTab: state.activeLessonTab,
+      termFilter: state.termFilter
+    })
   };
 
 })();

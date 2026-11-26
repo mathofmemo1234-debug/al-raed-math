@@ -173,12 +173,12 @@ body {
 .platform-navbar {
   background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%);
   color: #ffffff;
-  height: 56px;
-  max-height: 56px;
-  padding: 0 18px;
+  min-height: 56px;
+  padding: 6px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
   position: sticky;
   top: 0;
@@ -321,8 +321,80 @@ body {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+
+.nav-more-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-more-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 228px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  padding: 6px;
+  z-index: 1200;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-more-dropdown.open {
+  display: flex;
+}
+
+.nav-more-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: right;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-more-item:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+[data-theme="dark"] .nav-more-dropdown {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .nav-more-item {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .nav-more-item:hover {
+  background: rgba(59, 130, 246, 0.22);
+  color: #93c5fd;
+}
+
+.barcode-btn {
+  padding: 0 14px !important;
+  min-width: max-content !important;
 }
 
 /* Mobile Hamburger Toggle (hidden by default on desktop) */
@@ -672,9 +744,9 @@ body {
 
 /* ================= Sidebar: Hierarchical Navigation (Light Practical Theme) ================= */
 .app-sidebar {
-  width: 215px;
-  min-width: 215px;
-  max-width: 215px;
+  width: 244px;
+  min-width: 244px;
+  max-width: 244px;
   background-color: #ffffff;
   color: #1e293b;
   border-left: 1.5px solid #e2e8f0;
@@ -876,18 +948,19 @@ body {
 }
 
 .tree-grade-header {
-  padding: 5px 6px;
+  padding: 6px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 6px;
   background: #f8fafc;
-  border: 1px solid #f1f5f9;
+  border: 1px solid #e2e8f0;
   transition: all 0.16s ease;
   user-select: none;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.81rem;
+  font-weight: 800;
   color: #0f172a;
 }
 
@@ -900,20 +973,29 @@ body {
 .tree-grade-title {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.tree-grade-title > span:last-child {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .grade-badge {
-  font-size: 0.6rem;
-  padding: 1px 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
   border-radius: 6px;
   background: #eff6ff;
   color: #1d4ed8;
-  border: 1px solid #dbeafe;
+  border: 1px solid #bfdbfe;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .node-arrow {
@@ -1021,32 +1103,86 @@ body {
   margin-right: 6px;
   padding-right: 4px;
   border-right: 1.5px solid #e2e8f0;
-  margin-top: 2px;
+  margin-top: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tree-chapter-main,
+.tree-lesson-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
+}
+
+.tree-chapter-title,
+.tree-lesson-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-chapter-meta,
+.tree-lesson-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.tree-chapter-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.tree-lesson-num {
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: #1d4ed8;
+  flex-shrink: 0;
+}
+
+.tree-lesson-status {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.tree-lesson-status.completed {
+  color: #15803d;
+}
+
+.tree-lesson-status.roadmap {
+  color: #b45309;
 }
 
 /* Lesson Node Item with Branch Connector */
 .tree-lesson-item {
   position: relative;
-  padding: 4px 6px;
+  padding: 6px 8px;
   margin: 2px 0;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: #475569;
-  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e293b;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 6px;
   transition: all 0.15s ease;
-  line-height: 1.25;
+  line-height: 1.42;
 }
 
 .tree-lesson-item::before {
   content: "";
   position: absolute;
   right: -5.5px;
-  top: 10px;
+  top: 13px;
   width: 4px;
   height: 1.5px;
   background: #e2e8f0;
@@ -1064,6 +1200,11 @@ body {
   font-weight: 800 !important;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
   border-right: 3px solid #1d4ed8;
+}
+
+.tree-lesson-item.active .tree-lesson-num,
+.tree-lesson-item.active .tree-lesson-status {
+  color: #ffffff !important;
 }
 
 .lesson-status-dot {
@@ -1099,7 +1240,7 @@ body {
 [data-theme="dark"] .sidebar-tool-btn {
   background: #334155;
   border-color: #475569;
-  color: #cbd5e1;
+  color: #e2e8f0;
 }
 [data-theme="dark"] .tree-stage-header {
   background: #1e293b;
@@ -1113,7 +1254,19 @@ body {
 [data-theme="dark"] .tree-term-header,
 [data-theme="dark"] .tree-chapter-header,
 [data-theme="dark"] .tree-lesson-item {
+  color: #e2e8f0;
+}
+[data-theme="dark"] .tree-chapter-count {
   color: #cbd5e1;
+}
+[data-theme="dark"] .tree-lesson-num {
+  color: #93c5fd;
+}
+[data-theme="dark"] .tree-lesson-status.completed {
+  color: #86efac;
+}
+[data-theme="dark"] .tree-lesson-status.roadmap {
+  color: #fcd34d;
 }
 [data-theme="dark"] .tree-lesson-item:hover {
   background: rgba(59, 130, 246, 0.18);
@@ -1127,7 +1280,7 @@ body {
 .app-viewport {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 32px;
+  padding: 20px 26px;
   background-color: var(--bg-page);
 }
 
@@ -1136,72 +1289,75 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 10px 14px;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  padding: 8px 14px;
-  margin-bottom: 20px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
   box-shadow: var(--shadow-sm);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.viewport-top-tabs::-webkit-scrollbar {
-  display: none;
 }
 
 .view-switcher-group {
   display: flex;
   gap: 6px;
   align-items: center;
-  flex-wrap: nowrap;
-  white-space: nowrap;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+}
+
+.viewport-print-wrap {
+  display: flex;
+  align-items: center;
+  padding-right: 12px;
+  border-right: 1.5px solid var(--border-light, #e2e8f0);
+  flex-shrink: 0;
 }
 
 .view-tab-btn {
   background: transparent;
   border: 1px solid transparent;
-  padding: 7px 15px;
+  padding: 7px 13px;
+  min-height: 36px;
   font-size: 0.86rem;
   font-weight: 700;
   color: var(--text-muted);
   cursor: pointer;
-  border-radius: 20px;
-  display: flex;
+  border-radius: 10px;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   position: relative;
 }
 
 .view-tab-btn:hover {
   background: rgba(37, 99, 235, 0.08);
   color: #2563eb;
-  transform: translateY(-1px);
 }
 
 .view-tab-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .view-tab-btn.active {
   background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
   color: #ffffff;
   border-color: #3b82f6;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
 }
 
 .viewport-top-tabs .nav-btn {
   background: #ffffff;
   color: var(--text-main, #1e293b);
   border: 1px solid var(--border-light, #e2e8f0);
-  padding: 8px 14px;
+  padding: 7px 14px;
+  min-height: 36px;
   font-size: 0.85rem;
   font-weight: 700;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1218,12 +1374,14 @@ body {
   transform: translateY(-1px);
 }
 
+[data-theme="dark"] .viewport-top-tabs .nav-btn,
 body.dark-mode .viewport-top-tabs .nav-btn {
   background: #1e293b;
   color: #f1f5f9;
   border-color: #334155;
 }
 
+[data-theme="dark"] .viewport-top-tabs .nav-btn:hover,
 body.dark-mode .viewport-top-tabs .nav-btn:hover {
   background: #334155;
   color: #60a5fa;
@@ -1564,46 +1722,61 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 /* ================= Content Tabs inside Lesson ================= */
 .lesson-nav-tabs {
   display: flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
   background: var(--bg-card);
-  padding: 8px;
+  padding: 10px 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-light);
-  margin-bottom: 24px;
-  overflow-x: auto;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 .lesson-tab-button {
-  background: transparent;
-  border: 1px solid transparent;
-  padding: 8px 16px;
-  font-size: 0.88rem;
+  background: var(--bg-surface, #f8fafc);
+  border: 1px solid var(--border-light, #e2e8f0);
+  padding: 8px 14px;
+  min-height: 38px;
+  font-size: 0.86rem;
   font-weight: 700;
-  color: var(--text-muted);
-  border-radius: 20px;
+  color: var(--text-main, #1e293b);
+  border-radius: 10px;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   white-space: nowrap;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
 }
 
 .lesson-tab-button:hover {
-  background: rgba(37, 99, 235, 0.08);
-  color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
   transform: translateY(-1px);
 }
 
 .lesson-tab-button:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .lesson-tab-button.active {
   background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
   color: #ffffff;
-  border-color: #3b82f6;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+}
+
+[data-theme="dark"] .lesson-tab-button {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .lesson-tab-button:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  border-color: #60a5fa;
 }
 
 .tab-pane-content {
@@ -4040,14 +4213,16 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 
 /* Document Sheet (White Official Paper Aesthetic) */
 .prep-document-sheet {
+  width: 100%;
+  box-sizing: border-box;
   background: #ffffff;
   border: 1.5px solid #cbd5e1;
-  border-radius: 12px;
-  padding: 28px 32px;
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  padding: 24px 26px;
+  box-shadow: 0 6px 20px -4px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 20px;
 }
 
 /* Official Header Table */
@@ -4972,12 +5147,9 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 }
 
 /* ==========================================================================
-   Smooth Touch Horizontal Scrolling (Tabs & Toolbars)
+   Smooth Wrapping Toolbars on Desktop + Touch Scroll on Narrow Tabs
    ========================================================================== */
-.lesson-nav-tabs,
-.viewport-top-tabs,
-.term-filter-tabs,
-.view-switcher-group {
+.term-filter-tabs {
   overflow-x: auto !important;
   white-space: nowrap !important;
   -webkit-overflow-scrolling: touch !important;
@@ -4985,10 +5157,15 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
   flex-wrap: nowrap !important;
 }
 
-.lesson-nav-tabs::-webkit-scrollbar,
-.viewport-top-tabs::-webkit-scrollbar,
-.term-filter-tabs::-webkit-scrollbar,
-.view-switcher-group::-webkit-scrollbar {
+.lesson-nav-tabs,
+.viewport-top-tabs,
+.view-switcher-group {
+  flex-wrap: wrap !important;
+  white-space: normal !important;
+  overflow-x: visible !important;
+}
+
+.term-filter-tabs::-webkit-scrollbar {
   display: none !important;
 }
 
@@ -5318,49 +5495,49 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 
 /* 1. Sidebar Membership Status Card */
 .sidebar-member-card {
-  margin: 10px 10px 14px 10px;
-  padding: 11px 13px;
+  margin: 10px 10px 12px 10px;
+  padding: 12px 13px;
   border-radius: 12px;
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  backdrop-filter: blur(8px);
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
   transition: all 0.2s ease;
   font-family: inherit;
 }
 
 .sidebar-member-card.admin {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(217, 119, 6, 0.28));
-  border-color: rgba(245, 158, 11, 0.5);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #f59e0b;
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.14);
 }
 
 .sidebar-member-card.approved {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.25));
-  border-color: rgba(16, 185, 129, 0.45);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border-color: #10b981;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.12);
 }
 
 .sidebar-member-card.pending {
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(217, 119, 6, 0.2));
-  border-color: rgba(249, 115, 22, 0.4);
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border-color: #f97316;
 }
 
 .sidebar-member-card.visitor {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: #f8fafc;
+  border-color: #cbd5e1;
   cursor: pointer;
 }
 .sidebar-member-card.visitor:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(59, 130, 246, 0.5);
+  background: #eff6ff;
+  border-color: #3b82f6;
   transform: translateY(-1px);
 }
 
 .smc-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 5px;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin-bottom: 6px;
 }
 
 .smc-icon {
@@ -5370,47 +5547,90 @@ body.dark-mode .lesson-header-actions .nav-btn.primary:hover {
 
 .smc-title {
   font-weight: 800;
-  font-size: 0.84rem;
-  color: #f8fafc;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.86rem;
+  color: #0f172a;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.sidebar-member-card.admin .smc-title {
+  color: #78350f;
+}
+
+.sidebar-member-card.approved .smc-title {
+  color: #065f46;
+}
+
+.sidebar-member-card.pending .smc-title {
+  color: #9a3412;
 }
 
 .smc-badge {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 10px;
   white-space: nowrap;
 }
 
 .smc-badge.admin {
-  background: #f59e0b;
-  color: #0f172a;
+  background: #d97706;
+  color: #ffffff;
 }
 
 .smc-badge.approved {
-  background: #10b981;
+  background: #059669;
   color: #ffffff;
 }
 
 .smc-badge.pending {
-  background: #f97316;
+  background: #ea580c;
   color: #ffffff;
 }
 
 .smc-badge.visitor {
-  background: rgba(59, 130, 246, 0.25);
-  color: #93c5fd;
-  border: 1px solid rgba(147, 197, 253, 0.4);
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
 }
 
 .smc-desc {
-  font-size: 0.74rem;
-  line-height: 1.5;
-  color: #cbd5e1;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: #334155;
+  font-weight: 600;
+}
+
+.sidebar-member-card.admin .smc-desc {
+  color: #451a03;
+}
+
+.sidebar-member-card.approved .smc-desc {
+  color: #064e3b;
+}
+
+[data-theme="dark"] .sidebar-member-card.admin {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(217, 119, 6, 0.3));
+  border-color: rgba(245, 158, 11, 0.55);
+}
+[data-theme="dark"] .sidebar-member-card.approved {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(5, 150, 105, 0.26));
+  border-color: rgba(16, 185, 129, 0.5);
+}
+[data-theme="dark"] .sidebar-member-card.visitor {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: #334155;
+}
+[data-theme="dark"] .smc-title,
+[data-theme="dark"] .sidebar-member-card.admin .smc-title,
+[data-theme="dark"] .sidebar-member-card.approved .smc-title {
+  color: #f8fafc;
+}
+[data-theme="dark"] .smc-desc,
+[data-theme="dark"] .sidebar-member-card.admin .smc-desc,
+[data-theme="dark"] .sidebar-member-card.approved .smc-desc {
+  color: #e2e8f0;
 }
 
 /* 2. Tree Unlocked Star for Approved Members */

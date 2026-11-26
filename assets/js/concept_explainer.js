@@ -15,6 +15,7 @@
 
   const TEACHER_STORE_KEY = 'alraed_teacher_subtopics_v1';
   const CACHE_STORE_KEY = 'alraed_ce_cache_v2';
+  const CE_NAV_SESSION_KEY = 'alraed_ce_nav_v1';
   const STOP_WORDS = new Set(['في', 'من', 'على', 'إلى', 'عن', 'ما', 'هي', 'هو', 'هذا', 'هذه', 'كيف', 'متى', 'لماذا', 'أو', 'ثم', 'بين', 'مع', 'كل', 'أي', 'لي', 'لـ', 'الدرس', 'جزئية', 'شرح', 'مثال', 'توضيحي', 'تفصيلي', 'اريد', 'أريد', 'اشرح']);
 
   const state = {
@@ -1583,17 +1584,48 @@
     return null;
   }
 
+  function loadSessionNavMap() {
+    try {
+      if (typeof sessionStorage === 'undefined') return {};
+      const raw = sessionStorage.getItem(CE_NAV_SESSION_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveLessonNavState(lessonId) {
+    try {
+      if (typeof sessionStorage === 'undefined' || !state.lessonStates[lessonId]) return;
+      const st = state.lessonStates[lessonId];
+      const map = loadSessionNavMap();
+      map[lessonId] = {
+        selectedSubtopicId: st.selectedSubtopicId || '',
+        altExOffset: st.altExOffset || 0,
+        revealCheck: !!st.revealCheck,
+        queryDraft: st.queryDraft || '',
+        level: st.level || 'متوسط منهجي',
+        hasCustom: !!st.customResult,
+        customResult: st.customResult && st.customResult.source ? st.customResult : null
+      };
+      sessionStorage.setItem(CE_NAV_SESSION_KEY, JSON.stringify(map));
+    } catch (e) {}
+  }
+
   function ensureLessonState(lessonId) {
     if (!state.lessonStates[lessonId]) {
+      const savedMap = loadSessionNavMap();
+      const s = savedMap[lessonId] || {};
       state.lessonStates[lessonId] = {
-        selectedSubtopicId: '',
-        customResult: null,
-        altExOffset: 0,
-        revealCheck: false,
+        selectedSubtopicId: s.selectedSubtopicId || '',
+        customResult: (s.hasCustom && s.customResult) ? s.customResult : null,
+        altExOffset: s.altExOffset || 0,
+        revealCheck: !!s.revealCheck,
         loading: false,
         showTeacherForm: false,
-        queryDraft: '',
-        level: 'متوسط منهجي'
+        queryDraft: s.queryDraft || '',
+        level: s.level || 'متوسط منهجي'
       };
     }
     return state.lessonStates[lessonId];
@@ -1835,24 +1867,28 @@
     st.customResult = null;
     st.altExOffset = 0;
     st.revealCheck = false;
+    saveLessonNavState(lessonId);
     rerenderInDom(lessonId);
   }
 
   function nextExample(lessonId) {
     const st = ensureLessonState(lessonId);
     st.altExOffset = (st.altExOffset || 0) + 1;
+    saveLessonNavState(lessonId);
     rerenderInDom(lessonId);
   }
 
   function toggleQuickCheck(lessonId) {
     const st = ensureLessonState(lessonId);
     st.revealCheck = !st.revealCheck;
+    saveLessonNavState(lessonId);
     rerenderInDom(lessonId);
   }
 
   function updateDraft(lessonId, val) {
     const st = ensureLessonState(lessonId);
     st.queryDraft = String(val || '');
+    saveLessonNavState(lessonId);
   }
 
   function toggleTeacherForm(lessonId, show) {
@@ -1954,6 +1990,7 @@
       st.customResult = solvedEntry;
       st.altExOffset = 0;
       st.revealCheck = false;
+      saveLessonNavState(lessonId);
       rerenderInDom(lessonId);
       return solvedEntry;
     }
@@ -2020,6 +2057,7 @@
             st.altExOffset = 0;
             st.revealCheck = false;
             setCachedExplanation(cacheKey, aiEntry);
+            saveLessonNavState(lessonId);
             rerenderInDom(lessonId);
             return aiEntry;
           }
@@ -2034,6 +2072,7 @@
     st.customResult = localEntry;
     st.altExOffset = 0;
     st.revealCheck = false;
+    saveLessonNavState(lessonId);
     rerenderInDom(lessonId);
     return localEntry;
   }
